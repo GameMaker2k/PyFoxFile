@@ -13,7 +13,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: pyshell-old.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: pyshell-old.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
@@ -22,9 +22,9 @@ import traceback
 import code
 import re
 import readline
-import pycatfile
+import pyarchivefile
 from sys import argv
-from pycatfile import *
+from pyarchivefile import *
 
 taskfound = False
 if(len(sys.argv) < 2):
@@ -34,7 +34,7 @@ if(len(sys.argv) < 2):
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform +
-          "\nLoaded Python module PyCatFile "+pycatfile.__version__+"\n")
+          "\nLoaded Python module PyArchiveFile "+pyarchivefile.__version__+"\n")
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)
@@ -59,7 +59,7 @@ if(sys.argv[1] == "sh" or sys.argv[1] == "shell" or sys.argv[1] == "pysh" or sys
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform +
-          "\nLoaded Python module PyCatFile "+pycatfile.__version__+"\n")
+          "\nLoaded Python module PyArchiveFile "+pyarchivefile.__version__+"\n")
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)

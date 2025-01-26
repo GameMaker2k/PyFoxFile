@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-function PackCatFile {
+function PackArchiveFile {
  shopt -s globstar
  declare -A inodetofile
  declare -i curinode=0
  numfiles=$(find "${1}" -mindepth 1 -type f,l,c,b,d,p -print | wc -l)
- printf 'CatFile1\x00%s\x00' "${numfiles}" > "${2}"
+ printf 'ArchiveFile1\x00%s\x00' "${numfiles}" > "${2}"
  tmpfile=$(mktemp)
  
  for file in "${1}"/**; do
@@ -54,19 +54,19 @@ function PackCatFile {
   # Calculate checksums
   if [ "${4}" == "none" ]; then
     echo -n "none\x00" > "$tmpfile"  # Writing directly to temporary file
-    catfileheadercshex="0"
-    catfilecontentcshex="0"
+    archivefileheadercshex="0"
+    archivefilecontentcshex="0"
   elif [ -z "${4}" ] || [ "${4}" == "crc32" ]; then
-    catfileheadercshex=$(crc32 "$tmpfile" | cut -d ' ' -f 1)
-    catfilecontentcshex=$(if [ -f "$fname" ]; then crc32 "$fname"; else crc32 /dev/null; fi | cut -d ' ' -f 1)
+    archivefileheadercshex=$(crc32 "$tmpfile" | cut -d ' ' -f 1)
+    archivefilecontentcshex=$(if [ -f "$fname" ]; then crc32 "$fname"; else crc32 /dev/null; fi | cut -d ' ' -f 1)
   else
     checksum_command="${4}sum"
-    catfileheadercshex=$($checksum_command "$tmpfile" | cut -d ' ' -f 1)
-    catfilecontentcshex=$(if [ -f "$fname" ]; then $checksum_command "$fname"; else $checksum_command /dev/null; fi | cut -d ' ' -f 1)
+    archivefileheadercshex=$($checksum_command "$tmpfile" | cut -d ' ' -f 1)
+    archivefilecontentcshex=$(if [ -f "$fname" ]; then $checksum_command "$fname"; else $checksum_command /dev/null; fi | cut -d ' ' -f 1)
   fi
   
   cat "$tmpfile" >> "${2}"
-  printf "%s\x00%s\x00" "$catfileheadercshex" "$catfilecontentcshex" >> "${2}"
+  printf "%s\x00%s\x00" "$archivefileheadercshex" "$archivefilecontentcshex" >> "${2}"
   [ -f "$fname" ] && cat "$fname" >> "${2}"
   printf '\x00' >> "${2}"
  done
@@ -86,4 +86,4 @@ function PackCatFile {
  esac
 }
 
-PackCatFile "${1}" "${2}" "${3}" "${4}"
+PackArchiveFile "${1}" "${2}" "${3}" "${4}"

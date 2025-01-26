@@ -14,7 +14,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: pycatfile.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: pyarchivefile.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
@@ -260,7 +260,7 @@ __use_pysftp__ = False
 __use_alt_format__ = False
 __use_env_file__ = True
 __use_ini_file__ = True
-__use_ini_name__ = "catfile.ini"
+__use_ini_name__ = "archivefile.ini"
 if('PYCATFILE_CONFIG_FILE' in os.environ and os.path.exists(os.environ['PYCATFILE_CONFIG_FILE']) and __use_env_file__):
     scriptconf = os.environ['PYCATFILE_CONFIG_FILE']
 else:
@@ -283,7 +283,7 @@ if(__use_http_lib__ == "requests" and havehttpx and not haverequests):
 if((__use_http_lib__ == "httpx" or __use_http_lib__ == "requests") and not havehttpx and not haverequests):
     __use_http_lib__ = "urllib"
 __file_format_multi_dict__ = {}
-__file_format_default__ = "CatFile"
+__file_format_default__ = "ArchiveFile"
 __include_defaults__ = True
 __program_name__ = "Py"+__file_format_default__
 if __use_ini_file__ and os.path.exists(__config_file__):
@@ -314,20 +314,8 @@ elif __use_ini_file__ and not os.path.exists(__config_file__):
 if not __use_ini_file__ and not __include_defaults__:
     __include_defaults__ = True
 if(__include_defaults__):
-    if("CatFile" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'CatFile': {'format_name': "CatFile", 'format_magic': "CatFile", 'format_lower': "catfile", 'format_len': 7, 'format_hex': "43617446696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".cat" } } )
-    if("NekoFile" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'NekoFile': {'format_name': "NekoFile", 'format_magic': "NekoFile", 'format_lower': "nekofile", 'format_len': 8, 'format_hex': "4e656b6f46696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".neko" } } )
-    if("ねこファイル" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'ねこファイル': {'format_name': "NekoFairu", 'format_magic': "ねこファイル", 'format_lower': "nekofairu", 'format_len': 18, 'format_hex': "e381ade38193e38395e382a1e382a4e383ab", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".ねこ" } } )
-    if("네코파일" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { '네코파일': {'format_name': "NekoPa-il", 'format_magic': "네코파일", 'format_lower': "nekopa-il", 'format_len': 12, 'format_hex': "eb84a4ecbd94ed8c8cec9dbc", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".네코" } } )
-    if("고양이파일" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { '고양이파일': {'format_name': "GoyangiPa-il", 'format_magic': "고양이파일", 'format_lower': "goyangipa-il", 'format_len': 15, 'format_hex': "eab3a0ec9691ec9db4ed8c8cec9dbc", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".고양이" } } )
-    if("内酷法伊鲁" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { '内酷法伊鲁': {'format_name': "NèiKùFǎYīLǔ", 'format_magic': "内酷法伊鲁", 'format_lower': "nèikùfǎyīlǔ", 'format_len': 15, 'format_hex': "e58685e985b7e6b395e4bc8ae9b281", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".内酷" } } )
-    if("猫文件" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { '猫文件': {'format_name': "MāoWénjiàn", 'format_magic': "猫文件", 'format_lower': "māowénjiàn", 'format_len': 9, 'format_hex': "e78cabe69687e4bbb6", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".猫" } } )
+    if("ArchiveFile" not in __file_format_multi_dict__):
+        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_lower': "archivefile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".cat" } } )
 if(__file_format_default__ not in __file_format_multi_dict__):
     __file_format_default__ = next(iter(__file_format_multi_dict__))
 __file_format_name__ = __file_format_multi_dict__[__file_format_default__]['format_name']
@@ -343,13 +331,13 @@ __use_alt_inode__ = __file_format_multi_dict__[__file_format_default__]['use_alt
 __file_format_extension__ = __file_format_multi_dict__[__file_format_default__]['format_extension']
 __file_format_dict__ = __file_format_multi_dict__[__file_format_default__]
 __project__ = __program_name__
-__project_url__ = "https://github.com/GameMaker2k/PyCatFile"
-__version_info__ = (0, 17, 2, "RC 1", 1)
-__version_date_info__ = (2025, 1, 24, "RC 1", 1)
+__project_url__ = "https://github.com/GameMaker2k/PyArchiveFile"
+__version_info__ = (0, 17, 4, "RC 1", 1)
+__version_date_info__ = (2025, 1, 26, "RC 1", 1)
 __version_date__ = str(__version_date_info__[0]) + "." + str(
     __version_date_info__[1]).zfill(2) + "." + str(__version_date_info__[2]).zfill(2)
 __revision__ = __version_info__[3]
-__revision_id__ = "$Id: af35b5794147adcfb397ca7e5c0e946262164e25 $"
+__revision_id__ = "$Id$"
 if(__version_info__[4] is not None):
     __version_date_plusrc__ = __version_date__ + \
         "-" + str(__version_date_info__[4])
@@ -370,19 +358,19 @@ elif(PyBitness == "64bit" or PyBitness == "64"):
 else:
     PyBitness = "32"
 
-geturls_ua_pycatfile_python = "Mozilla/5.0 (compatible; {proname}/{prover}; +{prourl})".format(
+geturls_ua_pyarchivefile_python = "Mozilla/5.0 (compatible; {proname}/{prover}; +{prourl})".format(
     proname=__project__, prover=__version__, prourl=__project_url__)
 if(platform.python_implementation() != ""):
     py_implementation = platform.python_implementation()
 if(platform.python_implementation() == ""):
     py_implementation = "Python"
-geturls_ua_pycatfile_python_alt = "Mozilla/5.0 ({osver}; {archtype}; +{prourl}) {pyimp}/{pyver} (KHTML, like Gecko) {proname}/{prover}".format(osver=platform.system(
+geturls_ua_pyarchivefile_python_alt = "Mozilla/5.0 ({osver}; {archtype}; +{prourl}) {pyimp}/{pyver} (KHTML, like Gecko) {proname}/{prover}".format(osver=platform.system(
 )+" "+platform.release(), archtype=platform.machine(), prourl=__project_url__, pyimp=py_implementation, pyver=platform.python_version(), proname=__project__, prover=__version__)
 geturls_ua_googlebot_google = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 geturls_ua_googlebot_google_old = "Googlebot/2.1 (+http://www.google.com/bot.html)"
-geturls_headers_pycatfile_python = {'Referer': "http://google.com/", 'User-Agent': geturls_ua_pycatfile_python, 'Accept-Encoding': "none", 'Accept-Language': "en-US,en;q=0.8,en-CA,en-GB;q=0.6", 'Accept-Charset': "ISO-8859-1,ISO-8859-15,UTF-8;q=0.7,*;q=0.7", 'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 'Connection': "close",
+geturls_headers_pyarchivefile_python = {'Referer': "http://google.com/", 'User-Agent': geturls_ua_pyarchivefile_python, 'Accept-Encoding': "none", 'Accept-Language': "en-US,en;q=0.8,en-CA,en-GB;q=0.6", 'Accept-Charset': "ISO-8859-1,ISO-8859-15,UTF-8;q=0.7,*;q=0.7", 'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 'Connection': "close",
                                     'SEC-CH-UA': "\""+__project__+"\";v=\""+str(__version__)+"\", \"Not;A=Brand\";v=\"8\", \""+py_implementation+"\";v=\""+str(platform.release())+"\"", 'SEC-CH-UA-FULL-VERSION': str(__version__), 'SEC-CH-UA-PLATFORM': ""+py_implementation+"", 'SEC-CH-UA-ARCH': ""+platform.machine()+"", 'SEC-CH-UA-PLATFORM': str(__version__), 'SEC-CH-UA-BITNESS': str(PyBitness)}
-geturls_headers_pycatfile_python_alt = {'Referer': "http://google.com/", 'User-Agent': geturls_ua_pycatfile_python_alt, 'Accept-Encoding': "none", 'Accept-Language': "en-US,en;q=0.8,en-CA,en-GB;q=0.6", 'Accept-Charset': "ISO-8859-1,ISO-8859-15,UTF-8;q=0.7,*;q=0.7", 'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 'Connection': "close",
+geturls_headers_pyarchivefile_python_alt = {'Referer': "http://google.com/", 'User-Agent': geturls_ua_pyarchivefile_python_alt, 'Accept-Encoding': "none", 'Accept-Language': "en-US,en;q=0.8,en-CA,en-GB;q=0.6", 'Accept-Charset': "ISO-8859-1,ISO-8859-15,UTF-8;q=0.7,*;q=0.7", 'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 'Connection': "close",
                                         'SEC-CH-UA': "\""+__project__+"\";v=\""+str(__version__)+"\", \"Not;A=Brand\";v=\"8\", \""+py_implementation+"\";v=\""+str(platform.release())+"\"", 'SEC-CH-UA-FULL-VERSION': str(__version__), 'SEC-CH-UA-PLATFORM': ""+py_implementation+"", 'SEC-CH-UA-ARCH': ""+platform.machine()+"", 'SEC-CH-UA-PLATFORM': str(__version__), 'SEC-CH-UA-BITNESS': str(PyBitness)}
 geturls_headers_googlebot_google = {'Referer': "http://google.com/", 'User-Agent': geturls_ua_googlebot_google, 'Accept-Encoding': "none", 'Accept-Language': "en-US,en;q=0.8,en-CA,en-GB;q=0.6",
                                     'Accept-Charset': "ISO-8859-1,ISO-8859-15,UTF-8;q=0.7,*;q=0.7", 'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", 'Connection': "close"}
@@ -505,7 +493,7 @@ if __name__ == "__main__":
     if(os.sep == "\\"):
         curscrpath = curscrpath.replace(os.sep, "/")
     curscrpath = curscrpath + "/"
-    scrfile = curscrpath + "catfile.py"
+    scrfile = curscrpath + "archivefile.py"
     if(os.path.exists(scrfile) and os.path.isfile(scrfile)):
         scrcmd = subprocess.Popen([sys.executable, scrfile] + sys.argv[1:])
         scrcmd.wait()
@@ -1798,9 +1786,9 @@ def GetFileChecksum(instr, checksumtype="crc32", encodedata=True, formatspecs=__
 
 
 def ValidateHeaderChecksum(inlist=[], checksumtype="crc32", inchecksum="0", formatspecs=__file_format_dict__):
-    catfileheadercshex = GetHeaderChecksum(
+    archivefileheadercshex = GetHeaderChecksum(
         inlist, checksumtype, True, formatspecs).lower()
-    return inchecksum.lower() == catfileheadercshex
+    return inchecksum.lower() == archivefileheadercshex
 
 
 def ValidateFileChecksum(infile, checksumtype="crc32", inchecksum="0", formatspecs=__file_format_dict__):
@@ -3111,19 +3099,19 @@ def AppendFileHeader(fp, numfiles, fencoding, extradata=[], checksumtype="crc32"
             extradata, formatspecs['format_delimiter'])
     fnumfilesa = fnumfilesa + \
         AppendNullByte(checksumtype, formatspecs['format_delimiter'])
-    catfileheadercshex = GetFileChecksum(
+    archivefileheadercshex = GetFileChecksum(
         fnumfilesa, checksumtype, True, formatspecs)
     tmpfileoutstr = fnumfilesa + \
-        AppendNullByte(catfileheadercshex,
+        AppendNullByte(archivefileheadercshex,
                         formatspecs['format_delimiter'])
     catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
     fnumfilesa = fileheader + \
         AppendNullByte(
         catheaersize, formatspecs['format_delimiter']) + fnumfilesa
-    catfileheadercshex = GetFileChecksum(
+    archivefileheadercshex = GetFileChecksum(
         fnumfilesa, checksumtype, True, formatspecs)
     fnumfilesa = fnumfilesa + \
-        AppendNullByte(catfileheadercshex, formatspecs['format_delimiter'])
+        AppendNullByte(archivefileheadercshex, formatspecs['format_delimiter'])
     catheaersize = format(int(len(fnumfilesa) - len(formatspecs['format_delimiter'])), 'x').lower()
     catheaersizestr = AppendNullByte(catheaersize, formatspecs['format_delimiter'])
     try:
@@ -3252,41 +3240,41 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     catoutlist.insert(0, catoutlenhex)
     catoutlist.append(extrasizelen)
     catoutlist.append(extrafields)
-    catfileoutstr = AppendNullBytes(
+    archivefileoutstr = AppendNullBytes(
         catoutlist, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
-        catfileoutstr = catfileoutstr + \
+        archivefileoutstr = archivefileoutstr + \
             AppendNullBytes(extradata, formatspecs['format_delimiter'])
     if(len(filecontent) == 0):
         checksumlist = [checksumtype[0], "none"]
     else:
         checksumlist = checksumtype
-    catfileoutstr = catfileoutstr + \
+    archivefileoutstr = archivefileoutstr + \
         AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
-    catfileheadercshex = GetFileChecksum(
-        catfileoutstr, checksumtype[0], True, formatspecs)
+    archivefileheadercshex = GetFileChecksum(
+        archivefileoutstr, checksumtype[0], True, formatspecs)
     if(len(filecontent) == 0):
-        catfilecontentcshex = GetFileChecksum(
+        archivefilecontentcshex = GetFileChecksum(
             filecontent, "none", False, formatspecs)
     else:
-        catfilecontentcshex = GetFileChecksum(
+        archivefilecontentcshex = GetFileChecksum(
             filecontent, checksumtype[1], False, formatspecs)
-    tmpfileoutstr = catfileoutstr + \
-        AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+    tmpfileoutstr = archivefileoutstr + \
+        AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                         formatspecs['format_delimiter'])
     catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-    catfileoutstr = AppendNullByte(
-        catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-    catfileheadercshex = GetFileChecksum(
-        catfileoutstr, checksumtype[0], True, formatspecs)
-    catfileoutstr = catfileoutstr + \
-        AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+    archivefileoutstr = AppendNullByte(
+        catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+    archivefileheadercshex = GetFileChecksum(
+        archivefileoutstr, checksumtype[0], True, formatspecs)
+    archivefileoutstr = archivefileoutstr + \
+        AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                         formatspecs['format_delimiter'])
-    catfileoutstrecd = catfileoutstr
+    archivefileoutstrecd = archivefileoutstr
     nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
-    catfileout = catfileoutstrecd + filecontent + nullstrecd
+    archivefileout = archivefileoutstrecd + filecontent + nullstrecd
     try:
-        fp.write(catfileout)
+        fp.write(archivefileout)
     except OSError:
         return False
     try:
@@ -7545,8 +7533,8 @@ def ArchiveFileStringToArray(catstr, seekstart=0, seekend=0, listonly=False, con
     if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
         formatspecs = formatspecs[checkcompressfile]
     fp = BytesIO(catstr)
-    listcatfiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
-    return listcatfiles
+    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
+    return listarchivefiles
 
 
 def TarFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, returnfp=False):
@@ -7556,8 +7544,8 @@ def TarFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile
     fp = BytesIO()
     fp = PackArchiveFileFromTarFile(
         infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-    listcatfiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
-    return listcatfiles
+    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
+    return listarchivefiles
 
 
 def ZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, returnfp=False):
@@ -7567,8 +7555,8 @@ def ZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile
     fp = BytesIO()
     fp = PackArchiveFileFromZipFile(
         infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-    listcatfiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
-    return listcatfiles
+    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
+    return listarchivefiles
 
 
 if(not rarfile_support):
@@ -7583,8 +7571,8 @@ if(rarfile_support):
         fp = BytesIO()
         fp = PackArchiveFileFromRarFile(
             infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-        listcatfiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
-        return listcatfiles
+        listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
+        return listarchivefiles
 
 if(not py7zr_support):
     def SevenZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, returnfp=False):
@@ -7598,8 +7586,8 @@ if(py7zr_support):
         fp = BytesIO()
         fp = PackArchiveFileFromSevenZipFile(
             infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-        listcatfiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
-        return listcatfiles
+        listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, returnfp)
+        return listarchivefiles
 
 
 def InFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, returnfp=False):
@@ -7681,23 +7669,23 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
     fnumfileshex = format(int(fnumfiles), 'x').lower()
     fostype = platform.system()
     fhencoding = "UTF-8"
-    tmpcatfile = BytesIO()
-    AppendFileHeader(tmpcatfile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
-    tmpcatfile.seek(0, 0)
+    tmparchivefile = BytesIO()
+    AppendFileHeader(tmparchivefile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
+    tmparchivefile.seek(0, 0)
     catheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-    catstring = tmpcatfile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
+    catstring = tmparchivefile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
     catdelszie = len(formatspecs['format_delimiter'])
-    catdel = tmpcatfile.read(catdelszie).decode("UTF-8")
+    catdel = tmparchivefile.read(catdelszie).decode("UTF-8")
     if(catstring != formatspecs['format_magic']+catheaderver):
         return False
     if(catdel != formatspecs['format_delimiter']):
         return False
     if(formatspecs['new_style']):
         catheader = ReadFileHeaderDataBySize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     else:
         catheader = ReadFileHeaderDataWoSize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     fnumextrafieldsize = int(catheader[5], 16)
     fnumextrafields = int(catheader[6], 16)
     fextrafieldslist = []
@@ -7719,14 +7707,14 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
     newfcs = GetHeaderChecksum([catstring] + catheader[:-1], fprechecksumtype, True, formatspecs)
     if(not headercheck):
         return False
-    fileheader = tmpcatfile.read()
-    tmpcatfile.close()
+    fileheader = tmparchivefile.read()
+    tmparchivefile.close()
     catversions = re.search('(.*?)(\\d+)', catstring).groups()
-    catfileheadercshex = GetFileChecksum(
+    archivefileheadercshex = GetFileChecksum(
         fileheader, checksumtype[0], False, formatspecs)
     fheadtell = len(fileheader)
     catlist = {'fnumfiles': fnumfiles, 'fformat': catversions[0], 'fcompression': "", 'fencoding': fhencoding, 'fversion': catversions[1], 'fostype': fostype,
-               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': catfileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
+               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': archivefileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
     FullSizeFilesAlt = 0
     for curfname in GetDirList:
         catfhstart = fheadtell
@@ -7889,47 +7877,47 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
         catoutlen = len(catoutlist) + len(extradata) + 3
         catoutlenhex = format(catoutlen, 'x').lower()
         catoutlist.insert(0, catoutlenhex)
-        catfileoutstr = AppendNullBytes(
+        archivefileoutstr = AppendNullBytes(
             catoutlist, formatspecs['format_delimiter'])
         catheaderdata = catoutlist
         if(len(extradata) > 0):
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(extradata, formatspecs['format_delimiter'])
         if(fsize == 0):
             checksumlist = [checksumtype[1], "none"]
         else:
             checksumlist = [checksumtype[1], checksumtype[2]]
-        catfileoutstr = catfileoutstr + \
+        archivefileoutstr = archivefileoutstr + \
             AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
         catfnumfields = catoutlen
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
         fcontents.seek(0, 0)
         if(fsize == 0):
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), "none", False, formatspecs)
         else:
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), checksumtype[2], False, formatspecs)
-        tmpfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        tmpfileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
         catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-        catfileoutstr = AppendNullByte(
-            catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
-        catfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        archivefileoutstr = AppendNullByte(
+            catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
+        archivefileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
-        catfileoutstrecd = catfileoutstr
+        archivefileoutstrecd = archivefileoutstr
         nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
         catfcontentstart = fheadtell
-        fheadtell += len(catfileoutstr) + 1
+        fheadtell += len(archivefileoutstr) + 1
         catfcontentend = fheadtell - 1
         catfhend = catfcontentend
         fcontents.seek(0, 0)
-        catfileout = catfileoutstrecd + fcontents.read() + nullstrecd
+        archivefileout = archivefileoutstrecd + fcontents.read() + nullstrecd
         pyhascontents = False
         if(int(fsize) > 0 and not listonly):
             pyhascontents = True
@@ -7940,7 +7928,7 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
         if(not contentasfile):
             fcontents = fcontents.read()
         catlist['ffilelist'].append({'fid': fileidnum, 'fidalt': fileidnum, 'fheadersize': int(catheaersize, 16), 'fhstart': catfhstart, 'fhend': catfhend, 'ftype': ftype, 'fencoding': fencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-                                     'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(catfileheadercshex, 16), 'fcontentchecksum': int(catfilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
+                                     'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(archivefileheadercshex, 16), 'fcontentchecksum': int(archivefilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
         fileidnum = fileidnum + 1
     return catlist
 
@@ -8025,23 +8013,23 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
     fnumfileshex = format(int(fnumfiles), 'x').lower()
     fostype = platform.system()
     fhencoding = "UTF-8"
-    tmpcatfile = BytesIO()
-    AppendFileHeader(tmpcatfile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
-    tmpcatfile.seek(0, 0)
+    tmparchivefile = BytesIO()
+    AppendFileHeader(tmparchivefile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
+    tmparchivefile.seek(0, 0)
     catheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-    catstring = tmpcatfile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
+    catstring = tmparchivefile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
     catdelszie = len(formatspecs['format_delimiter'])
-    catdel = tmpcatfile.read(catdelszie).decode("UTF-8")
+    catdel = tmparchivefile.read(catdelszie).decode("UTF-8")
     if(catstring != formatspecs['format_magic']+catheaderver):
         return False
     if(catdel != formatspecs['format_delimiter']):
         return False
     if(formatspecs['new_style']):
         catheader = ReadFileHeaderDataBySize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     else:
         catheader = ReadFileHeaderDataWoSize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     fnumextrafieldsize = int(catheader[5], 16)
     fnumextrafields = int(catheader[6], 16)
     fextrafieldslist = []
@@ -8063,14 +8051,14 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
     newfcs = GetHeaderChecksum([catstring] + catheader[:-1], fprechecksumtype, True, formatspecs)
     if(not headercheck):
         return False
-    fileheader = tmpcatfile.read()
-    tmpcatfile.close()
+    fileheader = tmparchivefile.read()
+    tmparchivefile.close()
     catversions = re.search('(.*?)(\\d+)', catstring).groups()
-    catfileheadercshex = GetFileChecksum(
+    archivefileheadercshex = GetFileChecksum(
         fileheader, checksumtype[0], False, formatspecs)
     fheadtell = len(fileheader)
     catlist = {'fnumfiles': fnumfiles, 'fformat': catversions[0], 'fcompression': "", 'fencoding': fhencoding, 'fversion': catversions[1], 'fostype': fostype,
-               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': catfileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
+               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': archivefileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
     for member in sorted(tarfp.getmembers(), key=lambda x: x.name):
         catfhstart = fheadtell
         fencoding = "UTF-8"
@@ -8176,47 +8164,47 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         catoutlen = len(catoutlist) + len(extradata) + 3
         catoutlenhex = format(catoutlen, 'x').lower()
         catoutlist.insert(0, catoutlenhex)
-        catfileoutstr = AppendNullBytes(
+        archivefileoutstr = AppendNullBytes(
             catoutlist, formatspecs['format_delimiter'])
         catheaderdata = catoutlist
         if(len(extradata) > 0):
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(extradata, formatspecs['format_delimiter'])
         if(fsize == 0):
             checksumlist = [checksumtype[1], "none"]
         else:
             checksumlist = [checksumtype[1], checksumtype[2]]
-        catfileoutstr = catfileoutstr + \
+        archivefileoutstr = archivefileoutstr + \
             AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
         catfnumfields = catoutlen
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
         fcontents.seek(0, 0)
         if(fsize == 0):
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), "none", False, formatspecs)
         else:
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), checksumtype[2], False, formatspecs)
-        tmpfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        tmpfileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
         catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-        catfileoutstr = AppendNullByte(
-            catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
-        catfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        archivefileoutstr = AppendNullByte(
+            catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
+        archivefileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
-        catfileoutstrecd = catfileoutstr
+        archivefileoutstrecd = archivefileoutstr
         nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
         catfcontentstart = fheadtell
-        fheadtell += len(catfileoutstr) + 1
+        fheadtell += len(archivefileoutstr) + 1
         catfcontentend = fheadtell - 1
         catfhend = catfcontentend
         fcontents.seek(0, 0)
-        catfileout = catfileoutstrecd + fcontents.read() + nullstrecd
+        archivefileout = archivefileoutstrecd + fcontents.read() + nullstrecd
         pyhascontents = False
         if(int(fsize) > 0 and not listonly):
             pyhascontents = True
@@ -8227,7 +8215,7 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         if(not contentasfile):
             fcontents = fcontents.read()
         catlist['ffilelist'].append({'fid': fileidnum, 'fidalt': fileidnum, 'fheadersize': int(catheaersize, 16), 'fhstart': catfhstart, 'fhend': catfhend, 'ftype': ftype, 'fencoding': fencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-                                    'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(catfileheadercshex, 16), 'fcontentchecksum': int(catfilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
+                                    'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(archivefileheadercshex, 16), 'fcontentchecksum': int(archivefilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
         fileidnum = fileidnum + 1
     return catlist
 
@@ -8284,23 +8272,23 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
     fnumfileshex = format(int(fnumfiles), 'x').lower()
     fostype = platform.system()
     fhencoding = "UTF-8"
-    tmpcatfile = BytesIO()
-    AppendFileHeader(tmpcatfile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
-    tmpcatfile.seek(0, 0)
+    tmparchivefile = BytesIO()
+    AppendFileHeader(tmparchivefile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
+    tmparchivefile.seek(0, 0)
     catheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-    catstring = tmpcatfile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
+    catstring = tmparchivefile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
     catdelszie = len(formatspecs['format_delimiter'])
-    catdel = tmpcatfile.read(catdelszie).decode("UTF-8")
+    catdel = tmparchivefile.read(catdelszie).decode("UTF-8")
     if(catstring != formatspecs['format_magic']+catheaderver):
         return False
     if(catdel != formatspecs['format_delimiter']):
         return False
     if(formatspecs['new_style']):
         catheader = ReadFileHeaderDataBySize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     else:
         catheader = ReadFileHeaderDataWoSize(
-            tmpcatfile, formatspecs['format_delimiter'])
+            tmparchivefile, formatspecs['format_delimiter'])
     fnumextrafieldsize = int(catheader[5], 16)
     fnumextrafields = int(catheader[6], 16)
     fextrafieldslist = []
@@ -8322,14 +8310,14 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
     newfcs = GetHeaderChecksum([catstring] + catheader[:-1], fprechecksumtype, True, formatspecs)
     if(not headercheck):
         return False
-    fileheader = tmpcatfile.read()
-    tmpcatfile.close()
+    fileheader = tmparchivefile.read()
+    tmparchivefile.close()
     catversions = re.search('(.*?)(\\d+)', catstring).groups()
-    catfileheadercshex = GetFileChecksum(
+    archivefileheadercshex = GetFileChecksum(
         fileheader, checksumtype[0], False, formatspecs)
     fheadtell = len(fileheader)
     catlist = {'fnumfiles': fnumfiles, 'fformat': catversions[0], 'fcompression': "", 'fencoding': fhencoding, 'fversion': catversions[1], 'fostype': fostype,
-               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': catfileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
+               'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': archivefileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
     for member in sorted(zipfp.infolist(), key=lambda x: x.filename):
         catfhstart = fheadtell
         fencoding = "UTF-8"
@@ -8458,47 +8446,47 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         catoutlen = len(catoutlist) + len(extradata) + 3
         catoutlenhex = format(catoutlen, 'x').lower()
         catoutlist.insert(0, catoutlenhex)
-        catfileoutstr = AppendNullBytes(
+        archivefileoutstr = AppendNullBytes(
             catoutlist, formatspecs['format_delimiter'])
         catheaderdata = catoutlist
         if(len(extradata) > 0):
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(extradata, formatspecs['format_delimiter'])
         if(fsize == 0):
             checksumlist = [checksumtype[1], "none"]
         else:
             checksumlist = [checksumtype[1], checksumtype[2]]
-        catfileoutstr = catfileoutstr + \
+        archivefileoutstr = archivefileoutstr + \
             AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
         catfnumfields = catoutlen
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
         fcontents.seek(0, 0)
         if(fsize == 0):
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), "none", False, formatspecs)
         else:
-            catfilecontentcshex = GetFileChecksum(
+            archivefilecontentcshex = GetFileChecksum(
                 fcontents.read(), checksumtype[2], False, formatspecs)
-        tmpfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        tmpfileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
         catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-        catfileoutstr = AppendNullByte(
-            catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-        catfileheadercshex = GetFileChecksum(
-            catfileoutstr, checksumtype[1], True, formatspecs)
-        catfileoutstr = catfileoutstr + \
-            AppendNullBytes([catfileheadercshex, catfilecontentcshex],
+        archivefileoutstr = AppendNullByte(
+            catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+        archivefileheadercshex = GetFileChecksum(
+            archivefileoutstr, checksumtype[1], True, formatspecs)
+        archivefileoutstr = archivefileoutstr + \
+            AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
                             formatspecs['format_delimiter'])
-        catfileoutstrecd = catfileoutstr
+        archivefileoutstrecd = archivefileoutstr
         nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
         catfcontentstart = fheadtell
-        fheadtell += len(catfileoutstr) + 1
+        fheadtell += len(archivefileoutstr) + 1
         catfcontentend = fheadtell - 1
         catfhend = catfcontentend
         fcontents.seek(0, 0)
-        catfileout = catfileoutstrecd + fcontents.read() + nullstrecd
+        archivefileout = archivefileoutstrecd + fcontents.read() + nullstrecd
         pyhascontents = False
         if(int(fsize) > 0 and not listonly):
             pyhascontents = True
@@ -8509,7 +8497,7 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         if(not contentasfile):
             fcontents = fcontents.read()
         catlist['ffilelist'].append({'fid': fileidnum, 'fidalt': fileidnum, 'fheadersize': int(catheaersize, 16), 'fhstart': catfhstart, 'fhend': catfhend, 'ftype': ftype, 'fencoding': fencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-                                    'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(catfileheadercshex, 16), 'fcontentchecksum': int(catfilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
+                                    'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(archivefileheadercshex, 16), 'fcontentchecksum': int(archivefilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
         fileidnum = fileidnum + 1
     return catlist
 
@@ -8549,23 +8537,23 @@ if(rarfile_support):
         fnumfileshex = format(int(fnumfiles), 'x').lower()
         fostype = platform.system()
         fhencoding = "UTF-8"
-        tmpcatfile = BytesIO()
-        AppendFileHeader(tmpcatfile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
-        tmpcatfile.seek(0, 0)
+        tmparchivefile = BytesIO()
+        AppendFileHeader(tmparchivefile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
+        tmparchivefile.seek(0, 0)
         catheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-        catstring = tmpcatfile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
+        catstring = tmparchivefile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
         catdelszie = len(formatspecs['format_delimiter'])
-        catdel = tmpcatfile.read(catdelszie).decode("UTF-8")
+        catdel = tmparchivefile.read(catdelszie).decode("UTF-8")
         if(catstring != formatspecs['format_magic']+catheaderver):
             return False
         if(catdel != formatspecs['format_delimiter']):
             return False
         if(formatspecs['new_style']):
             catheader = ReadFileHeaderDataBySize(
-                tmpcatfile, formatspecs['format_delimiter'])
+                tmparchivefile, formatspecs['format_delimiter'])
         else:
             catheader = ReadFileHeaderDataWoSize(
-                tmpcatfile, formatspecs['format_delimiter'])
+                tmparchivefile, formatspecs['format_delimiter'])
         fnumextrafieldsize = int(catheader[5], 16)
         fnumextrafields = int(catheader[6], 16)
         fextrafieldslist = []
@@ -8587,15 +8575,15 @@ if(rarfile_support):
         newfcs = GetHeaderChecksum([catstring] + catheader[:-1], fprechecksumtype, True, formatspecs)
         if(not headercheck):
             return False
-        fileheader = tmpcatfile.read()
-        tmpcatfile.close()
+        fileheader = tmparchivefile.read()
+        tmparchivefile.close()
         catversion = re.findall("([\\d]+)", fileheader)
         catversions = re.search('(.*?)(\\d+)', fileheader).groups()
-        catfileheadercshex = GetFileChecksum(
+        archivefileheadercshex = GetFileChecksum(
             fileheader, checksumtype[0], False, formatspecs)
         fheadtell = len(fileheader)
         catlist = {'fnumfiles': fnumfiles, 'fformat': catversions[0], 'fcompression': "", 'fencoding': fhencoding, 'fversion': catversions[1], 'fostype': fostype,
-                   'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': catfileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
+                   'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': archivefileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
         for member in sorted(rarfp.infolist(), key=lambda x: x.filename):
             catfhstart = fheadtell
             fencoding = "UTF-8"
@@ -8751,47 +8739,47 @@ if(rarfile_support):
             catoutlen = len(catoutlist) + len(extradata) + 3
             catoutlenhex = format(catoutlen, 'x').lower()
             catoutlist.insert(0, catoutlenhex)
-            catfileoutstr = AppendNullBytes(
+            archivefileoutstr = AppendNullBytes(
                 catoutlist, formatspecs['format_delimiter'])
             if(len(extradata) > 0):
-                catfileoutstr = catfileoutstr + \
+                archivefileoutstr = archivefileoutstr + \
                     AppendNullBytes(extradata, formatspecs['format_delimiter'])
             if(fsize == 0):
                 checksumlist = [checksumtype[1], "none"]
             else:
                 checksumlist = [checksumtype[1], checksumtype[2]]
-            ccatfileoutstr = catfileoutstr + \
+            carchivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
             catfnumfields = 24 + catfextrafields
-            catfileheadercshex = GetFileChecksum(
-                catfileoutstr, checksumtype[1], True, formatspecs)
+            archivefileheadercshex = GetFileChecksum(
+                archivefileoutstr, checksumtype[1], True, formatspecs)
             fcontents.seek(0, 0)
             if(fsize == 0):
-                catfilecontentcshex = GetFileChecksum(
+                archivefilecontentcshex = GetFileChecksum(
                     fcontents.read(), "none", False, formatspecs)
             else:
-                catfilecontentcshex = GetFileChecksum(
+                archivefilecontentcshex = GetFileChecksum(
                     fcontents.read(), checksumtype[2], False, formatspecs)
-            tmpfileoutstr = catfileoutstr + \
+            tmpfileoutstr = archivefileoutstr + \
                 AppendNullBytes(
-                    [catfileheadercshex, catfilecontentcshex], formatspecs['format_delimiter'])
+                    [archivefileheadercshex, archivefilecontentcshex], formatspecs['format_delimiter'])
             catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-            catfileoutstr = AppendNullByte(
-                catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-            catfileheadercshex = GetFileChecksum(
-                catfileoutstr, checksumtype[1], True, formatspecs)
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = AppendNullByte(
+                catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+            archivefileheadercshex = GetFileChecksum(
+                archivefileoutstr, checksumtype[1], True, formatspecs)
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(
-                    [catfileheadercshex, catfilecontentcshex], formatspecs['format_delimiter'])
+                    [archivefileheadercshex, archivefilecontentcshex], formatspecs['format_delimiter'])
             catheaderdata = catoutlist
-            catfileoutstrecd = catfileoutstr
+            archivefileoutstrecd = archivefileoutstr
             nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
             catfcontentstart = fheadtell
-            fheadtell += len(catfileoutstr) + 1
+            fheadtell += len(archivefileoutstr) + 1
             catfcontentend = fheadtell - 1
             catfhend = catfcontentend
             fcontents.seek(0, 0)
-            catfileout = catfileoutstrecd + fcontents.read() + nullstrecd
+            archivefileout = archivefileoutstrecd + fcontents.read() + nullstrecd
             pyhascontents = False
             if(int(fsize) > 0 and not listonly):
                 pyhascontents = True
@@ -8802,7 +8790,7 @@ if(rarfile_support):
             if(not contentasfile):
                 fcontents = fcontents.read()
             catlist['ffilelist'].append({'fid': fileidnum, 'fidalt': fileidnum, 'fheadersize': int(catheaersize, 16), 'fhstart': catfhstart, 'fhend': catfhend, 'ftype': ftype, 'fencoding': fencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-                                        'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(catfileheadercshex, 16), 'fcontentchecksum': int(catfilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
+                                        'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(archivefileheadercshex, 16), 'fcontentchecksum': int(archivefilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
             fileidnum = fileidnum + 1
         return catlist
 
@@ -8840,23 +8828,23 @@ if(py7zr_support):
         fnumfileshex = format(int(fnumfiles), 'x').lower()
         fostype = platform.system()
         fhencoding = "UTF-8"
-        tmpcatfile = BytesIO()
-        AppendFileHeader(tmpcatfile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
-        tmpcatfile.seek(0, 0)
+        tmparchivefile = BytesIO()
+        AppendFileHeader(tmparchivefile, fnumfiles, fhencoding, [], checksumtype[0], formatspecs)
+        tmparchivefile.seek(0, 0)
         catheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-        catstring = tmpcatfile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
+        catstring = tmparchivefile.read(formatspecs['format_len'] + len(catheaderver)).decode("UTF-8")
         catdelszie = len(formatspecs['format_delimiter'])
-        catdel = tmpcatfile.read(catdelszie).decode("UTF-8")
+        catdel = tmparchivefile.read(catdelszie).decode("UTF-8")
         if(catstring != formatspecs['format_magic']+catheaderver):
             return False
         if(catdel != formatspecs['format_delimiter']):
             return False
         if(formatspecs['new_style']):
             catheader = ReadFileHeaderDataBySize(
-                tmpcatfile, formatspecs['format_delimiter'])
+                tmparchivefile, formatspecs['format_delimiter'])
         else:
             catheader = ReadFileHeaderDataWoSize(
-                tmpcatfile, formatspecs['format_delimiter'])
+                tmparchivefile, formatspecs['format_delimiter'])
         fnumextrafieldsize = int(catheader[5], 16)
         fnumextrafields = int(catheader[6], 16)
         fextrafieldslist = []
@@ -8878,15 +8866,15 @@ if(py7zr_support):
         newfcs = GetHeaderChecksum([catstring] + catheader[:-1], fprechecksumtype, True, formatspecs)
         if(not headercheck):
             return False
-        fileheader = tmpcatfile.read()
-        tmpcatfile.close()
+        fileheader = tmparchivefile.read()
+        tmparchivefile.close()
         catversion = re.findall("([\\d]+)", fileheader)
         catversions = re.search('(.*?)(\\d+)', fileheader).groups()
-        catfileheadercshex = GetFileChecksum(
+        archivefileheadercshex = GetFileChecksum(
             fileheader, checksumtype[0], False, formatspecs)
         fheadtell = len(fileheader)
         catlist = {'fnumfiles': fnumfiles, 'fformat': catversions[0], 'fcompression': "", 'fencoding': fhencoding, 'fversion': catversions[1], 'fostype': fostype,
-                   'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': catfileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
+                   'fformatspecs': formatspecs, 'fchecksumtype': checksumtype[0], 'fheaderchecksum': archivefileheadercshex, 'frawheader': [catstring] + catheader, 'ffilelist': []}
         for member in sorted(szpfp.list(), key=lambda x: x.filename):
             catfhstart = fheadtell
             fencoding = "UTF-8"
@@ -8989,47 +8977,47 @@ if(py7zr_support):
             catoutlen = len(catoutlist) + len(extradata) + 3
             catoutlenhex = format(catoutlen, 'x').lower()
             catoutlist.insert(0, catoutlenhex)
-            catfileoutstr = AppendNullBytes(
+            archivefileoutstr = AppendNullBytes(
                 catoutlist, formatspecs['format_delimiter'])
             catheaderdata = catoutlist
             if(len(extradata) > 0):
-                catfileoutstr = catfileoutstr + \
+                archivefileoutstr = archivefileoutstr + \
                     AppendNullBytes(extradata, formatspecs['format_delimiter'])
             if(fsize == 0):
                 checksumlist = [checksumtype[1], "none"]
             else:
                 checksumlist = [checksumtype[1], checksumtype[2]]
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
             catfnumfields = 24 + catfextrafields
-            catfileheadercshex = GetFileChecksum(
-                catfileoutstr, checksumtype[1], True, formatspecs)
+            archivefileheadercshex = GetFileChecksum(
+                archivefileoutstr, checksumtype[1], True, formatspecs)
             fcontents.seek(0, 0)
             if(fsize == 0):
-                catfilecontentcshex = GetFileChecksum(
+                archivefilecontentcshex = GetFileChecksum(
                     fcontents.read(), "none", False, formatspecs)
             else:
-                catfilecontentcshex = GetFileChecksum(
+                archivefilecontentcshex = GetFileChecksum(
                     fcontents.read(), checksumtype[2], False, formatspecs)
-            tmpfileoutstr = catfileoutstr + \
+            tmpfileoutstr = archivefileoutstr + \
                 AppendNullBytes(
-                    [catfileheadercshex, catfilecontentcshex], formatspecs['format_delimiter'])
+                    [archivefileheadercshex, archivefilecontentcshex], formatspecs['format_delimiter'])
             catheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-            catfileoutstr = AppendNullByte(
-                catheaersize, formatspecs['format_delimiter']) + catfileoutstr
-            catfileheadercshex = GetFileChecksum(
-                catfileoutstr, checksumtype[1], True, formatspecs)
-            catfileoutstr = catfileoutstr + \
+            archivefileoutstr = AppendNullByte(
+                catheaersize, formatspecs['format_delimiter']) + archivefileoutstr
+            archivefileheadercshex = GetFileChecksum(
+                archivefileoutstr, checksumtype[1], True, formatspecs)
+            archivefileoutstr = archivefileoutstr + \
                 AppendNullBytes(
-                    [catfileheadercshex, catfilecontentcshex], formatspecs['format_delimiter'])
-            catfileoutstrecd = catfileoutstr
+                    [archivefileheadercshex, archivefilecontentcshex], formatspecs['format_delimiter'])
+            archivefileoutstrecd = archivefileoutstr
             nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
             catfcontentstart = fheadtell
-            fheadtell += len(catfileoutstr) + 1
+            fheadtell += len(archivefileoutstr) + 1
             catfcontentend = fheadtell - 1
             catfhend = catfcontentend
             fcontents.seek(0, 0)
-            catfileout = catfileoutstrecd + fcontents.read() + nullstrecd
+            archivefileout = archivefileoutstrecd + fcontents.read() + nullstrecd
             pyhascontents = False
             if(int(fsize) > 0 and not listonly):
                 pyhascontents = True
@@ -9040,7 +9028,7 @@ if(py7zr_support):
             if(not contentasfile):
                 fcontents = fcontents.read()
             catlist['ffilelist'].append({'fid': fileidnum, 'fidalt': fileidnum, 'fheadersize': int(catheaersize, 16), 'fhstart': catfhstart, 'fhend': catfhend, 'ftype': ftype, 'fencoding': fencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-                                        'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(catfileheadercshex, 16), 'fcontentchecksum': int(catfilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
+                                        'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': "+"+str(len(formatspecs['format_delimiter'])), 'fheaderchecksumtype': checksumtype[1], 'fcontentchecksumtype': checksumtype[2], 'fnumfields': catfnumfields + 2, 'frawheader': catheaderdata, 'fextrafields': catfextrafields, 'fextrafieldsize': extrasizelen, 'fextralist': extrafieldslist, 'fheaderchecksum': int(archivefileheadercshex, 16), 'fcontentchecksum': int(archivefilecontentcshex, 16), 'fhascontents': pyhascontents, 'fcontentstart': catfcontentstart, 'fcontentend': catfcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents})
             fileidnum = fileidnum + 1
         return catlist
 
@@ -9065,68 +9053,68 @@ def ListDirToArray(infiles, dirlistfromtxt=False, fmttype=__file_format_default_
     outarray = BytesIO()
     packcat = PackArchiveFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
                               compressionlevel, followlink, checksumtype, extradata, formatspecs, verbose, True)
-    listcatfiles = ArchiveFileToArray(outarray, "auto", seekstart, seekend, listonly, True, skipchecksum, formatspecs, returnfp)
-    return listcatfiles
+    listarchivefiles = ArchiveFileToArray(outarray, "auto", seekstart, seekend, listonly, True, skipchecksum, formatspecs, returnfp)
+    return listarchivefiles
 
 
 def ArchiveFileArrayToArrayIndex(inarray, seekstart=0, seekend=0, listonly=False, uncompress=True, skipchecksum=False, returnfp=False):
     if(isinstance(inarray, dict)):
-        listcatfiles = inarray
+        listarchivefiles = inarray
     else:
         return False
-    if(not listcatfiles):
+    if(not listarchivefiles):
         return False
-    catarray = {'list': listcatfiles, 'filetoid': {}, 'idtofile': {}, 'filetypes': {'directories': {'filetoid': {}, 'idtofile': {}}, 'files': {'filetoid': {}, 'idtofile': {}}, 'links': {'filetoid': {}, 'idtofile': {}}, 'symlinks': {'filetoid': {
+    catarray = {'list': listarchivefiles, 'filetoid': {}, 'idtofile': {}, 'filetypes': {'directories': {'filetoid': {}, 'idtofile': {}}, 'files': {'filetoid': {}, 'idtofile': {}}, 'links': {'filetoid': {}, 'idtofile': {}}, 'symlinks': {'filetoid': {
     }, 'idtofile': {}}, 'hardlinks': {'filetoid': {}, 'idtofile': {}}, 'character': {'filetoid': {}, 'idtofile': {}}, 'block': {'filetoid': {}, 'idtofile': {}}, 'fifo': {'filetoid': {}, 'idtofile': {}}, 'devices': {'filetoid': {}, 'idtofile': {}}}}
     if(returnfp):
-        catarray.update({'fp': listcatfiles['fp']})
-    lenlist = len(listcatfiles['ffilelist'])
+        catarray.update({'fp': listarchivefiles['fp']})
+    lenlist = len(listarchivefiles['ffilelist'])
     lcfi = 0
-    lcfx = int(listcatfiles['fnumfiles'])
-    if(lenlist > listcatfiles['fnumfiles'] or lenlist < listcatfiles['fnumfiles']):
+    lcfx = int(listarchivefiles['fnumfiles'])
+    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listcatfiles['fnumfiles'])
+        lcfx = int(listarchivefiles['fnumfiles'])
     while(lcfi < lcfx):
-        filetoidarray = {listcatfiles['ffilelist'][lcfi]
-                         ['fname']: listcatfiles['ffilelist'][lcfi]['fid']}
-        idtofilearray = {listcatfiles['ffilelist'][lcfi]
-                         ['fid']: listcatfiles['ffilelist'][lcfi]['fname']}
+        filetoidarray = {listarchivefiles['ffilelist'][lcfi]
+                         ['fname']: listarchivefiles['ffilelist'][lcfi]['fid']}
+        idtofilearray = {listarchivefiles['ffilelist'][lcfi]
+                         ['fid']: listarchivefiles['ffilelist'][lcfi]['fname']}
         catarray['filetoid'].update(filetoidarray)
         catarray['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 0 or listcatfiles['ffilelist'][lcfi]['ftype'] == 7):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 0 or listarchivefiles['ffilelist'][lcfi]['ftype'] == 7):
             catarray['filetypes']['files']['filetoid'].update(filetoidarray)
             catarray['filetypes']['files']['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 1):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
             catarray['filetypes']['hardlinks']['filetoid'].update(
                 filetoidarray)
             catarray['filetypes']['hardlinks']['idtofile'].update(
                 idtofilearray)
             catarray['filetypes']['links']['filetoid'].update(filetoidarray)
             catarray['filetypes']['links']['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 2):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
             catarray['filetypes']['symlinks']['filetoid'].update(filetoidarray)
             catarray['filetypes']['symlinks']['idtofile'].update(idtofilearray)
             catarray['filetypes']['links']['filetoid'].update(filetoidarray)
             catarray['filetypes']['links']['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 3):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 3):
             catarray['filetypes']['character']['filetoid'].update(
                 filetoidarray)
             catarray['filetypes']['character']['idtofile'].update(
                 idtofilearray)
             catarray['filetypes']['devices']['filetoid'].update(filetoidarray)
             catarray['filetypes']['devices']['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 4):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 4):
             catarray['filetypes']['block']['filetoid'].update(filetoidarray)
             catarray['filetypes']['block']['idtofile'].update(idtofilearray)
             catarray['filetypes']['devices']['filetoid'].update(filetoidarray)
             catarray['filetypes']['devices']['idtofile'].update(idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 5):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 5):
             catarray['filetypes']['directories']['filetoid'].update(
                 filetoidarray)
             catarray['filetypes']['directories']['idtofile'].update(
                 idtofilearray)
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 6):
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 6):
             catarray['filetypes']['symlinks']['filetoid'].update(filetoidarray)
             catarray['filetypes']['symlinks']['idtofile'].update(idtofilearray)
             catarray['filetypes']['devices']['filetoid'].update(filetoidarray)
@@ -9137,11 +9125,11 @@ def ArchiveFileArrayToArrayIndex(inarray, seekstart=0, seekend=0, listonly=False
 
 def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, seekstart=0, seekend=0, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(isinstance(infile, dict)):
-        listcatfiles = infile
+        listarchivefiles = infile
     else:
         if(infile != "-" and not isinstance(infile, bytes) and not hasattr(infile, "read") and not hasattr(infile, "write")):
             infile = RemoveWindowsPath(infile)
-        listcatfiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, returnfp)
+        listarchivefiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, returnfp)
     if(IsNestedDict(formatspecs) and fmttype in formatspecs):
         formatspecs = formatspecs[fmttype]
     elif(IsNestedDict(formatspecs) and fmttype not in formatspecs):
@@ -9167,7 +9155,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 os.unlink(outfile)
             except OSError:
                 pass
-    if(not listcatfiles):
+    if(not listarchivefiles):
         return False
     if(outfile == "-" or outfile is None):
         verbose = False
@@ -9184,19 +9172,19 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         fp = CompressOpenFile(outfile, compresswholefile, compressionlevel)
     catver = formatspecs['format_ver']
     fileheaderver = str(int(catver.replace(".", "")))
-    lenlist = len(listcatfiles['ffilelist'])
-    fnumfiles = int(listcatfiles['fnumfiles'])
+    lenlist = len(listarchivefiles['ffilelist'])
+    fnumfiles = int(listarchivefiles['fnumfiles'])
     if(lenlist > fnumfiles or lenlist < fnumfiles):
         fnumfiles = lenlist
-    AppendFileHeader(fp, fnumfiles, listcatfiles['fencoding'], [], checksumtype[0], formatspecs)
-    lenlist = len(listcatfiles['ffilelist'])
-    fnumfiles = int(listcatfiles['fnumfiles'])
+    AppendFileHeader(fp, fnumfiles, listarchivefiles['fencoding'], [], checksumtype[0], formatspecs)
+    lenlist = len(listarchivefiles['ffilelist'])
+    fnumfiles = int(listarchivefiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listcatfiles['fnumfiles'])
-    if(lenlist > listcatfiles['fnumfiles'] or lenlist < listcatfiles['fnumfiles']):
+    lcfx = int(listarchivefiles['fnumfiles'])
+    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listcatfiles['fnumfiles'])
+        lcfx = int(listarchivefiles['fnumfiles'])
     curinode = 0
     curfid = 0
     inodelist = []
@@ -9204,59 +9192,59 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
     filetoinode = {}
     reallcfi = 0
     while(lcfi < lcfx):
-        fencoding = listcatfiles['ffilelist'][reallcfi]['fencoding']
-        if(re.findall("^[.|/]", listcatfiles['ffilelist'][reallcfi]['fname'])):
-            fname = listcatfiles['ffilelist'][reallcfi]['fname']
+        fencoding = listarchivefiles['ffilelist'][reallcfi]['fencoding']
+        if(re.findall("^[.|/]", listarchivefiles['ffilelist'][reallcfi]['fname'])):
+            fname = listarchivefiles['ffilelist'][reallcfi]['fname']
         else:
-            fname = "./"+listcatfiles['ffilelist'][reallcfi]['fname']
+            fname = "./"+listarchivefiles['ffilelist'][reallcfi]['fname']
         if(verbose):
             VerbosePrintOut(fname)
         fheadersize = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fheadersize']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fheadersize']), 'x').lower()
         fsize = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fsize']), 'x').lower()
-        flinkname = listcatfiles['ffilelist'][reallcfi]['flinkname']
+            int(listarchivefiles['ffilelist'][reallcfi]['fsize']), 'x').lower()
+        flinkname = listarchivefiles['ffilelist'][reallcfi]['flinkname']
         fatime = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fatime']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fatime']), 'x').lower()
         fmtime = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fmtime']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fmtime']), 'x').lower()
         fctime = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fctime']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fctime']), 'x').lower()
         fbtime = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fbtime']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fbtime']), 'x').lower()
         fmode = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fmode']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fmode']), 'x').lower()
         fchmode = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fchmode']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fchmode']), 'x').lower()
         fuid = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fuid']), 'x').lower()
-        funame = listcatfiles['ffilelist'][reallcfi]['funame']
+            int(listarchivefiles['ffilelist'][reallcfi]['fuid']), 'x').lower()
+        funame = listarchivefiles['ffilelist'][reallcfi]['funame']
         fgid = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fgid']), 'x').lower()
-        fgname = listcatfiles['ffilelist'][reallcfi]['fgname']
+            int(listarchivefiles['ffilelist'][reallcfi]['fgid']), 'x').lower()
+        fgname = listarchivefiles['ffilelist'][reallcfi]['fgname']
         finode = format(
-            int(listcatfiles['ffilelist'][reallcfi]['finode']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['finode']), 'x').lower()
         flinkcount = format(
-            int(listcatfiles['ffilelist'][reallcfi]['flinkcount']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['flinkcount']), 'x').lower()
         fwinattributes = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fwinattributes']), 'x').lower()
-        fcompression = listcatfiles['ffilelist'][reallcfi]['fcompression']
+            int(listarchivefiles['ffilelist'][reallcfi]['fwinattributes']), 'x').lower()
+        fcompression = listarchivefiles['ffilelist'][reallcfi]['fcompression']
         fcsize = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fcsize']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fcsize']), 'x').lower()
         fdev = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fdev']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fdev']), 'x').lower()
         fdev_minor = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fminor']), 'x').lower()
+            int(listarchivefiles['ffilelist'][reallcfi]['fminor']), 'x').lower()
         fdev_major = format(
-            int(listcatfiles['ffilelist'][reallcfi]['fmajor']), 'x').lower()
-        fseeknextfile = listcatfiles['ffilelist'][reallcfi]['fseeknextfile']
-        if(len(listcatfiles['ffilelist'][reallcfi]['fextralist']) > listcatfiles['ffilelist'][reallcfi]['fextrafields'] and len(listcatfiles['ffilelist'][reallcfi]['fextralist']) > 0):
-            listcatfiles['ffilelist'][reallcfi]['fextrafields'] = len(
-                listcatfiles['ffilelist'][reallcfi]['fextralist'])
+            int(listarchivefiles['ffilelist'][reallcfi]['fmajor']), 'x').lower()
+        fseeknextfile = listarchivefiles['ffilelist'][reallcfi]['fseeknextfile']
+        if(len(listarchivefiles['ffilelist'][reallcfi]['fextralist']) > listarchivefiles['ffilelist'][reallcfi]['fextrafields'] and len(listarchivefiles['ffilelist'][reallcfi]['fextralist']) > 0):
+            listarchivefiles['ffilelist'][reallcfi]['fextrafields'] = len(
+                listarchivefiles['ffilelist'][reallcfi]['fextralist'])
         if(not followlink and len(extradata) < 0):
-            extradata = listcatfiles['ffilelist'][reallcfi]['fextralist']
-        fcontents = listcatfiles['ffilelist'][reallcfi]['fcontents']
-        if(not listcatfiles['ffilelist'][reallcfi]['fcontentasfile']):
+            extradata = listarchivefiles['ffilelist'][reallcfi]['fextralist']
+        fcontents = listarchivefiles['ffilelist'][reallcfi]['fcontents']
+        if(not listarchivefiles['ffilelist'][reallcfi]['fcontentasfile']):
             fcontents = BytesIO(fcontents)
         fencoding = GetFileEncoding(fcontents, False)
         fcompression = ""
@@ -9303,10 +9291,10 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 fcontents.close()
                 fcontents = cfcontents
         if(followlink):
-            if(listcatfiles['ffilelist'][reallcfi]['ftype'] == 1 or listcatfiles['ffilelist'][reallcfi]['ftype'] == 2):
-                getflinkpath = listcatfiles['ffilelist'][reallcfi]['flinkname']
-                flinkid = prelistcatfiles['filetoid'][getflinkpath]
-                flinkinfo = listcatfiles['ffilelist'][flinkid]
+            if(listarchivefiles['ffilelist'][reallcfi]['ftype'] == 1 or listarchivefiles['ffilelist'][reallcfi]['ftype'] == 2):
+                getflinkpath = listarchivefiles['ffilelist'][reallcfi]['flinkname']
+                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
+                flinkinfo = listarchivefiles['ffilelist'][flinkid]
                 fheadersize = format(
                     int(flinkinfo['fheadersize']), 'x').lower()
                 fsize = format(int(flinkinfo['fsize']), 'x').lower()
@@ -9341,10 +9329,10 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 ftypehex = format(flinkinfo['ftype'], 'x').lower()
         else:
             ftypehex = format(
-                listcatfiles['ffilelist'][reallcfi]['ftype'], 'x').lower()
+                listarchivefiles['ffilelist'][reallcfi]['ftype'], 'x').lower()
         fcurfid = format(curfid, 'x').lower()
         if(not followlink and finode != 0):
-            if(listcatfiles['ffilelist'][reallcfi]['ftype'] != 1):
+            if(listarchivefiles['ffilelist'][reallcfi]['ftype'] != 1):
                 fcurinode = format(int(curinode), 'x').lower()
                 inodetofile.update({curinode: fname})
                 filetoinode.update({fname: curinode})
@@ -9409,18 +9397,18 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
 
 def RePackArchiveFileFromString(catstr, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     fp = BytesIO(catstr)
-    listcatfiles = RePackArchiveFile(fp, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
+    listarchivefiles = RePackArchiveFile(fp, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
                                      checksumtype, skipchecksum, extradata, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def PackArchiveFileFromListDir(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = BytesIO()
     packcat = PackArchiveFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
                               compressionlevel, compressionuselist, followlink, checksumtype, extradata, formatspecs, verbose, True)
-    listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+    listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
                                      compressionlevel, checksumtype, skipchecksum, extradata, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, preservepermissions=True, preservetime=True, verbose=False, returnfp=False):
@@ -9429,28 +9417,28 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(isinstance(infile, dict)):
-        listcatfiles = infile
+        listarchivefiles = infile
     else:
         if(infile != "-" and not hasattr(infile, "read") and not hasattr(infile, "write") and not (sys.version_info[0] >= 3 and isinstance(infile, bytes))):
             infile = RemoveWindowsPath(infile)
-        listcatfiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, returnfp)
-    if(not listcatfiles):
+        listarchivefiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, returnfp)
+    if(not listarchivefiles):
         return False
-    lenlist = len(listcatfiles['ffilelist'])
-    fnumfiles = int(listcatfiles['fnumfiles'])
+    lenlist = len(listarchivefiles['ffilelist'])
+    fnumfiles = int(listarchivefiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listcatfiles['fnumfiles'])
-    if(lenlist > listcatfiles['fnumfiles'] or lenlist < listcatfiles['fnumfiles']):
+    lcfx = int(listarchivefiles['fnumfiles'])
+    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listcatfiles['fnumfiles'])
+        lcfx = int(listarchivefiles['fnumfiles'])
     while(lcfi < lcfx):
         funame = ""
         try:
             import pwd
             try:
                 userinfo = pwd.getpwuid(
-                    listcatfiles['ffilelist'][lcfi]['fuid'])
+                    listarchivefiles['ffilelist'][lcfi]['fuid'])
                 funame = userinfo.pw_name
             except KeyError:
                 funame = ""
@@ -9461,7 +9449,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
             import grp
             try:
                 groupinfo = grp.getgrgid(
-                    listcatfiles['ffilelist'][lcfi]['fgid'])
+                    listarchivefiles['ffilelist'][lcfi]['fgid'])
                 fgname = groupinfo.gr_name
             except KeyError:
                 fgname = ""
@@ -9469,15 +9457,15 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
             fgname = ""
         if(verbose):
             VerbosePrintOut(PrependPath(
-                outdir, listcatfiles['ffilelist'][lcfi]['fname']))
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 0 or listcatfiles['ffilelist'][lcfi]['ftype'] == 7):
-            with open(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
-                if(not listcatfiles['ffilelist'][lcfi]['fcontentasfile']):
-                    listcatfiles['ffilelist'][lcfi]['fcontents'] = BytesIO(
-                        listcatfiles['ffilelist'][lcfi]['fcontents'])
-                listcatfiles['ffilelist'][lcfi]['fcontents'].seek(0, 0)
+                outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 0 or listarchivefiles['ffilelist'][lcfi]['ftype'] == 7):
+            with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                if(not listarchivefiles['ffilelist'][lcfi]['fcontentasfile']):
+                    listarchivefiles['ffilelist'][lcfi]['fcontents'] = BytesIO(
+                        listarchivefiles['ffilelist'][lcfi]['fcontents'])
+                listarchivefiles['ffilelist'][lcfi]['fcontents'].seek(0, 0)
                 shutil.copyfileobj(
-                    listcatfiles['ffilelist'][lcfi]['fcontents'], fpc)
+                    listarchivefiles['ffilelist'][lcfi]['fcontents'], fpc)
                 try:
                     fpc.flush()
                     if(hasattr(os, "sync")):
@@ -9488,20 +9476,20 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                     pass
                 except OSError:
                     pass
-            if(hasattr(os, "chown") and funame == listcatfiles['ffilelist'][lcfi]['funame'] and fgname == listcatfiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
-                os.chown(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']),
-                         listcatfiles['ffilelist'][lcfi]['fuid'], listcatfiles['ffilelist'][lcfi]['fgid'])
+            if(hasattr(os, "chown") and funame == listarchivefiles['ffilelist'][lcfi]['funame'] and fgname == listarchivefiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
+                os.chown(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']),
+                         listarchivefiles['ffilelist'][lcfi]['fuid'], listarchivefiles['ffilelist'][lcfi]['fgid'])
             if(preservepermissions):
                 os.chmod(PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']), listcatfiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
             if(preservetime):
-                os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
-                    listcatfiles['ffilelist'][lcfi]['fatime'], listcatfiles['ffilelist'][lcfi]['fmtime']))
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 1):
+                os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                    listarchivefiles['ffilelist'][lcfi]['fatime'], listarchivefiles['ffilelist'][lcfi]['fmtime']))
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
             if(followlink):
-                getflinkpath = listcatfiles['ffilelist'][lcfi]['flinkname']
-                flinkid = prelistcatfiles['filetoid'][getflinkpath]
-                flinkinfo = listcatfiles['ffilelist'][flinkid]
+                getflinkpath = listarchivefiles['ffilelist'][lcfi]['flinkname']
+                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
+                flinkinfo = listarchivefiles['ffilelist'][flinkid]
                 funame = ""
                 try:
                     import pwd
@@ -9523,7 +9511,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                 except ImportError:
                     fgname = ""
                 if(flinkinfo['ftype'] == 0 or flinkinfo['ftype'] == 7):
-                    with open(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                    with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
                         if(not flinkinfo['fcontentasfile']):
                             flinkinfo['fcontents'] = BytesIO(
                                 flinkinfo['fcontents'])
@@ -9541,46 +9529,46 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                             pass
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 1):
                     os.link(flinkinfo['flinkname'], PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 2):
                     os.symlink(flinkinfo['flinkname'], PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 5):
                     if(preservepermissions):
                         os.mkdir(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     else:
                         os.mkdir(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 6 and hasattr(os, "mkfifo")):
                     os.mkfifo(PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
             else:
-                os.link(listcatfiles['ffilelist'][lcfi]['flinkname'], PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']))
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 2):
+                os.link(listarchivefiles['ffilelist'][lcfi]['flinkname'], PrependPath(
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
             if(followlink):
-                getflinkpath = listcatfiles['ffilelist'][lcfi]['flinkname']
-                flinkid = prelistcatfiles['filetoid'][getflinkpath]
-                flinkinfo = listcatfiles['ffilelist'][flinkid]
+                getflinkpath = listarchivefiles['ffilelist'][lcfi]['flinkname']
+                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
+                flinkinfo = listarchivefiles['ffilelist'][flinkid]
                 funame = ""
                 try:
                     import pwd
@@ -9602,7 +9590,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                 except ImportError:
                     fgname = ""
                 if(flinkinfo['ftype'] == 0 or flinkinfo['ftype'] == 7):
-                    with open(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                    with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
                         if(not flinkinfo['fcontentasfile']):
                             flinkinfo['fcontents'] = BytesIO(
                                 flinkinfo['fcontents'])
@@ -9620,127 +9608,127 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                             pass
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 1):
                     os.link(flinkinfo['flinkname'], PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 2):
                     os.symlink(flinkinfo['flinkname'], PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 5):
                     if(preservepermissions):
                         os.mkdir(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     else:
                         os.mkdir(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']))
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 6 and hasattr(os, "mkfifo")):
                     os.mkfifo(PrependPath(
-                        outdir, listcatfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
             else:
-                os.symlink(listcatfiles['ffilelist'][lcfi]['flinkname'], PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']))
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 5):
+                os.symlink(listarchivefiles['ffilelist'][lcfi]['flinkname'], PrependPath(
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 5):
             if(preservepermissions):
                 os.mkdir(PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']), listcatfiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
             else:
                 os.mkdir(PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']))
-            if(hasattr(os, "chown") and funame == listcatfiles['ffilelist'][lcfi]['funame'] and fgname == listcatfiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
-                os.chown(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']),
-                         listcatfiles['ffilelist'][lcfi]['fuid'], listcatfiles['ffilelist'][lcfi]['fgid'])
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+            if(hasattr(os, "chown") and funame == listarchivefiles['ffilelist'][lcfi]['funame'] and fgname == listarchivefiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
+                os.chown(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']),
+                         listarchivefiles['ffilelist'][lcfi]['fuid'], listarchivefiles['ffilelist'][lcfi]['fgid'])
             if(preservepermissions):
                 os.chmod(PrependPath(
-                    outdir, listcatfiles['ffilelist'][lcfi]['fname']), listcatfiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
             if(preservetime):
-                os.utime(PrependPath(outdir, listcatfiles['ffilelist'][lcfi]['fname']), (
-                    listcatfiles['ffilelist'][lcfi]['fatime'], listcatfiles['ffilelist'][lcfi]['fmtime']))
-        if(listcatfiles['ffilelist'][lcfi]['ftype'] == 6 and hasattr(os, "mkfifo")):
+                os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                    listarchivefiles['ffilelist'][lcfi]['fatime'], listarchivefiles['ffilelist'][lcfi]['fmtime']))
+        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 6 and hasattr(os, "mkfifo")):
             os.mkfifo(PrependPath(
-                outdir, listcatfiles['ffilelist'][lcfi]['fname']), listcatfiles['ffilelist'][lcfi]['fchmode'])
+                outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
         lcfi = lcfi + 1
     if(returnfp):
-        return listcatfiles['ffilelist']['fp']
+        return listarchivefiles['ffilelist']['fp']
     else:
         return True
 
 
 def UnPackArchiveFileString(catstr, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     fp = BytesIO(catstr)
-    listcatfiles = UnPackArchiveFile(fp, outdir, followlink, seekstart, seekend, skipchecksum, formatspecs, verbose, returnfp)
-    return listcatfiles
+    listarchivefiles = UnPackArchiveFile(fp, outdir, followlink, seekstart, seekend, skipchecksum, formatspecs, verbose, returnfp)
+    return listarchivefiles
 
 
 def ArchiveFileListFiles(infile, fmttype="auto", seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(isinstance(infile, dict)):
-        listcatfiles = infile
+        listarchivefiles = infile
     else:
         if(infile != "-" and not hasattr(infile, "read") and not hasattr(infile, "write") and not (sys.version_info[0] >= 3 and isinstance(infile, bytes))):
             infile = RemoveWindowsPath(infile)
-        listcatfiles = ArchiveFileToArray(infile, fmttype, seekstart, seekend, True, False, False, skipchecksum, formatspecs, returnfp)
-    if(not listcatfiles):
+        listarchivefiles = ArchiveFileToArray(infile, fmttype, seekstart, seekend, True, False, False, skipchecksum, formatspecs, returnfp)
+    if(not listarchivefiles):
         return False
-    lenlist = len(listcatfiles['ffilelist'])
-    fnumfiles = int(listcatfiles['fnumfiles'])
+    lenlist = len(listarchivefiles['ffilelist'])
+    fnumfiles = int(listarchivefiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listcatfiles['fnumfiles'])
-    if(lenlist > listcatfiles['fnumfiles'] or lenlist < listcatfiles['fnumfiles']):
+    lcfx = int(listarchivefiles['fnumfiles'])
+    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listcatfiles['fnumfiles'])
+        lcfx = int(listarchivefiles['fnumfiles'])
     returnval = {}
     while(lcfi < lcfx):
-        returnval.update({lcfi: listcatfiles['ffilelist'][lcfi]['fname']})
+        returnval.update({lcfi: listarchivefiles['ffilelist'][lcfi]['fname']})
         if(not verbose):
-            VerbosePrintOut(listcatfiles['ffilelist'][lcfi]['fname'])
+            VerbosePrintOut(listarchivefiles['ffilelist'][lcfi]['fname'])
         if(verbose):
             permissions = {'access': {'0': ('---'), '1': ('--x'), '2': ('-w-'), '3': ('-wx'), '4': (
                 'r--'), '5': ('r-x'), '6': ('rw-'), '7': ('rwx')}, 'roles': {0: 'owner', 1: 'group', 2: 'other'}}
-            printfname = listcatfiles['ffilelist'][lcfi]['fname']
-            if(listcatfiles['ffilelist'][lcfi]['ftype'] == 1):
-                printfname = listcatfiles['ffilelist'][lcfi]['fname'] + \
-                    " link to " + listcatfiles['ffilelist'][lcfi]['flinkname']
-            if(listcatfiles['ffilelist'][lcfi]['ftype'] == 2):
-                printfname = listcatfiles['ffilelist'][lcfi]['fname'] + \
-                    " -> " + listcatfiles['ffilelist'][lcfi]['flinkname']
-            fuprint = listcatfiles['ffilelist'][lcfi]['funame']
+            printfname = listarchivefiles['ffilelist'][lcfi]['fname']
+            if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
+                printfname = listarchivefiles['ffilelist'][lcfi]['fname'] + \
+                    " link to " + listarchivefiles['ffilelist'][lcfi]['flinkname']
+            if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
+                printfname = listarchivefiles['ffilelist'][lcfi]['fname'] + \
+                    " -> " + listarchivefiles['ffilelist'][lcfi]['flinkname']
+            fuprint = listarchivefiles['ffilelist'][lcfi]['funame']
             if(len(fuprint) <= 0):
-                fuprint = listcatfiles['ffilelist'][lcfi]['fuid']
-            fgprint = listcatfiles['ffilelist'][lcfi]['fgname']
+                fuprint = listarchivefiles['ffilelist'][lcfi]['fuid']
+            fgprint = listarchivefiles['ffilelist'][lcfi]['fgname']
             if(len(fgprint) <= 0):
-                fgprint = listcatfiles['ffilelist'][lcfi]['fgid']
-            VerbosePrintOut(PrintPermissionString(listcatfiles['ffilelist'][lcfi]['fmode'], listcatfiles['ffilelist'][lcfi]['ftype']) + " " + str(fuprint) + "/" + str(fgprint) + " " + str(
-                listcatfiles['ffilelist'][lcfi]['fsize']).rjust(15) + " " + datetime.datetime.utcfromtimestamp(listcatfiles['ffilelist'][lcfi]['fmtime']).strftime('%Y-%m-%d %H:%M') + " " + printfname)
+                fgprint = listarchivefiles['ffilelist'][lcfi]['fgid']
+            VerbosePrintOut(PrintPermissionString(listarchivefiles['ffilelist'][lcfi]['fmode'], listarchivefiles['ffilelist'][lcfi]['ftype']) + " " + str(fuprint) + "/" + str(fgprint) + " " + str(
+                listarchivefiles['ffilelist'][lcfi]['fsize']).rjust(15) + " " + datetime.datetime.utcfromtimestamp(listarchivefiles['ffilelist'][lcfi]['fmtime']).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listcatfiles['fp']
+        return listarchivefiles['fp']
     else:
         return True
 
 
 def ArchiveFileStringListFiles(catstr, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     fp = BytesIO(catstr)
-    listcatfiles = ArchiveFileListFiles(
+    listarchivefiles = ArchiveFileListFiles(
         catstr, seekstart, seekend, skipchecksum, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def TarFileListFiles(infile, verbose=False, returnfp=False):
@@ -9863,7 +9851,7 @@ def TarFileListFiles(infile, verbose=False, returnfp=False):
                 member.size).rjust(15) + " " + datetime.datetime.utcfromtimestamp(member.mtime).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listcatfiles['fp']
+        return listarchivefiles['fp']
     else:
         return True
 
@@ -9996,7 +9984,7 @@ def ZipFileListFiles(infile, verbose=False, returnfp=False):
                 15) + " " + datetime.datetime.utcfromtimestamp(int(time.mktime(member.date_time + (0, 0, -1)))).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listcatfiles['fp']
+        return listarchivefiles['fp']
     else:
         return True
 
@@ -10134,7 +10122,7 @@ if(rarfile_support):
                     member.file_size).rjust(15) + " " + member.mtime.strftime('%Y-%m-%d %H:%M') + " " + printfname)
             lcfi = lcfi + 1
         if(returnfp):
-            return listcatfiles['fp']
+            return listarchivefiles['fp']
         else:
             return True
 
@@ -10241,7 +10229,7 @@ if(py7zr_support):
                     fsize).rjust(15) + " " + member.creationtime.strftime('%Y-%m-%d %H:%M') + " " + printfname)
             lcfi = lcfi + 1
         if(returnfp):
-            return listcatfiles['fp']
+            return listarchivefiles['fp']
         else:
             return True
 
@@ -10271,41 +10259,41 @@ def ListDirListFiles(infiles, dirlistfromtxt=False, compression="auto", compress
     outarray = BytesIO()
     packcat = PackArchiveFile(infiles, outarray, dirlistfromtxt, compression, compresswholefile,
                               compressionlevel, followlink, checksumtype, formatspecs, False, True)
-    listcatfiles = ArchiveFileListFiles(
+    listarchivefiles = ArchiveFileListFiles(
         outarray, seekstart, seekend, skipchecksum, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def ListDirListFilesAlt(infiles, dirlistfromtxt=False, fmttype="auto", followlink=False, listonly=False, contentasfile=True, seekstart=0, seekend=0, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = ListDirToArrayAlt(infiles, dirlistfromtxt, fmttype, followlink,
                                  listonly, contentasfile, checksumtype, formatspecs, verbose)
-    listcatfiles = ArchiveFileListFiles(
+    listarchivefiles = ArchiveFileListFiles(
         outarray, seekstart, seekend, skipchecksum, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def PackArchiveFileFromListDirAlt(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = ListDirToArrayAlt(infiles, dirlistfromtxt, fmttype, followlink,
                                  False, True, checksumtype, extradata, formatspecs, False)
-    listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
+    listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
                                      followlink, checksumtype, skipchecksum, extradata, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def PackArchiveFileFromTarFileAlt(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = TarFileToArrayAlt(
         infile, fmttype, False, True, checksumtype, extradata, formatspecs, False)
-    listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+    listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
                                      compressionlevel, compressionuselist, False, checksumtype, False, extradata, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 def PackArchiveFileFromZipFileAlt(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = ZipFileToArrayAlt(
         infile, fmttype, False, True, checksumtype, extradata, formatspecs, False)
-    listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+    listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
                                      compressionlevel, compressionuselist, False, checksumtype, False, extradata, formatspecs, verbose, returnfp)
-    return listcatfiles
+    return listarchivefiles
 
 
 if(not rarfile_support):
@@ -10316,9 +10304,9 @@ if(rarfile_support):
     def PackArchiveFileFromRarFileAlt(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         outarray = RarFileToArrayAlt(
             infile, fmttype, False, True, checksumtype, extradata, formatspecs, False)
-        listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+        listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
                                          compressionlevel, compressionuselist, False, checksumtype, False, extradata, formatspecs, verbose, returnfp)
-        return listcatfiles
+        return listarchivefiles
 
 
 if(not py7zr_support):
@@ -10329,9 +10317,9 @@ if(py7zr_support):
     def PackArchiveFileFromSevenZipFileAlt(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         outarray = SevenZipFileToArrayAlt(
             infile, fmttype, False, True, checksumtype, extradata, formatspecs, False)
-        listcatfiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+        listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
                                          compressionlevel, compressionuselist, False, checksumtype, False, extradata, formatspecs, verbose, returnfp)
-        return listcatfiles
+        return listarchivefiles
 
 
 def download_file_from_ftp_file(url):
@@ -10550,7 +10538,7 @@ def download_file_from_http_file(url, headers=None, usehttp=__use_http_lib__):
     return httpfile
 
 
-def download_file_from_http_string(url, headers=geturls_headers_pycatfile_python_alt, usehttp=__use_http_lib__):
+def download_file_from_http_string(url, headers=geturls_headers_pyarchivefile_python_alt, usehttp=__use_http_lib__):
     httpfile = download_file_from_http_file(url, headers, usehttp)
     return httpfile.read()
 
@@ -10788,7 +10776,7 @@ else:
         return False
 
 
-def download_file_from_internet_file(url, headers=geturls_headers_pycatfile_python_alt, usehttp=__use_http_lib__):
+def download_file_from_internet_file(url, headers=geturls_headers_pyarchivefile_python_alt, usehttp=__use_http_lib__):
     urlparts = urlparse(url)
     if(urlparts.scheme == "http" or urlparts.scheme == "https"):
         return download_file_from_http_file(url, headers, usehttp)
@@ -10804,7 +10792,7 @@ def download_file_from_internet_file(url, headers=geturls_headers_pycatfile_pyth
     return False
 
 
-def download_file_from_internet_uncompress_file(url, headers=geturls_headers_pycatfile_python_alt, formatspecs=__file_format_dict__):
+def download_file_from_internet_uncompress_file(url, headers=geturls_headers_pyarchivefile_python_alt, formatspecs=__file_format_dict__):
     fp = download_file_from_internet_file(url)
     fp = UncompressArchiveFile(fp, formatspecs)
     fp.seek(0, 0)
@@ -10813,7 +10801,7 @@ def download_file_from_internet_uncompress_file(url, headers=geturls_headers_pyc
     return fp
 
 
-def download_file_from_internet_string(url, headers=geturls_headers_pycatfile_python_alt):
+def download_file_from_internet_string(url, headers=geturls_headers_pyarchivefile_python_alt):
     urlparts = urlparse(url)
     if(urlparts.scheme == "http" or urlparts.scheme == "https"):
         return download_file_from_http_string(url, headers)
@@ -10829,7 +10817,7 @@ def download_file_from_internet_string(url, headers=geturls_headers_pycatfile_py
     return False
 
 
-def download_file_from_internet_uncompress_string(url, headers=geturls_headers_pycatfile_python_alt, formatspecs=__file_format_dict__):
+def download_file_from_internet_uncompress_string(url, headers=geturls_headers_pyarchivefile_python_alt, formatspecs=__file_format_dict__):
     fp = download_file_from_internet_string(url)
     fp = UncompressArchiveFile(fp, formatspecs)
     fp.seek(0, 0)
@@ -10857,7 +10845,7 @@ def upload_file_to_internet_file(ifp, url):
 def upload_file_to_internet_compress_file(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
     fp = CompressArchiveFile(
         fp, compression, compressionlevel, formatspecs)
-    if(not catfileout):
+    if(not archivefileout):
         return False
     fp.seek(0, 0)
     upload_file_to_internet_file(fp, outfile)
@@ -10883,7 +10871,7 @@ def upload_file_to_internet_string(ifp, url):
 def upload_file_to_internet_compress_string(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
     fp = CompressArchiveFile(
         BytesIO(ifp), compression, compressionlevel, formatspecs)
-    if(not catfileout):
+    if(not archivefileout):
         return False
     fp.seek(0, 0)
     upload_file_to_internet_file(fp, outfile)

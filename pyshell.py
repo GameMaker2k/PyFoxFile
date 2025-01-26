@@ -13,7 +13,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: pyshell.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: pyshell.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
@@ -23,9 +23,9 @@ import traceback
 import code
 import re
 import readline
-import pycatfile
+import pyarchivefile
 from sys import argv
-from pycatfile import *
+from pyarchivefile import *
 
 taskfound = False
 if(len(sys.argv) < 2):
@@ -35,7 +35,7 @@ if(len(sys.argv) < 2):
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform+os.linesep+"Loaded Python module " +
-          pycatfile.__program_name__+" "+pycatfile.__version__+os.linesep)
+          pyarchivefile.__program_name__+" "+pyarchivefile.__version__+os.linesep)
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)
@@ -60,7 +60,7 @@ if(sys.argv[1] == "sh" or sys.argv[1] == "shell" or sys.argv[1] == "pysh" or sys
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform+os.linesep+"Loaded Python module " +
-          pycatfile.__program_name__+" "+pycatfile.__version__+os.linesep)
+          pyarchivefile.__program_name__+" "+pyarchivefile.__version__+os.linesep)
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)
@@ -90,7 +90,7 @@ if(sys.argv[1] == "shebang" or sys.argv[1] == "shabang" or sys.argv[1] == "hashb
 
 if(sys.argv[1] == "version" or sys.argv[1] == "ver" or sys.argv[1] == "getversion" or sys.argv[1] == "getver"):
     taskfound = True
-    print(pycatfile.__version__)
+    print(pyarchivefile.__version__)
     sys.exit(0)
 
 if(sys.argv[1] == "exec" or sys.argv[1] == "run" or sys.argv[1] == "execute"):

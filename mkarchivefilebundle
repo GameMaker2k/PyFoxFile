@@ -14,7 +14,7 @@ fi
 export PYTHONPATH="$(command -v python${PYVER})"
 
 if [[ -z "${2}" ]]; then
- infile="catfile.py"
+ infile="archivefile.py"
  outfilebin="${infile%.*}"
  outfilezip="${infile%.*}.zip"
 else
@@ -23,7 +23,7 @@ else
   outfilebin="${infile%.*}"
   outfilezip="${infile%.*}.zip"
  else
-  infile="catfile.py"
+  infile="archivefile.py"
   outfilebin="${infile%.*}"
   outfilezip="${infile%.*}.zip"
  fi
@@ -34,14 +34,14 @@ if ! [ -x "$(command -v python${PYVER})" ]; then
  exit 1
 fi
 
-if [[ -f "./catfile.py" ]]; then
- ${PYTHONPATH} ./catfile.py "${infile}"
+if [[ -f "./archivefile.py" ]]; then
+ ${PYTHONPATH} ./archivefile.py "${infile}"
  exit 0
 fi
 
 mkdir -p -v /tmp/pybundle
 cp -r -v ./${infile} /tmp/pybundle/__main__.py
-cp -r -v ./pycatfile.py   /tmp/pybundle/pycatfile.py
+cp -r -v ./pyarchivefile.py   /tmp/pybundle/pyarchivefile.py
 export OLDPATH="$(pwd)"
 cd ./bundle/python${PYVER}
 rm -rfv *

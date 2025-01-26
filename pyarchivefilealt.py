@@ -11,18 +11,18 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class CatFilePacker:
+class ArchiveFilePacker:
     def __init__(self, checksum_type='crc32'):
         self.checksum_type = checksum_type
 
-    def pack_from_tar(self, tar_path, catfile_path):
+    def pack_from_tar(self, tar_path, archivefile_path):
         try:
-            with tarfile.open(tar_path, 'r') as tar, open(catfile_path, 'wb') as catfile:
+            with tarfile.open(tar_path, 'r') as tar, open(archivefile_path, 'wb') as archivefile:
                 for member in tar.getmembers():
                     if member.isfile():
                         file_data = tar.extractfile(member).read()
                         packed_data = self._pack_file_data(file_data, member)
-                        catfile.write(packed_data)
+                        archivefile.write(packed_data)
             return True
         except tarfile.TarError as e:
             logger.error(f"Tar file error: {e}")
@@ -62,11 +62,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Pack files from a TAR archive into a CAT file.')
     parser.add_argument('tar_path', help='Path to the TAR file to pack')
-    parser.add_argument('catfile_path', help='Path to the CAT file to create')
+    parser.add_argument('archivefile_path', help='Path to the CAT file to create')
     args = parser.parse_args()
 
-    packer = CatFilePacker(checksum_type='crc32')
-    success = packer.pack_from_tar(args.tar_path, args.catfile_path)
+    packer = ArchiveFilePacker(checksum_type='crc32')
+    success = packer.pack_from_tar(args.tar_path, args.archivefile_path)
     if success:
         logger.info("Packing completed successfully.")
     else:

@@ -1,14 +1,14 @@
 import unittest
-# Assuming the script above is named pycatfilealt.py
-from pycatfilealt import CatFilePacker
+# Assuming the script above is named pyarchivefilealt.py
+from pyarchivefilealt import ArchiveFilePacker
 import os
 
 
-class TestCatFilePacker(unittest.TestCase):
+class TestArchiveFilePacker(unittest.TestCase):
     def setUp(self):
-        self.packer = CatFilePacker(checksum_type='crc32')
+        self.packer = ArchiveFilePacker(checksum_type='crc32')
         self.test_tar_path = 'test.tar'
-        self.test_catfile_path = 'test.cat'
+        self.test_archivefile_path = 'test.cat'
 
     def test_pack_from_tar(self):
         # Implement this test with actual file operations or mocking

@@ -1,10 +1,10 @@
 import unittest
 import os
 from io import BytesIO
-import pycatfile  # Ensure pycatfile.py is accessible
+import pyarchivefile  # Ensure pyarchivefile.py is accessible
 
 
-class TestPyCatFile(unittest.TestCase):
+class TestPyArchiveFile(unittest.TestCase):
     def setUp(self):
         """Prepare environment for testing."""
         # Create example files to pack
@@ -27,9 +27,9 @@ class TestPyCatFile(unittest.TestCase):
 
     def test_pack_files(self):
         """Test packing files into a single file."""
-        # Assuming a function PackCatFile exists for packing files
+        # Assuming a function PackArchiveFile exists for packing files
         with open(self.packed_file, 'wb') as out_file:
-            pycatfile.PackCatFile(
+            pyarchivefile.PackArchiveFile(
                 self.test_files, out_file, compression="none", checksum="none", verbose=False)
 
         # Check if the packed file has been created
@@ -39,12 +39,12 @@ class TestPyCatFile(unittest.TestCase):
         """Test listing contents of a packed file."""
         # First, pack files into a single file
         with open(self.packed_file, 'wb') as out_file:
-            pycatfile.PackCatFile(
+            pyarchivefile.PackArchiveFile(
                 self.test_files, out_file, compression="none", checksum="none", verbose=False)
 
-        # Assuming a function CatFileListFiles exists for listing contents
+        # Assuming a function ArchiveFileListFiles exists for listing contents
         with open(self.packed_file, 'rb') as in_file:
-            contents = pycatfile.CatFileListFiles(in_file, verbose=False)
+            contents = pyarchivefile.ArchiveFileListFiles(in_file, verbose=False)
 
         # Check if the contents match the packed files
         expected_contents = set(self.test_files)

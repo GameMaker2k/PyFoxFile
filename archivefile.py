@@ -14,14 +14,14 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: catfile.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: archivefile.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
 import os
 import sys
 import argparse
-import pycatfile
+import pyarchivefile
 import binascii
 
 # Conditional import and signal handling for Unix-like systems
@@ -29,13 +29,13 @@ if os.name != 'nt':  # Not Windows
     import signal
 
     def handler(signum, frame):
-        pycatfile.VerbosePrintOut(
+        pyarchivefile.VerbosePrintOut(
             "Received SIGPIPE, exiting gracefully.", "info")
         sys.exit(0)
 signal.signal(signal.SIGPIPE, handler)
 
-rarfile_support = pycatfile.rarfile_support
-py7zr_support = pycatfile.py7zr_support
+rarfile_support = pyarchivefile.rarfile_support
+py7zr_support = pyarchivefile.py7zr_support
 
 if(sys.version[0] == "2"):
     try:
@@ -70,46 +70,46 @@ else:
         except ImportError:
             teststringio = 0
 
-__project__ = pycatfile.__project__
-__program_name__ = pycatfile.__program_name__
-__file_format_name__ = pycatfile.__file_format_name__
-__file_format_lower__ = pycatfile.__file_format_lower__
-__file_format_magic__ = pycatfile.__file_format_magic__
-__file_format_len__ = pycatfile.__file_format_len__
-__file_format_hex__ = pycatfile.__file_format_hex__
-__file_format_delimiter__ = pycatfile.__file_format_delimiter__
-__file_format_dict__ = pycatfile.__file_format_dict__
-__file_format_default__ = pycatfile.__file_format_default__
-__file_format_multi_dict__ = pycatfile.__file_format_multi_dict__
-__use_new_style__ = pycatfile.__use_new_style__
-__use_advanced_list__ = pycatfile.__use_advanced_list__
-__use_alt_inode__ = pycatfile.__use_alt_inode__
-__project_url__ = pycatfile.__project_url__
-__version_info__ = pycatfile.__version_info__
-__version_date_info__ = pycatfile.__version_date_info__
-__version_date__ = pycatfile.__version_date__
-__version_date_plusrc__ = pycatfile.__version_date_plusrc__
-__version__ = pycatfile.__version__
+__project__ = pyarchivefile.__project__
+__program_name__ = pyarchivefile.__program_name__
+__file_format_name__ = pyarchivefile.__file_format_name__
+__file_format_lower__ = pyarchivefile.__file_format_lower__
+__file_format_magic__ = pyarchivefile.__file_format_magic__
+__file_format_len__ = pyarchivefile.__file_format_len__
+__file_format_hex__ = pyarchivefile.__file_format_hex__
+__file_format_delimiter__ = pyarchivefile.__file_format_delimiter__
+__file_format_dict__ = pyarchivefile.__file_format_dict__
+__file_format_default__ = pyarchivefile.__file_format_default__
+__file_format_multi_dict__ = pyarchivefile.__file_format_multi_dict__
+__use_new_style__ = pyarchivefile.__use_new_style__
+__use_advanced_list__ = pyarchivefile.__use_advanced_list__
+__use_alt_inode__ = pyarchivefile.__use_alt_inode__
+__project_url__ = pyarchivefile.__project_url__
+__version_info__ = pyarchivefile.__version_info__
+__version_date_info__ = pyarchivefile.__version_date_info__
+__version_date__ = pyarchivefile.__version_date__
+__version_date_plusrc__ = pyarchivefile.__version_date_plusrc__
+__version__ = pyarchivefile.__version__
 
 # Initialize the argument parser
 argparser = argparse.ArgumentParser(
-    description="Manipulate concatenated files.", conflict_handler="resolve", add_help=True)
+    description="Manipulate archive files.", conflict_handler="resolve", add_help=True)
 
 # Version information
 argparser.add_argument("-V", "--version", action="version",
                        version=__program_name__ + " " + __version__)
 # Input and output specifications
 argparser.add_argument(
-    "-i", "--input", nargs="+", help="Specify the file(s) to concatenate or the concatenated file to extract.", required=True)
+    "-i", "--input", nargs="+", help="Specify the file(s) to concatenate or the archive file to extract.", required=True)
 argparser.add_argument("-o", "--output", default=None,
-                       help="Specify the name for the extracted or output concatenated files.")
+                       help="Specify the name for the extracted or output archive files.")
 # Operations
 argparser.add_argument("-c", "--create", action="store_true",
                        help="Perform only the concatenation operation.")
 argparser.add_argument("-e", "--extract", action="store_true",
                        help="Perform only the extraction operation.")
 argparser.add_argument("-t", "--convert", action="store_true",
-                       help="Convert a tar/zip/rar/7zip file to a concatenated file.")
+                       help="Convert a tar/zip/rar/7zip file to a archive file.")
 argparser.add_argument("-r", "--repack", action="store_true",
                        help="Re-concatenate files, fixing checksum errors if any.")
 # File manipulation options
@@ -120,7 +120,7 @@ argparser.add_argument(
 argparser.add_argument(
     "-m", "--formatver", default=__file_format_dict__['format_ver'], help="Specify the format version.")
 argparser.add_argument("-l", "--list", action="store_true",
-                       help="List files included in the concatenated file.")
+                       help="List files included in the archive file.")
 # Compression options
 argparser.add_argument("-P", "--compression", default="auto",
                        help="Specify the compression method to use for concatenation.")
@@ -130,7 +130,7 @@ argparser.add_argument("-W", "--wholefile", action="store_true",
                        help="Whole file compression method to use for concatenation.")
 # Checksum and validation
 argparser.add_argument("-v", "--validate", action="store_true",
-                       help="Validate concatenated file checksums.")
+                       help="Validate archive file checksums.")
 argparser.add_argument("-C", "--checksum", default="crc32",
                        help="Specify the type of checksum to use. The default is crc32.")
 argparser.add_argument("-s", "--skipchecksum", action="store_true",
@@ -172,72 +172,72 @@ input_file = getargs.input[0]
 if active_action:
     if active_action == 'create':
         if getargs.convert:
-            checkcompressfile = pycatfile.CheckCompressionSubType(
+            checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pycatfile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, getargs.verbose, False)
+                tmpout = pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, getargs.verbose, False)
             else:
-                tmpout = pycatfile.PackArchiveFileFromInFile(
-                    input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
+                tmpout = pyarchivefile.PackArchiveFileFromInFile(
+                    input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pycatfile.PackArchiveFile(getargs.input, getargs.output, getargs.text, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, False, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
+            pyarchivefile.PackArchiveFile(getargs.input, getargs.output, getargs.text, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
     elif active_action == 'repack':
         if getargs.convert:
-            checkcompressfile = pycatfile.CheckCompressionSubType(
+            checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                pycatfile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt,
+                pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt,
                                             False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, getargs.verbose, False)
             else:
-                pycatfile.PackArchiveFileFromInFile(input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
+                pyarchivefile.PackArchiveFileFromInFile(input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, getargs.verbose, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pycatfile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt,
+            pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt,
                                         False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, getargs.verbose, False)
     elif active_action == 'extract':
         if getargs.convert:
-            checkcompressfile = pycatfile.CheckCompressionSubType(
+            checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             tempout = BytesIO()
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pycatfile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, False, False)
+                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, False, False)
             else:
-                tmpout = pycatfile.PackArchiveFileFromInFile(
-                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, False, False)
+                tmpout = pyarchivefile.PackArchiveFileFromInFile(
+                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, False, False)
             if(not tmpout):
                 sys.exit(1)
             input_file = tempout
-        pycatfile.UnPackArchiveFile(input_file, getargs.output, False, 0, 0, getargs.skipchecksum,
+        pyarchivefile.UnPackArchiveFile(input_file, getargs.output, False, 0, 0, getargs.skipchecksum,
                                     fnamedict, getargs.verbose, getargs.preserve, getargs.preserve, False)
     elif active_action == 'list':
         if getargs.convert:
-            checkcompressfile = pycatfile.CheckCompressionSubType(
+            checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pycatfile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
+                tmpout = pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
             else:
-                tmpout = pycatfile.InFileListFiles(input_file, getargs.verbose, fnamedict, False)
+                tmpout = pyarchivefile.InFileListFiles(input_file, getargs.verbose, fnamedict, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pycatfile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
+            pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
     elif active_action == 'validate':
         if getargs.convert:
-            checkcompressfile = pycatfile.CheckCompressionSubType(
+            checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             tempout = BytesIO()
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pycatfile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, False, False)
+                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], fnamedict, False, False)
             else:
-                tmpout = pycatfile.PackArchiveFileFromInFile(
-                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pycatfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, False, False)
+                tmpout = pyarchivefile.PackArchiveFileFromInFile(
+                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], fnamedict, False, False)
             input_file = tempout
             if(not tmpout):
                 sys.exit(1)
-        fvalid = pycatfile.ArchiveFileValidate(
+        fvalid = pyarchivefile.ArchiveFileValidate(
             input_file, "auto", fnamedict, getargs.verbose, False)
         if(not getargs.verbose):
             import sys
@@ -245,6 +245,6 @@ if active_action:
             logging.basicConfig(format="%(message)s",
                                 stream=sys.stdout, level=logging.DEBUG)
         if(fvalid):
-            pycatfile.VerbosePrintOut("File is valid: \n" + str(input_file))
+            pyarchivefile.VerbosePrintOut("File is valid: \n" + str(input_file))
         else:
-            pycatfile.VerbosePrintOut("File is invalid: \n" + str(input_file))
+            pyarchivefile.VerbosePrintOut("File is invalid: \n" + str(input_file))

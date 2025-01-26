@@ -14,7 +14,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: mkbundle.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: mkbundle.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 import os
@@ -85,15 +85,15 @@ if(len(sys.argv) > 2):
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
     elif(os.path.exists("./"+sys.argv[2]) and os.path.isdir("./"+sys.argv[2])):
-        infile = "catfile.py"
+        infile = "archivefile.py"
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
     else:
-        infile = "catfile.py"
+        infile = "archivefile.py"
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
 else:
-    infile = "catfile.py"
+    infile = "archivefile.py"
     outfilebin = os.path.splitext(infile)[0]
     outfilezip = outfilebin+".zip"
 if(os.path.exists(tempdir+"/pybundle") and os.path.isfile(tempdir+"/pybundle")):
@@ -106,11 +106,11 @@ if(os.path.exists(tempdir+"/pybundle/__main__.py") and os.path.isfile(tempdir+"/
 if(os.path.exists(tempdir+"/pybundle/__main__.py") and os.path.isdir(tempdir+"/pybundle/__main__.py")):
     shutil.rmtree(tempdir+"/pybundle/__main__.py")
 shutil.copy2("./"+infile, tempdir+"/pybundle/__main__.py")
-if(os.path.exists(tempdir+"/pybundle/pycatfile.py") and os.path.isfile(tempdir+"/pybundle/pycatfile.py")):
-    os.unlink(tempdir+"/pybundle/pycatfile.py")
-if(os.path.exists(tempdir+"/pybundle/pycatfile.py") and os.path.isdir(tempdir+"/pybundle/pycatfile.py")):
-    shutil.rmtree(tempdir+"/pybundle/pycatfile.py")
-shutil.copy2("./pycatfile.py", tempdir+"/pybundle/pycatfile.py")
+if(os.path.exists(tempdir+"/pybundle/pyarchivefile.py") and os.path.isfile(tempdir+"/pybundle/pyarchivefile.py")):
+    os.unlink(tempdir+"/pybundle/pyarchivefile.py")
+if(os.path.exists(tempdir+"/pybundle/pyarchivefile.py") and os.path.isdir(tempdir+"/pybundle/pyarchivefile.py")):
+    shutil.rmtree(tempdir+"/pybundle/pyarchivefile.py")
+shutil.copy2("./pyarchivefile.py", tempdir+"/pybundle/pyarchivefile.py")
 if(os.path.exists(tempdir+"/"+outfilezip) and os.path.isfile(tempdir+"/"+outfilezip)):
     os.unlink(tempdir+"/"+outfilezip)
 if(os.path.exists(tempdir+"/"+outfilezip) and os.path.isdir(tempdir+"/"+outfilezip)):
@@ -150,7 +150,7 @@ elif(os.path.sep == "\\"):
 curscrpath = curscrpath+os.path.sep
 scrfile = curscrpath+outfilebin
 '''
-if(os.path.exists(scrfile) and os.path.isfile(scrfile) and infile=="catfile.py"):
+if(os.path.exists(scrfile) and os.path.isfile(scrfile) and infile=="archivefile.py"):
  scrcmd = subprocess.Popen([sys.executable, scrfile, "mksymlinks"]);
  scrcmd.wait();
 '''

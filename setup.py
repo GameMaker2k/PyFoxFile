@@ -13,7 +13,7 @@
     Copyright 2016-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2016-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: setup.py - Last Update: 1/24/2025 Ver. 0.17.2 RC 1 - Author: cooldude2k $
+    $FileInfo: setup.py - Last Update: 1/26/2025 Ver. 0.17.4 RC 1 - Author: cooldude2k $
 '''
 
 import os
@@ -23,7 +23,7 @@ import pkg_resources
 from setuptools import setup
 
 # Open and read the version info file in a Python 2/3 compatible way
-verinfofilename = os.path.realpath("."+os.path.sep+os.path.sep+"pycatfile.py")
+verinfofilename = os.path.realpath("."+os.path.sep+os.path.sep+"pyarchivefile.py")
 
 # Use `with` to ensure the file is properly closed after reading
 # In Python 2, open defaults to text mode; in Python 3, it’s better to specify encoding
@@ -65,22 +65,22 @@ pymodule['verdate'] = str(setuppy_dateinfo_exp[0])+"." + \
 pymodule['verdaterc'] = int(setuppy_dateinfo_exp[4])
 pymodule['verdatelist'] = (int(setuppy_dateinfo_exp[0]), int(setuppy_dateinfo_exp[1]), int(
     setuppy_dateinfo_exp[2]), str(setuppy_dateinfo_exp[3]), int(setuppy_dateinfo_exp[4]))
-pymodule['name'] = 'PyCatFile'
+pymodule['name'] = 'PyArchiveFile'
 pymodule['author'] = 'Kazuki Przyborowski'
 pymodule['authoremail'] = 'kazuki.przyborowski@gmail.com'
 pymodule['maintainer'] = 'Kazuki Przyborowski'
 pymodule['maintaineremail'] = 'kazuki.przyborowski@gmail.com'
-pymodule['description'] = 'A tar like file format name catfile after unix cat command (concatenate files) .'
+pymodule['description'] = 'A tar like file format name archivefile after unix cat command (concatenate files) .'
 pymodule['license'] = 'Revised BSD License'
-pymodule['keywords'] = 'cat catfile cat-archive catfile-archive pycatfile python python-catfile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite hairball'
-pymodule['url'] = 'https://github.com/GameMaker2k/PyCatFile'
-pymodule['downloadurl'] = 'https://github.com/GameMaker2k/PyCatFile/archive/master.tar.gz'
+pymodule['keywords'] = 'cat archivefile cat-archive archivefile-archive pyarchivefile python python-archivefile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite hairball'
+pymodule['url'] = 'https://github.com/GameMaker2k/PyArchiveFile'
+pymodule['downloadurl'] = 'https://github.com/GameMaker2k/PyArchiveFile/archive/master.tar.gz'
 pymodule[
-    'longdescription'] = 'A tar like file format name catfile after unix cat command (concatenate files) .'
+    'longdescription'] = 'A tar like file format name archivefile after unix cat command (concatenate files) .'
 pymodule['platforms'] = 'OS Independent'
 pymodule['zipsafe'] = True
-pymodule['pymodules'] = ['pycatfile']
-pymodule['scripts'] = ['catfile.py', 'neocatfile.py']
+pymodule['pymodules'] = ['pyarchivefile']
+pymodule['scripts'] = ['archivefile.py', 'neoarchivefile.py']
 pymodule['classifiers'] = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',
