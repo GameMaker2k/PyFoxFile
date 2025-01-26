@@ -6340,12 +6340,7 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
         compresschecking = CheckCompressionType(fp, formatspecs, False)
         if(compresschecking not in formatspecs):
             fp.seek(0, 0)
-            compresschecking = CheckCompressionSubType(fp, formatspecs, True)
-            if(compresschecking not in formatspecs):
-                return False
-            else:
-                formatspecs = formatspecs[compresschecking]
-                fp.seek(0, 0)
+            return False
         else:
             formatspecs = formatspecs[compresschecking]
             fp.seek(0, 0)
@@ -6641,13 +6636,7 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
     if(IsNestedDict(formatspecs)):
         compresschecking = CheckCompressionType(fp, formatspecs, False)
         if(compresschecking not in formatspecs):
-            fp.seek(0, 0)
-            compresschecking = CheckCompressionSubType(fp, formatspecs, True)
-            if(compresschecking not in formatspecs):
-                return False
-            else:
-                formatspecs = formatspecs[compresschecking]
-                fp.seek(0, 0)
+            return False
         else:
             formatspecs = formatspecs[compresschecking]
             fp.seek(0, 0)
@@ -6950,13 +6939,7 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
     if(IsNestedDict(formatspecs)):
         compresschecking = CheckCompressionType(fp, formatspecs, False)
         if(compresschecking not in formatspecs):
-            fp.seek(0, 0)
-            compresschecking = CheckCompressionSubType(fp, formatspecs, True)
-            if(compresschecking not in formatspecs):
-                return False
-            else:
-                formatspecs = formatspecs[compresschecking]
-                fp.seek(0, 0)
+            return False
         else:
             formatspecs = formatspecs[compresschecking]
             fp.seek(0, 0)
@@ -7291,13 +7274,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
     if(IsNestedDict(formatspecs)):
         compresschecking = CheckCompressionType(fp, formatspecs, False)
         if(compresschecking not in formatspecs):
-            fp.seek(0, 0)
-            compresschecking = CheckCompressionSubType(fp, formatspecs, True)
-            if(compresschecking not in formatspecs):
-                return False
-            else:
-                formatspecs = formatspecs[compresschecking]
-                fp.seek(0, 0)
+            return False
         else:
             formatspecs = formatspecs[compresschecking]
             fp.seek(0, 0)
