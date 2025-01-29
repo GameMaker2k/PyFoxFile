@@ -315,7 +315,7 @@ if not __use_ini_file__ and not __include_defaults__:
     __include_defaults__ = True
 if(__include_defaults__):
     if("ArchiveFile" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_lower': "archivefile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".cat" } } )
+        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_lower': "archivefile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".arc" } } )
 if(__file_format_default__ not in __file_format_multi_dict__):
     __file_format_default__ = next(iter(__file_format_multi_dict__))
 __file_format_name__ = __file_format_multi_dict__[__file_format_default__]['format_name']
