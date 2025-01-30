@@ -70,13 +70,13 @@ pymodule['author'] = 'Kazuki Przyborowski'
 pymodule['authoremail'] = 'kazuki.przyborowski@gmail.com'
 pymodule['maintainer'] = 'Kazuki Przyborowski'
 pymodule['maintaineremail'] = 'kazuki.przyborowski@gmail.com'
-pymodule['description'] = 'A tar like file format name archivefile after unix cat command (concatenate files) .'
+pymodule['description'] = 'A tar like file format name archivefile.'
 pymodule['license'] = 'Revised BSD License'
-pymodule['keywords'] = 'cat archivefile cat-archive archivefile-archive pyarchivefile python python-archivefile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite hairball'
+pymodule['keywords'] = 'archivefile archive archivefile-archive pyarchivefile python python-archivefile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite'
 pymodule['url'] = 'https://github.com/GameMaker2k/PyArchiveFile'
 pymodule['downloadurl'] = 'https://github.com/GameMaker2k/PyArchiveFile/archive/master.tar.gz'
 pymodule[
-    'longdescription'] = 'A tar like file format name archivefile after unix cat command (concatenate files) .'
+    'longdescription'] = 'A tar like file format name archivefile.'
 pymodule['platforms'] = 'OS Independent'
 pymodule['zipsafe'] = True
 pymodule['pymodules'] = ['pyarchivefile']
