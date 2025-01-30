@@ -304,15 +304,15 @@ if __use_ini_file__ and os.path.exists(__config_file__):
     # Loop through all sections
     for section in config.sections():
         required_keys = [
-            "len", "hex", "ver", "name", "lower", 
+            "len", "hex", "ver", "name", 
             "magic", "delimiter", "extension",
             "newstyle", "advancedlist", "altinode"
         ]
-        if all(key in config[section] for key in required_keys):
+        if section != "config" and all(key in config[section] for key in required_keys):
             delim = decode_unicode_escape(config.get(section, 'delimiter'))
             if(not is_only_nonprintable(delim)):
                 delim = "\x00" * len("\x00")
-            __file_format_multi_dict__.update( { decode_unicode_escape(config.get(section, 'magic')): {'format_name': decode_unicode_escape(config.get(section, 'name')), 'format_magic': decode_unicode_escape(config.get(section, 'magic')), 'format_lower': decode_unicode_escape(config.get(section, 'lower')), 'format_len': config.getint(section, 'len'), 'format_hex': config.get(section, 'hex'), 'format_delimiter': delim, 'format_ver': config.get(section, 'ver'), 'new_style': config.getboolean(section, 'newstyle'), 'use_advanced_list': config.getboolean(section, 'advancedlist'), 'use_alt_inode': config.getboolean(section, 'altinode'), 'format_extension': decode_unicode_escape(config.get(section, 'extension')) } } )
+            __file_format_multi_dict__.update( { decode_unicode_escape(config.get(section, 'magic')): {'format_name': decode_unicode_escape(config.get(section, 'name')), 'format_magic': decode_unicode_escape(config.get(section, 'magic')), 'format_len': config.getint(section, 'len'), 'format_hex': config.get(section, 'hex'), 'format_delimiter': delim, 'format_ver': config.get(section, 'ver'), 'new_style': config.getboolean(section, 'newstyle'), 'use_advanced_list': config.getboolean(section, 'advancedlist'), 'use_alt_inode': config.getboolean(section, 'altinode'), 'format_extension': decode_unicode_escape(config.get(section, 'extension')) } } )
         if not __file_format_multi_dict__ and not __include_defaults__:
             __include_defaults__ = True
 elif __use_ini_file__ and not os.path.exists(__config_file__):
@@ -322,11 +322,10 @@ if not __use_ini_file__ and not __include_defaults__:
     __include_defaults__ = True
 if(__include_defaults__):
     if("ArchiveFile" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_lower': "archivefile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".arc" } } )
+        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".arc" } } )
 if(__file_format_default__ not in __file_format_multi_dict__):
     __file_format_default__ = next(iter(__file_format_multi_dict__))
 __file_format_name__ = __file_format_multi_dict__[__file_format_default__]['format_name']
-__file_format_lower__ = __file_format_multi_dict__[__file_format_default__]['format_lower']
 __file_format_magic__ = __file_format_multi_dict__[__file_format_default__]['format_magic']
 __file_format_len__ = __file_format_multi_dict__[__file_format_default__]['format_len']
 __file_format_hex__ = __file_format_multi_dict__[__file_format_default__]['format_hex']
