@@ -2192,13 +2192,18 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     fseeknextfile = HeaderOut[26]
     fextrasize = int(HeaderOut[27], 16)
     fextrafields = int(HeaderOut[28], 16)
-    extrafieldslist = []
+    fextrafieldslist = []
     extrastart = 29
     extraend = extrastart + fextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
-        extrafieldslist.append(HeaderOut[extrastart])
+        fextrafieldslist.append(HeaderOut[extrastart])
         extrastart = extrastart + 1
+    if(fextrasize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fextrasize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
     newfcs = GetHeaderChecksum(
@@ -2268,7 +2273,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     if(not contentasfile):
         fcontents = fcontents.read()
     outlist = {'fheadersize': fheadsize, 'fhstart': fheaderstart, 'fhend': fhend, 'ftype': ftype, 'fencoding': fencoding, 'fcencoding': fcencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextralist': extrafieldslist, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
+               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextralist': fextrafieldslist, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
     return outlist
 
 
@@ -2318,13 +2323,18 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
     fseeknextfile = HeaderOut[26]
     fextrasize = int(HeaderOut[27], 16)
     fextrafields = int(HeaderOut[28], 16)
-    extrafieldslist = []
+    fextrafieldslist = []
     extrastart = 29
     extraend = extrastart + fextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
-        extrafieldslist.append(HeaderOut[extrastart])
+        fextrafieldslist.append(HeaderOut[extrastart])
         extrastart = extrastart + 1
+    if(fextrasize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fextrasize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
     newfcs = GetHeaderChecksum(
@@ -2394,7 +2404,7 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
     if(not contentasfile):
         fcontents = fcontents.read()
     outlist = [ftype, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression, fcsize, fuid, funame, fgid, fgname, fid,
-               finode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile, extrafieldslist, HeaderOut[-4], HeaderOut[-3], fcontents]
+               finode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile, fextrafieldslist, HeaderOut[-4], HeaderOut[-3], fcontents]
     return outlist
 
 
@@ -2488,10 +2498,15 @@ def ReadFileDataWithContentToArray(fp, seekstart=0, seekend=0, listonly=False, c
     fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
+    if(fextrasize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fextrasize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -2624,10 +2639,15 @@ def ReadFileDataWithContentToList(fp, seekstart=0, seekend=0, listonly=False, co
     fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
+    if(fextrasize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fextrasize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -3133,6 +3153,8 @@ def AppendFileHeader(fp, numfiles, fencoding, extradata=[], checksumtype="crc32"
     fileheader = AppendNullByte(
         formatspecs['format_magic'] + fileheaderver, formatspecs['format_delimiter'])
     extrafields = format(len(extradata), 'x').lower()
+    if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
         extrasizestr = extrasizestr + \
@@ -3153,19 +3175,19 @@ def AppendFileHeader(fp, numfiles, fencoding, extradata=[], checksumtype="crc32"
             extradata, formatspecs['format_delimiter'])
     fnumfilesa = fnumfilesa + \
         AppendNullByte(checksumtype, formatspecs['format_delimiter'])
-    archivefileheadercshex = GetFileChecksum(
+    outfileheadercshex = GetFileChecksum(
         fnumfilesa, checksumtype, True, formatspecs)
     tmpfileoutstr = fnumfilesa + \
-        AppendNullByte(archivefileheadercshex,
+        AppendNullByte(outfileheadercshex,
                         formatspecs['format_delimiter'])
     formheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
     fnumfilesa = fileheader + \
         AppendNullByte(
         formheaersize, formatspecs['format_delimiter']) + fnumfilesa
-    archivefileheadercshex = GetFileChecksum(
+    outfileheadercshex = GetFileChecksum(
         fnumfilesa, checksumtype, True, formatspecs)
     fnumfilesa = fnumfilesa + \
-        AppendNullByte(archivefileheadercshex, formatspecs['format_delimiter'])
+        AppendNullByte(outfileheadercshex, formatspecs['format_delimiter'])
     formheaersize = format(int(len(fnumfilesa) - len(formatspecs['format_delimiter'])), 'x').lower()
     formheaersizestr = AppendNullByte(formheaersize, formatspecs['format_delimiter'])
     try:
@@ -3285,6 +3307,8 @@ def MakeEmptyArchiveFile(outfile, compression="auto", compresswholefile=True, co
 def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="", checksumtype=["crc32", "crc32"], formatspecs=__file_format_dict__):
     if(not hasattr(fp, "write")):
         return False
+    if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
     extrafields = format(len(extradata), 'x').lower()
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
@@ -3297,41 +3321,41 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     tmpoutlist.insert(0, tmpoutlenhex)
     tmpoutlist.append(extrasizelen)
     tmpoutlist.append(extrafields)
-    archivefileoutstr = AppendNullBytes(
+    outfileoutstr = AppendNullBytes(
         tmpoutlist, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
-        archivefileoutstr = archivefileoutstr + \
+        outfileoutstr = outfileoutstr + \
             AppendNullBytes(extradata, formatspecs['format_delimiter'])
     if(len(filecontent) == 0):
         checksumlist = [checksumtype[0], "none"]
     else:
         checksumlist = checksumtype
-    archivefileoutstr = archivefileoutstr + \
+    outfileoutstr = outfileoutstr + \
         AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
-    archivefileheadercshex = GetFileChecksum(
-        archivefileoutstr, checksumtype[0], True, formatspecs)
+    outfileheadercshex = GetFileChecksum(
+        outfileoutstr, checksumtype[0], True, formatspecs)
     if(len(filecontent) == 0):
-        archivefilecontentcshex = GetFileChecksum(
+        outfilecontentcshex = GetFileChecksum(
             filecontent, "none", False, formatspecs)
     else:
-        archivefilecontentcshex = GetFileChecksum(
+        outfilecontentcshex = GetFileChecksum(
             filecontent, checksumtype[1], False, formatspecs)
-    tmpfileoutstr = archivefileoutstr + \
-        AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
+    tmpfileoutstr = outfileoutstr + \
+        AppendNullBytes([outfileheadercshex, outfilecontentcshex],
                         formatspecs['format_delimiter'])
     formheaersize = format(int(len(tmpfileoutstr) - len(formatspecs['format_delimiter'])), 'x').lower()
-    archivefileoutstr = AppendNullByte(
-        formheaersize, formatspecs['format_delimiter']) + archivefileoutstr
-    archivefileheadercshex = GetFileChecksum(
-        archivefileoutstr, checksumtype[0], True, formatspecs)
-    archivefileoutstr = archivefileoutstr + \
-        AppendNullBytes([archivefileheadercshex, archivefilecontentcshex],
+    outfileoutstr = AppendNullByte(
+        formheaersize, formatspecs['format_delimiter']) + outfileoutstr
+    outfileheadercshex = GetFileChecksum(
+        outfileoutstr, checksumtype[0], True, formatspecs)
+    outfileoutstr = outfileoutstr + \
+        AppendNullBytes([outfileheadercshex, outfilecontentcshex],
                         formatspecs['format_delimiter'])
-    archivefileoutstrecd = archivefileoutstr
+    outfileoutstrecd = outfileoutstr
     nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
-    archivefileout = archivefileoutstrecd + filecontent + nullstrecd
+    outfileout = outfileoutstrecd + filecontent + nullstrecd
     try:
-        fp.write(archivefileout)
+        fp.write(outfileout)
     except OSError:
         return False
     try:
@@ -4018,6 +4042,19 @@ def IsNestedDict(variable):
         if isinstance(value, dict):
             return True
 
+    return False
+
+def IsNestedDictAlt(variable):
+    """
+    Check if the input 'variable' (which is expected to be a list) contains
+    any dictionary or list elements. Works in Python 2 and 3.
+
+    :param variable: list to check
+    :return: True if there's at least one dict or list in 'variable', otherwise False
+    """
+    for elem in variable:
+        if isinstance(elem, (dict, list)):
+            return True
     return False
 
 def IsSingleDict(variable):
@@ -6460,10 +6497,15 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
     fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
+    if(fextrasize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fextrasize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -6538,13 +6580,8 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
             prefseeknextfile = preheaderdata[26]
             prefextrasize = int(preheaderdata[27], 16)
             prefextrafields = int(preheaderdata[28], 16)
-            extrafieldslist = []
             extrastart = 29
             extraend = extrastart + prefextrafields
-            extrafieldslist = []
-            if(extrastart < extraend):
-                extrafieldslist.append(preheaderdata[extrastart])
-                extrastart = extrastart + 1
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
@@ -6757,10 +6794,15 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
     fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
+    if(fnumextrafieldsize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fnumextrafieldsize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -6833,13 +6875,8 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
             prefseeknextfile = preheaderdata[26]
             prefextrasize = int(preheaderdata[27], 16)
             prefextrafields = int(preheaderdata[28], 16)
-            extrafieldslist = []
             extrastart = 29
             extraend = extrastart + prefextrafields
-            extrafieldslist = []
-            if(extrastart < extraend):
-                extrafieldslist.append(preheaderdata[extrastart])
-                extrastart = extrastart + 1
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
@@ -7058,13 +7095,8 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
             fp, formatspecs['format_delimiter'])
     fnumextrafieldsize = int(inheader[5], 16)
     fnumextrafields = int(inheader[6], 16)
-    fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
-    if(extrastart < extraend):
-        fextrafieldslist.append(inheader[extrastart])
-        extrastart = extrastart + 1
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -7150,13 +7182,8 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
         outfseeknextfile = inheaderdata[26]
         outfextrasize = int(inheaderdata[27], 16)
         outfextrafields = int(inheaderdata[28], 16)
-        extrafieldslist = []
         extrastart = 29
         extraend = extrastart + outfextrafields
-        extrafieldslist = []
-        if(extrastart < extraend):
-            extrafieldslist.append(inheaderdata[extrastart])
-            extrastart = extrastart + 1
         outfcs = inheaderdata[-2].lower()
         outfccs = inheaderdata[-1].lower()
         infcs = GetHeaderChecksum(
@@ -7397,10 +7424,15 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
     fextrafieldslist = []
     extrastart = 7
     extraend = extrastart + fnumextrafields
-    extrafieldslist = []
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
+    if(fnumextrafieldsize==1):
+        try:
+            fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
+            fnumextrafieldsize = len(fextrafieldslist)
+        except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+            pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -7456,13 +7488,8 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
             prefseeknextfile = preheaderdata[26]
             prefextrasize = int(preheaderdata[27], 16)
             prefextrafields = int(preheaderdata[28], 16)
-            extrafieldslist = []
             extrastart = 29
             extraend = extrastart + prefextrafields
-            extrafieldslist = []
-            if(extrastart < extraend):
-                extrafieldslist.append(preheaderdata[extrastart])
-                extrastart = extrastart + 1
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
@@ -7561,10 +7588,15 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         extrafieldslist = []
         extrastart = 29
         extraend = extrastart + outfextrafields
-        extrafieldslist = []
         if(extrastart < extraend):
             extrafieldslist.append(inheaderdata[extrastart])
             extrastart = extrastart + 1
+        if(outfextrasize==1):
+            try:
+                extrafieldslist = json.loads(base64.b64decode(extrafieldslist[0]).decode("UTF-8"))
+                outfextrasize = len(extrafieldslist)
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
         outfcs = inheaderdata[-2].lower()
         outfccs = inheaderdata[-1].lower()
         infcs = GetHeaderChecksum(
@@ -8000,6 +8032,8 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
             fcsize = fcontents.tell()
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
+        if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8288,6 +8322,8 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
             fcencoding = GetFileEncoding(fcontents, False)
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
+        if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8571,6 +8607,8 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
             fcencoding = GetFileEncoding(fcontents, False)
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
+        if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8865,6 +8903,8 @@ if(rarfile_support):
                 fcencoding = GetFileEncoding(fcontents, False)
             fcontents.seek(0, 0)
             ftypehex = format(ftype, 'x').lower()
+            if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
             extrafields = len(extradata)
             extrafieldslist = extradata
             outfextrafields = extrafields
@@ -9104,6 +9144,8 @@ if(py7zr_support):
                 fcencoding = GetFileEncoding(fcontents, False)
             fcontents.seek(0, 0)
             ftypehex = format(ftype, 'x').lower()
+            if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
             extrafields = len(extradata)
             extrafieldslist = extradata
             outfextrafields = extrafields
@@ -11022,4 +11064,3 @@ def upload_file_to_internet_compress_string(ifp, url, compression="auto", compre
     fp.seek(0, 0)
     upload_file_to_internet_file(fp, outfile)
     return True
-
