@@ -1,7 +1,7 @@
 [project]
     name = "PyArchiveFile"
     version = "0.18.0"
-    readme = "README.md
+    readme = "README.md"
     license = "BSD-3-Clause"
     keywords = []
     description = "A tar like file format name archivefile."
