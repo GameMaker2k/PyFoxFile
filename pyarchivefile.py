@@ -2198,10 +2198,10 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     if(extrastart < extraend):
         fextrafieldslist.append(HeaderOut[extrastart])
         extrastart = extrastart + 1
-    if(fextrasize==1):
+    if(fextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fextrasize = len(fextrafieldslist)
+            fextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     fcs = HeaderOut[-2].lower()
@@ -2329,10 +2329,10 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
     if(extrastart < extraend):
         fextrafieldslist.append(HeaderOut[extrastart])
         extrastart = extrastart + 1
-    if(fextrasize==1):
+    if(fextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fextrasize = len(fextrafieldslist)
+            fextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     fcs = HeaderOut[-2].lower()
@@ -2501,10 +2501,10 @@ def ReadFileDataWithContentToArray(fp, seekstart=0, seekend=0, listonly=False, c
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
-    if(fextrasize==1):
+    if(fnumextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fextrasize = len(fextrafieldslist)
+            fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     if(curloc > 0):
@@ -2642,10 +2642,10 @@ def ReadFileDataWithContentToList(fp, seekstart=0, seekend=0, listonly=False, co
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
-    if(fextrasize==1):
+    if(fnumextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fextrasize = len(fextrafieldslist)
+            fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     if(curloc > 0):
@@ -3154,7 +3154,7 @@ def AppendFileHeader(fp, numfiles, fencoding, extradata=[], checksumtype="crc32"
         formatspecs['format_magic'] + fileheaderver, formatspecs['format_delimiter'])
     extrafields = format(len(extradata), 'x').lower()
     if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
         extrasizestr = extrasizestr + \
@@ -3308,7 +3308,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     if(not hasattr(fp, "write")):
         return False
     if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+        extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
     extrafields = format(len(extradata), 'x').lower()
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
@@ -6500,10 +6500,10 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
-    if(fextrasize==1):
+    if(fnumextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fextrasize = len(fextrafieldslist)
+            fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     if(curloc > 0):
@@ -6797,10 +6797,10 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
-    if(fnumextrafieldsize==1):
+    if(fnumextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fnumextrafieldsize = len(fextrafieldslist)
+            fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     if(curloc > 0):
@@ -7427,10 +7427,10 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
     if(extrastart < extraend):
         fextrafieldslist.append(inheader[extrastart])
         extrastart = extrastart + 1
-    if(fnumextrafieldsize==1):
+    if(fnumextrafields==1):
         try:
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
-            fnumextrafieldsize = len(fextrafieldslist)
+            fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             pass
     if(curloc > 0):
@@ -7591,10 +7591,10 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         if(extrastart < extraend):
             extrafieldslist.append(inheaderdata[extrastart])
             extrastart = extrastart + 1
-        if(outfextrasize==1):
+        if(outfextrafields==1):
             try:
                 extrafieldslist = json.loads(base64.b64decode(extrafieldslist[0]).decode("UTF-8"))
-                outfextrasize = len(extrafieldslist)
+                outfextrafields = len(extrafieldslist)
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                 pass
         outfcs = inheaderdata[-2].lower()
@@ -8033,7 +8033,7 @@ def ListDirToArrayAlt(infiles, dirlistfromtxt=False, fmttype=__file_format_defau
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
         if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8323,7 +8323,7 @@ def TarFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
         if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8608,7 +8608,7 @@ def ZipFileToArrayAlt(infile, fmttype=__file_format_default__, listonly=False, c
         fcontents.seek(0, 0)
         ftypehex = format(ftype, 'x').lower()
         if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+            extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
         extrafields = len(extradata)
         extrafieldslist = extradata
         outfextrafields = extrafields
@@ -8904,7 +8904,7 @@ if(rarfile_support):
             fcontents.seek(0, 0)
             ftypehex = format(ftype, 'x').lower()
             if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
             extrafields = len(extradata)
             extrafieldslist = extradata
             outfextrafields = extrafields
@@ -9145,7 +9145,7 @@ if(py7zr_support):
             fcontents.seek(0, 0)
             ftypehex = format(ftype, 'x').lower()
             if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
-                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')))]
+                extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
             extrafields = len(extradata)
             extrafieldslist = extradata
             outfextrafields = extrafields
