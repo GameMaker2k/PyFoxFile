@@ -3152,9 +3152,11 @@ def AppendFileHeader(fp, numfiles, fencoding, extradata=[], checksumtype="crc32"
     fileheaderver = str(int(formver.replace(".", "")))
     fileheader = AppendNullByte(
         formatspecs['format_magic'] + fileheaderver, formatspecs['format_delimiter'])
-    extrafields = format(len(extradata), 'x').lower()
-    if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+    if (isinstance(extradata, dict) or IsNestedDictAlt(extradata)) and len(extradata) > 0:
         extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
+    elif (isinstance(extradata, dict) or IsNestedDictAlt(extradata)) and len(extradata) == 0:
+        extradata = []
+    extrafields = format(len(extradata), 'x').lower()
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
         extrasizestr = extrasizestr + \
@@ -3307,8 +3309,10 @@ def MakeEmptyArchiveFile(outfile, compression="auto", compresswholefile=True, co
 def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="", checksumtype=["crc32", "crc32"], formatspecs=__file_format_dict__):
     if(not hasattr(fp, "write")):
         return False
-    if isinstance(extradata, dict) or IsNestedDictAlt(extradata):
+    if (isinstance(extradata, dict) or IsNestedDictAlt(extradata)) and len(extradata) > 0:
         extradata = [base64.b64encode(json.dumps(extradata, separators=(',', ':')).encode("UTF-8")).decode("UTF-8")]
+    elif (isinstance(extradata, dict) or IsNestedDictAlt(extradata)) and len(extradata) == 0:
+        extradata = []
     extrafields = format(len(extradata), 'x').lower()
     extrasizestr = AppendNullByte(extrafields, formatspecs['format_delimiter'])
     if(len(extradata) > 0):
