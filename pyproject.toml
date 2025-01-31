@@ -1,10 +1,10 @@
 [project]
     name = "PyArchiveFile"
-    version = "0.17.4"
+    version = "0.18.0"
     readme = "README.md
     license = "BSD-3-Clause"
     keywords = []
-    description = "A tar like file format name archivefile after unix cat command (concatenate files) ."
+    description = "A tar like file format name archivefile."
     authors = [
         { name = "Kazuki Przyborowski", email = "kazuki.przyborowski@gmail.com" },
     ]
