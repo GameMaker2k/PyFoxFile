@@ -2088,6 +2088,7 @@ def ReadFileHeaderDataWithContent(fp, listonly=False, uncompress=True, skipcheck
     fjsonsize = int(HeaderOut[27], 16)
     fjsoncontent = {}
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
+    print(fprejsoncontent)
     if(fjsonsize > 0):
         try:
             fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
@@ -2287,7 +2288,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
             fcontents.seek(0, 0)
             fccs = GetFileChecksum(
                 fcontents.read(), HeaderOut[-3].lower(), False, formatspecs)
-    fcontentend = fp.tell() - 1
+    fcontentend = fp.tell()
     if(re.findall("^\\+([0-9]+)", fseeknextfile)):
         fseeknextasnum = int(fseeknextfile.replace("+", ""))
         if(abs(fseeknextasnum) == 0):
