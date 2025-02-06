@@ -2227,7 +2227,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
                 pass
     fjsoncontent = {}
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
-    if(len(fjsoncontent) > 0):
+    if(fjsonsize > 0):
         try:
             fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
@@ -2377,7 +2377,7 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
                 pass
     fjsoncontent = {}
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
-    if(len(fjsoncontent) > 0):
+    if(fjsonsize > 0):
         try:
             fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
@@ -3386,7 +3386,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     fprejsoncontent = {'testing': "test"}
     if(len(fprejsoncontent) > 0):
         try:
-            fjsoncontent = base64.b64encode(json.dumps(fprejsoncontent).encode("UTF-8"))
+            fjsoncontent = base64.b64encode(json.dumps(fprejsoncontent, separators=(',', ':')).encode("UTF-8"))
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             try:
                 fjsoncontent = json.dumps(fprejsoncontent.decode("UTF-8"))
