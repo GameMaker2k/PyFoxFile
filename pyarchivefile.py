@@ -2213,7 +2213,10 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     fjsoncontent = {}
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
     if(len(fjsoncontent) > 0):
@@ -2352,7 +2355,10 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     fjsoncontent = {}
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
     if(len(fjsoncontent) > 0):
@@ -2531,7 +2537,10 @@ def ReadFileDataWithContentToArray(fp, seekstart=0, seekend=0, listonly=False, c
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -2672,7 +2681,10 @@ def ReadFileDataWithContentToList(fp, seekstart=0, seekend=0, listonly=False, co
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -6544,7 +6556,10 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -6841,7 +6856,10 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -7471,7 +7489,10 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
             fextrafieldslist = json.loads(base64.b64decode(fextrafieldslist[0]).decode("UTF-8"))
             fnumextrafields = len(fextrafieldslist)
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-            pass
+            try:
+                fextrafieldslist = json.loads(fextrafieldslist[0])
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                pass
     if(curloc > 0):
         fp.seek(curloc, 0)
     formversion = re.findall("([\\d]+)", formstring)
@@ -7635,7 +7656,10 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
                 extrafieldslist = json.loads(base64.b64decode(extrafieldslist[0]).decode("UTF-8"))
                 outfextrafields = len(extrafieldslist)
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-                pass
+                try:
+                    fextrafieldslist = json.loads(fextrafieldslist[0])
+                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                    pass
         outfcs = inheaderdata[-2].lower()
         outfccs = inheaderdata[-1].lower()
         infcs = GetHeaderChecksum(
