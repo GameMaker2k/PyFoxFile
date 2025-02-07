@@ -3367,7 +3367,7 @@ def MakeEmptyCatFile(outfile, compression="auto", compresswholefile=True, compre
     return MakeEmptyFile(outfile, compression, compresswholefile, compressionlevel, checksumtype, formatspecs, returnfp)
 
 
-def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="", checksumtype=["crc32", "crc32"], formatspecs=__file_format_dict__):
+def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, filecontent="", checksumtype=["crc32", "crc32"], formatspecs=__file_format_dict__):
     if(not hasattr(fp, "write")):
         return False
     if (isinstance(extradata, dict) or IsNestedDictAlt(extradata)) and len(extradata) > 0:
@@ -3383,13 +3383,12 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     tmpoutlen = len(filevalues) + len(extradata) + 7
     tmpoutlenhex = format(tmpoutlen, 'x').lower()
     tmpoutlist = filevalues
-    fprejsoncontent = {'testing': "test"}
-    if(len(fprejsoncontent) > 0):
+    if(len(jsondata) > 0):
         try:
-            fjsoncontent = base64.b64encode(json.dumps(fprejsoncontent, separators=(',', ':')).encode("UTF-8"))
+            fjsoncontent = base64.b64encode(json.dumps(jsondata, separators=(',', ':')).encode("UTF-8"))
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             try:
-                fjsoncontent = json.dumps(fprejsoncontent.decode("UTF-8"))
+                fjsoncontent = json.dumps(jsondata.decode("UTF-8"))
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                 fjsoncontent = "".encode("UTF-8")
     else:
@@ -3449,7 +3448,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], filecontent="",
     return fp
 
 
-def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], extradata=[], compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
+def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
     if(not hasattr(fp, "write")):
         return False
     advancedlist = formatspecs['use_advanced_list']
@@ -3742,7 +3741,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                       fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
     if(numfiles > 0):
         try:
             fp.write(AppendNullBytes(
@@ -3753,7 +3752,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
     return fp
 
 
-def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extradata=[], compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
+def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
     if(not hasattr(fp, "write")):
         return False
     if(verbose):
@@ -3811,7 +3810,7 @@ def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extr
                       fuid, funame, fgid, fgname, fid, finode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile]
         fcontents.seek(0, 0)
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
     if(numfiles > 0):
         try:
             fp.write(AppendNullBytes(
@@ -4866,7 +4865,7 @@ def CheckSumSupportAlt(checkfor, guaranteed=True):
         return False
 
 
-def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], extradata=[], compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
+def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
     if(not hasattr(fp, "write")):
         return False
     advancedlist = formatspecs['use_advanced_list']
@@ -5159,7 +5158,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                       fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
     if(numfiles > 0):
         try:
             fp.write(AppendNullBytes(
@@ -5170,7 +5169,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
     return fp
 
 
-def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extradata=[], compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
+def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
     if(not hasattr(fp, "write")):
         return False
     if(verbose):
@@ -5228,7 +5227,7 @@ def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extr
                       fuid, funame, fgid, fgname, fid, finode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile]
         fcontents.seek(0, 0)
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
     if(numfiles > 0):
         try:
             fp.write(AppendNullBytes(
@@ -6283,7 +6282,7 @@ def CheckSumSupportAlt(checkfor, guaranteed=True):
         return False
 
 
-def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -6621,7 +6620,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                       fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
         fcontents.close()
     if(numfiles > 0):
         try:
@@ -6670,7 +6669,7 @@ def PackArchiveFileFromDirList(infiles, outfile, dirlistfromtxt=False, fmttype="
     return PackArchiveFile(infiles, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, extradata, formatspecs, verbose, returnfp)
 
 
-def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -6921,7 +6920,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                       fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
         fcontents.close()
     if(numfiles > 0):
         try:
@@ -6966,7 +6965,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
         return True
 
 
-def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -7212,7 +7211,7 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                       fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
         fcontents.close()
     if(numfiles > 0):
         try:
@@ -7258,11 +7257,11 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
 
 
 if(not rarfile_support):
-    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         return False
 
 if(rarfile_support):
-    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         if(IsNestedDict(formatspecs) and fmttype=="auto" and 
             (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
             get_in_ext = os.path.splitext(outfile)
@@ -7532,7 +7531,7 @@ if(rarfile_support):
             tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                           fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
             AppendFileHeaderWithContent(
-                fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+                fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
             fcontents.close()
         if(numfiles > 0):
             try:
@@ -7582,7 +7581,7 @@ if(not py7zr_support):
         return False
 
 if(py7zr_support):
-    def PackArchiveFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackArchiveFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         if(IsNestedDict(formatspecs) and fmttype=="auto" and 
             (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
             get_in_ext = os.path.splitext(outfile)
@@ -7785,7 +7784,7 @@ if(py7zr_support):
             tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
                           fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
             AppendFileHeaderWithContent(
-                fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+                fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
             fcontents.close()
         if(numfiles > 0):
             try:
@@ -9402,7 +9401,7 @@ def ArchiveFileArrayToArrayIndex(inarray, seekstart=0, seekend=0, listonly=False
     return outarray
 
 
-def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, seekstart=0, seekend=0, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, seekstart=0, seekend=0, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(isinstance(infile, dict)):
         listarchivefiles = infile
     else:
@@ -9526,6 +9525,8 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 listarchivefiles['ffilelist'][reallcfi]['fextralist'])
         if(not followlink and len(extradata) < 0):
             extradata = listarchivefiles['ffilelist'][reallcfi]['fextralist']
+        if(not followlink and len(jsondata) <= 0):
+            jsondata = listarchivefiles['ffilelist'][reallcfi]['jsondata']
         fcontents = listarchivefiles['ffilelist'][reallcfi]['fcontents']
         if(not listarchivefiles['ffilelist'][reallcfi]['fcontentasfile']):
             fcontents = BytesIO(fcontents)
@@ -9606,6 +9607,8 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                     flinkinfo['fextrafields'] = len(flinkinfo['fextralist'])
                 if(len(extradata) < 0):
                     extradata = flinkinfo['fextralist']
+                if(len(jsondata) < 0):
+                    extradata = flinkinfo['jsondata']
                 fcontents = flinkinfo['fcontents']
                 if(not flinkinfo['fcontentasfile']):
                     fcontents = BytesIO(fcontents)
@@ -9631,7 +9634,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression, fcsize,
                       fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile]
         AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
+            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
         fcontents.close()
         lcfi = lcfi + 1
         reallcfi = reallcfi + 1
