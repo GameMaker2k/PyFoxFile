@@ -2309,7 +2309,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     if(not contentasfile):
         fcontents = fcontents.read()
     outlist = {'fheadersize': fheadsize, 'fhstart': fheaderstart, 'fhend': fhend, 'ftype': ftype, 'fencoding': fencoding, 'fcencoding': fcencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextralist': fextrafieldslist, 'jsondata': fjsoncontent, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
+               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextradata': fextrafieldslist, 'fjsondata': fjsoncontent, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
     return outlist
 
 
@@ -2585,7 +2585,7 @@ def ReadFileDataWithContentToArray(fp, seekstart=0, seekend=0, listonly=False, c
         return False
     formversions = re.search('(.*?)(\\d+)', formstring).groups()
     fcompresstype = ""
-    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextralist': fextrafieldslist, 'ffilelist': []}
+    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextradata': fextrafieldslist, 'ffilelist': []}
     if(seekstart < 0 and seekstart > fnumfiles):
         seekstart = 0
     if(seekend == 0 or seekend > fnumfiles and seekend < seekstart):
@@ -3820,12 +3820,12 @@ def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extr
     return fp
 
 
-def AppendInFileWithContent(infile, fp, dirlistfromtxt=False, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
+def AppendInFileWithContent(infile, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
     inlist = ReadInFileWithContentToList(infile, "auto", 0, 0, False, False, True, False, formatspecs)
-    return AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, followlink, checksumtype, formatspecs, verbose)
+    return AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, jsondata, followlink, checksumtype, formatspecs, verbose)
 
 
-def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, filevalues=[], extradata=[], jsondata={}, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -3866,7 +3866,7 @@ def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmtt
             fp = CompressOpenFile(outfile, compresswholefile, compressionlevel)
         except PermissionError:
             return False
-    AppendFilesWithContent(infiles, fp, dirlistfromtxt, filevalues, extradata, compression,
+    AppendFilesWithContent(infiles, fp, dirlistfromtxt, filevalues, extradata, jsondata, compression,
                                    compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, formatspecs, verbose)
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
         fp = CompressCatFile(
@@ -3905,7 +3905,7 @@ def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmtt
         return True
 
 
-def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], jsondata={}, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -3946,7 +3946,7 @@ def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmtty
             fp = CompressOpenFile(outfile, compresswholefile, compressionlevel)
         except PermissionError:
             return False
-    AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, compression,
+    AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, jsondata, compression,
                                    compresswholefile, compressionlevel, followlink, checksumtype, formatspecs, verbose)
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
         fp = CompressCatFile(
@@ -3985,9 +3985,9 @@ def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmtty
         return True
 
 
-def AppendInFileWithContentToOutFile(infile, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def AppendInFileWithContentToOutFile(infile, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], jsondata={}, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     inlist = ReadInFileWithContentToList(infile, "auto", 0, 0, False, False, True, False, formatspecs)
-    return AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, filevalues, extradata, followlink, checksumtype, formatspecs, verbose, returnfp)
+    return AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, filevalues, extradata, jsondata, followlink, checksumtype, formatspecs, verbose, returnfp)
 
 
 def PrintPermissionString(fchmode, ftype):
@@ -4863,548 +4863,6 @@ def CheckSumSupportAlt(checkfor, guaranteed=True):
         return True
     else:
         return False
-
-
-def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
-    if(not hasattr(fp, "write")):
-        return False
-    advancedlist = formatspecs['use_advanced_list']
-    altinode = formatspecs['use_alt_inode']
-    if(verbose):
-        logging.basicConfig(format="%(message)s",
-                            stream=sys.stdout, level=logging.DEBUG)
-    if(infiles == "-"):
-        for line in sys.stdin:
-            infilelist.append(line.strip())
-        infilelist = list(filter(None, infilelist))
-    elif(infiles != "-" and dirlistfromtxt and os.path.exists(infiles) and (os.path.isfile(infiles) or infiles == os.devnull)):
-        if(not os.path.exists(infiles) or not os.path.isfile(infiles)):
-            return False
-        with UncompressFile(infiles, formatspecs, "r") as finfile:
-            for line in finfile:
-                infilelist.append(line.strip())
-        infilelist = list(filter(None, infilelist))
-    else:
-        if(isinstance(infiles, (list, tuple, ))):
-            infilelist = list(filter(None, infiles))
-        elif(isinstance(infiles, (basestring, ))):
-            infilelist = list(filter(None, [infiles]))
-    try:
-        if os.stat not in os.supports_follow_symlinks and followlink:
-            followlink = False
-    except AttributeError:
-        followlink = False
-    if(advancedlist):
-        GetDirList = ListDirAdvanced(infilelist, followlink, False)
-    elif(advancedlist is None):
-        GetDirList = infilelist
-    else:
-        GetDirList = ListDir(infilelist, followlink, False)
-    if(not isinstance(GetDirList, (list, tuple, ))):
-        return False
-    FullSizeFiles = GetTotalSize(GetDirList)
-    if(not GetDirList):
-        return False
-    curinode = 0
-    curfid = 0
-    inodelist = []
-    inodetofile = {}
-    filetoinode = {}
-    inodetoforminode = {}
-    numfiles = int(len(GetDirList))
-    fnumfiles = format(numfiles, 'x').lower()
-    AppendFileHeader(fp, fnumfiles, "UTF-8", [], checksumtype[0], formatspecs)
-    FullSizeFilesAlt = 0
-    for curfname in GetDirList:
-        fencoding = "UTF-8"
-        if(re.findall("^[.|/]", curfname)):
-            fname = curfname
-        else:
-            fname = "./"+curfname
-        if(not os.path.exists(fname)):
-            return False
-        if(verbose):
-            VerbosePrintOut(fname)
-        if(not followlink or followlink is None):
-            fstatinfo = os.lstat(fname)
-        else:
-            fstatinfo = os.stat(fname)
-        fpremode = fstatinfo.st_mode
-        finode = fstatinfo.st_ino
-        flinkcount = fstatinfo.st_nlink
-        try:
-            FullSizeFilesAlt += fstatinfo.st_rsize
-        except AttributeError:
-            FullSizeFilesAlt += fstatinfo.st_size
-        ftype = 0
-        if(hasattr(os.path, "isjunction") and os.path.isjunction(fname)):
-            ftype = 13
-        elif(fstatinfo.st_blocks * 512 < fstatinfo.st_size):
-            ftype = 12
-        elif(stat.S_ISREG(fpremode)):
-            ftype = 0
-        elif(stat.S_ISLNK(fpremode)):
-            ftype = 2
-        elif(stat.S_ISCHR(fpremode)):
-            ftype = 3
-        elif(stat.S_ISBLK(fpremode)):
-            ftype = 4
-        elif(stat.S_ISDIR(fpremode)):
-            ftype = 5
-        elif(stat.S_ISFIFO(fpremode)):
-            ftype = 6
-        elif(stat.S_ISSOCK(fpremode)):
-            ftype = 8
-        elif(hasattr(stat, "S_ISDOOR") and stat.S_ISDOOR(fpremode)):
-            ftype = 9
-        elif(hasattr(stat, "S_ISPORT") and stat.S_ISPORT(fpremode)):
-            ftype = 10
-        elif(hasattr(stat, "S_ISWHT") and stat.S_ISWHT(fpremode)):
-            ftype = 11
-        else:
-            ftype = 0
-        flinkname = ""
-        fcurfid = format(int(curfid), 'x').lower()
-        if not followlink and finode != 0:
-            unique_id = (fstatinfo.st_dev, finode)
-            if ftype != 1:
-                if unique_id in inodelist:
-                    # Hard link detected
-                    ftype = 1
-                    flinkname = inodetofile[unique_id]
-                    if altinode:
-                        fcurinode = format(int(unique_id[1]), 'x').lower()
-                    else:
-                        fcurinode = format(int(inodetoforminode[unique_id]), 'x').lower()
-                else:
-                    # New inode
-                    inodelist.append(unique_id)
-                    inodetofile[unique_id] = fname
-                    inodetoforminode[unique_id] = curinode
-                    if altinode:
-                        fcurinode = format(int(unique_id[1]), 'x').lower()
-                    else:
-                        fcurinode = format(int(curinode), 'x').lower()
-                    curinode += 1
-        else:
-            # Handle cases where inodes are not supported or symlinks are followed
-            fcurinode = format(int(curinode), 'x').lower()
-            curinode += 1
-        curfid = curfid + 1
-        if(ftype == 2):
-            flinkname = os.readlink(fname)
-            if(not os.path.exists(flinkname)):
-                return False
-        try:
-            fdev = fstatinfo.st_rdev
-        except AttributeError:
-            fdev = 0
-        getfdev = GetDevMajorMinor(fdev)
-        fdev_minor = getfdev[0]
-        fdev_major = getfdev[1]
-        # Types that should be considered zero-length in the archive context:
-        zero_length_types = {1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13}
-        # Types that have actual data to read:
-        data_types = {0, 7, 12}
-        if ftype in zero_length_types:
-            fsize = format(int("0"), 'x').lower()
-        elif ftype in data_types:
-            fsize = format(int(fstatinfo.st_size), 'x').lower()
-        else:
-            fsize = format(int(fstatinfo.st_size)).lower()
-        fatime = format(int(fstatinfo.st_atime), 'x').lower()
-        fmtime = format(int(fstatinfo.st_mtime), 'x').lower()
-        fctime = format(int(fstatinfo.st_ctime), 'x').lower()
-        if(hasattr(fstatinfo, "st_birthtime")):
-            fbtime = format(int(fstatinfo.st_birthtime), 'x').lower()
-        else:
-            fbtime = format(int(fstatinfo.st_ctime), 'x').lower()
-        fmode = format(int(fstatinfo.st_mode), 'x').lower()
-        fchmode = format(int(stat.S_IMODE(fstatinfo.st_mode)), 'x').lower()
-        ftypemod = format(int(stat.S_IFMT(fstatinfo.st_mode)), 'x').lower()
-        fuid = format(int(fstatinfo.st_uid), 'x').lower()
-        fgid = format(int(fstatinfo.st_gid), 'x').lower()
-        funame = ""
-        try:
-            import pwd
-            try:
-                userinfo = pwd.getpwuid(fstatinfo.st_uid)
-                funame = userinfo.pw_name
-            except KeyError:
-                funame = ""
-        except ImportError:
-            funame = ""
-        fgname = ""
-        try:
-            import grp
-            try:
-                groupinfo = grp.getgrgid(fstatinfo.st_gid)
-                fgname = groupinfo.gr_name
-            except KeyError:
-                fgname = ""
-        except ImportError:
-            fgname = ""
-        fdev = format(int(fdev), 'x').lower()
-        fdev_minor = format(int(fdev_minor), 'x').lower()
-        fdev_major = format(int(fdev_major), 'x').lower()
-        finode = format(int(finode), 'x').lower()
-        flinkcount = format(int(flinkcount), 'x').lower()
-        if(hasattr(fstatinfo, "st_file_attributes")):
-            fwinattributes = format(
-                int(fstatinfo.st_file_attributes), 'x').lower()
-        else:
-            fwinattributes = format(int(0), 'x').lower()
-        fcompression = ""
-        fcsize = format(int(0), 'x').lower()
-        fcontents = BytesIO()
-        chunk_size = 1024
-        fcencoding = "UTF-8"
-        if ftype in data_types:
-            with open(fname, "rb") as fpc:
-                shutil.copyfileobj(fpc, fcontents)
-                fcencoding = GetFileEncoding(fcontents, False)
-                if(not compresswholefile):
-                    fcontents.seek(0, 2)
-                    ucfsize = fcontents.tell()
-                    fcontents.seek(0, 0)
-                    if(compression == "auto"):
-                        ilsize = len(compressionuselist)
-                        ilmin = 0
-                        ilcsize = []
-                        while(ilmin < ilsize):
-                            cfcontents = BytesIO()
-                            fcontents.seek(0, 0)
-                            shutil.copyfileobj(fcontents, cfcontents)
-                            fcontents.seek(0, 0)
-                            cfcontents.seek(0, 0)
-                            cfcontents = CompressArchiveFile(
-                                cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
-                            if(cfcontents):
-                                cfcontents.seek(0, 2)
-                                ilcsize.append(cfcontents.tell())
-                                cfcontents.close()
-                            else:
-                                try:
-                                    ilcsize.append(sys.maxint)
-                                except AttributeError:
-                                    ilcsize.append(sys.maxsize)
-                            ilmin = ilmin + 1
-                        ilcmin = ilcsize.index(min(ilcsize))
-                        curcompression = compressionuselist[ilcmin]
-                    fcontents.seek(0, 0)
-                    cfcontents = BytesIO()
-                    shutil.copyfileobj(fcontents, cfcontents)
-                    cfcontents.seek(0, 0)
-                    cfcontents = CompressArchiveFile(
-                        cfcontents, curcompression, compressionlevel, formatspecs)
-                    cfcontents.seek(0, 2)
-                    cfsize = cfcontents.tell()
-                    if(ucfsize > cfsize):
-                        fcsize = format(int(cfsize), 'x').lower()
-                        fcompression = curcompression
-                        fcontents.close()
-                        fcontents = cfcontents
-        if(followlink and (ftype == 1 or ftype == 2)):
-            if(not os.path.exists(flinkname)):
-                return False
-            flstatinfo = os.stat(flinkname)
-            with open(flinkname, "rb") as fpc:
-                shutil.copyfileobj(fpc, fcontents)
-                if(not compresswholefile):
-                    fcontents.seek(0, 2)
-                    ucfsize = fcontents.tell()
-                    fcontents.seek(0, 0)
-                    if(compression == "auto"):
-                        ilsize = len(compressionuselist)
-                        ilmin = 0
-                        ilcsize = []
-                        while(ilmin < ilsize):
-                            cfcontents = BytesIO()
-                            fcontents.seek(0, 0)
-                            shutil.copyfileobj(fcontents, cfcontents)
-                            fcontents.seek(0, 0)
-                            cfcontents.seek(0, 0)
-                            cfcontents = CompressArchiveFile(
-                                cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
-                            if(cfcontents):
-                                cfcontents.seek(0, 2)
-                                ilcsize.append(cfcontents.tell())
-                                cfcontents.close()
-                            else:
-                                try:
-                                    ilcsize.append(sys.maxint)
-                                except AttributeError:
-                                    ilcsize.append(sys.maxsize)
-                            ilmin = ilmin + 1
-                        ilcmin = ilcsize.index(min(ilcsize))
-                        curcompression = compressionuselist[ilcmin]
-                    fcontents.seek(0, 0)
-                    cfcontents = BytesIO()
-                    shutil.copyfileobj(fcontents, cfcontents)
-                    cfcontents.seek(0, 0)
-                    cfcontents = CompressArchiveFile(
-                        cfcontents, curcompression, compressionlevel, formatspecs)
-                    cfcontents.seek(0, 2)
-                    cfsize = cfcontents.tell()
-                    if(ucfsize > cfsize):
-                        fcsize = format(int(cfsize), 'x').lower()
-                        fcompression = curcompression
-                        fcontents.close()
-                        fcontents = cfcontents
-        if(fcompression == "none"):
-            fcompression = ""
-        fcontents.seek(0, 0)
-        ftypehex = format(ftype, 'x').lower()
-        tmpoutlist = [ftypehex, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression,
-                      fcsize, fuid, funame, fgid, fgname, fcurfid, fcurinode, flinkcount, fdev, fdev_minor, fdev_major, "+"+str(len(formatspecs['format_delimiter']))]
-        AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
-    if(numfiles > 0):
-        try:
-            fp.write(AppendNullBytes(
-                ["0", "0"], formatspecs['format_delimiter']))
-        except OSError:
-            return False
-    fp.seek(0, 0)
-    return fp
-
-
-def AppendListsWithContent(inlist, fp, dirlistfromtxt=False, filevalues=[], extradata=[], jsondata={}, compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
-    if(not hasattr(fp, "write")):
-        return False
-    if(verbose):
-        logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
-    GetDirList = inlist
-    if(not GetDirList):
-        return False
-    curinode = 0
-    curfid = 0
-    inodelist = []
-    inodetofile = {}
-    filetoinode = {}
-    inodetoforminode = {}
-    numfiles = int(len(GetDirList))
-    fnumfiles = format(numfiles, 'x').lower()
-    AppendFileHeader(fp, fnumfiles, "UTF-8", [], checksumtype[0], formatspecs)
-    for curfname in GetDirList:
-        ftype = format(curfname[0], 'x').lower()
-        fencoding = curfname[1]
-        fcencoding = curfname[2]
-        if(re.findall("^[.|/]", curfname[3])):
-            fname = curfname[3]
-        else:
-            fname = "./"+curfname[3]
-        if(not os.path.exists(fname)):
-            return False
-        fbasedir = os.path.dirname(fname)
-        flinkname = curfname[4]
-        fsize = format(curfname[5], 'x').lower()
-        fatime = format(curfname[6], 'x').lower()
-        fmtime = format(curfname[7], 'x').lower()
-        fctime = format(curfname[8], 'x').lower()
-        fbtime = format(curfname[9], 'x').lower()
-        fmode = format(curfname[10], 'x').lower()
-        fwinattributes = format(curfname[11], 'x').lower()
-        fcompression = curfname[12]
-        fcsize = format(curfname[13], 'x').lower()
-        fuid = format(curfname[14], 'x').lower()
-        funame = curfname[15]
-        fgid = format(curfname[16], 'x').lower()
-        fgname = curfname[17]
-        fid = format(curfname[18], 'x').lower()
-        finode = format(curfname[19], 'x').lower()
-        flinkcount = format(curfname[20], 'x').lower()
-        fdev = format(curfname[21], 'x').lower()
-        fdev_minor = format(curfname[22], 'x').lower()
-        fdev_major = format(curfname[23], 'x').lower()
-        fseeknextfile = curfname[24]
-        extradata = curfname[25]
-        fheaderchecksumtype = curfname[26]
-        fcontentchecksumtype = curfname[27]
-        fcontents = curfname[28]
-        fencoding = GetFileEncoding(fcontents, False)
-        tmpoutlist = [ftype, fencoding, fcencoding, fname, flinkname, fsize, fatime, fmtime, fctime, fbtime, fmode, fwinattributes, fcompression, fcsize,
-                      fuid, funame, fgid, fgname, fid, finode, flinkcount, fdev, fdev_minor, fdev_major, fseeknextfile]
-        fcontents.seek(0, 0)
-        AppendFileHeaderWithContent(
-            fp, tmpoutlist, extradata, jsondata, fcontents.read(), [checksumtype[1], checksumtype[2]], formatspecs)
-    if(numfiles > 0):
-        try:
-            fp.write(AppendNullBytes(
-                ["0", "0"], formatspecs['format_delimiter']))
-        except OSError:
-            return False
-    return fp
-
-
-def AppendInFileWithContent(infile, fp, dirlistfromtxt=False, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False):
-    inlist = ReadInFileWithContentToList(infile, "auto", 0, 0, False, False, True, False, formatspecs)
-    return AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, followlink, checksumtype, formatspecs, verbose)
-
-
-def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
-    if(IsNestedDict(formatspecs) and fmttype=="auto" and 
-        (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
-        get_in_ext = os.path.splitext(outfile)
-        tmpfmt = GetKeyByFormatExtension(get_in_ext[1], formatspecs=__file_format_multi_dict__)
-        if(tmpfmt is None and get_in_ext[1]!=""):
-            get_in_ext = os.path.splitext(get_in_ext[0])
-            tmpfmt = GetKeyByFormatExtension(get_in_ext[0], formatspecs=__file_format_multi_dict__)
-        if(tmpfmt is None):
-            fmttype = __file_format_default__
-            formatspecs = formatspecs[fmttype]
-        else:
-            fmttype = tmpfmt
-            formatspecs = formatspecs[tmpfmt]
-    elif(IsNestedDict(formatspecs) and fmttype in formatspecs):
-        formatspecs = formatspecs[fmttype]
-    elif(IsNestedDict(formatspecs) and fmttype not in formatspecs):
-        fmttype = __file_format_default__
-        formatspecs = formatspecs[fmttype]
-    if(outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write")):
-        if(os.path.exists(outfile)):
-            try:
-                os.unlink(outfile)
-            except OSError:
-                pass
-    if(outfile == "-" or outfile is None):
-        verbose = False
-        fp = BytesIO()
-    elif(hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = outfile
-    elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = BytesIO()
-    else:
-        fbasename = os.path.splitext(outfile)[0]
-        fextname = os.path.splitext(outfile)[1]
-        if(not compresswholefile and fextname in outextlistwd):
-            compresswholefile = True
-        try:
-            fp = CompressOpenFile(outfile, compresswholefile, compressionlevel)
-        except PermissionError:
-            return False
-    AppendFilesWithContent(infiles, fp, dirlistfromtxt, filevalues, extradata, compression,
-                                   compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, formatspecs, verbose)
-    if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressArchiveFile(
-            fp, compression, compressionlevel, formatspecs)
-        try:
-            fp.flush()
-            if(hasattr(os, "sync")):
-                os.fsync(fp.fileno())
-        except io.UnsupportedOperation:
-            pass
-        except AttributeError:
-            pass
-        except OSError:
-            pass
-    if(outfile == "-"):
-        fp.seek(0, 0)
-        if(hasattr(sys.stdout, "buffer")):
-            shutil.copyfileobj(fp, sys.stdout.buffer)
-        else:
-            shutil.copyfileobj(fp, sys.stdout)
-    elif(outfile is None):
-        fp.seek(0, 0)
-        outvar = fp.read()
-        fp.close()
-        return outvar
-    elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressArchiveFile(
-            fp, compression, compressionlevel, formatspecs)
-        fp.seek(0, 0)
-        upload_file_to_internet_file(fp, outfile)
-    if(returnfp):
-        fp.seek(0, 0)
-        return fp
-    else:
-        fp.close()
-        return True
-
-
-def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
-    if(IsNestedDict(formatspecs) and fmttype=="auto" and 
-        (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
-        get_in_ext = os.path.splitext(outfile)
-        tmpfmt = GetKeyByFormatExtension(get_in_ext[1], formatspecs=__file_format_multi_dict__)
-        if(tmpfmt is None and get_in_ext[1]!=""):
-            get_in_ext = os.path.splitext(get_in_ext[0])
-            tmpfmt = GetKeyByFormatExtension(get_in_ext[0], formatspecs=__file_format_multi_dict__)
-        if(tmpfmt is None):
-            fmttype = __file_format_default__
-            formatspecs = formatspecs[fmttype]
-        else:
-            fmttype = tmpfmt
-            formatspecs = formatspecs[tmpfmt]
-    elif(IsNestedDict(formatspecs) and fmttype in formatspecs):
-        formatspecs = formatspecs[fmttype]
-    elif(IsNestedDict(formatspecs) and fmttype not in formatspecs):
-        fmttype = __file_format_default__
-        formatspecs = formatspecs[fmttype]
-    if(outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write")):
-        if(os.path.exists(outfile)):
-            try:
-                os.unlink(outfile)
-            except OSError:
-                pass
-    if(outfile == "-" or outfile is None):
-        verbose = False
-        fp = BytesIO()
-    elif(hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = outfile
-    elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = BytesIO()
-    else:
-        fbasename = os.path.splitext(outfile)[0]
-        fextname = os.path.splitext(outfile)[1]
-        if(not compresswholefile and fextname in outextlistwd):
-            compresswholefile = True
-        try:
-            fp = CompressOpenFile(outfile, compresswholefile, compressionlevel)
-        except PermissionError:
-            return False
-    AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, compression,
-                                   compresswholefile, compressionlevel, followlink, checksumtype, formatspecs, verbose)
-    if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressArchiveFile(
-            fp, compression, compressionlevel, formatspecs)
-        try:
-            fp.flush()
-            if(hasattr(os, "sync")):
-                os.fsync(fp.fileno())
-        except io.UnsupportedOperation:
-            pass
-        except AttributeError:
-            pass
-        except OSError:
-            pass
-    if(outfile == "-"):
-        fp.seek(0, 0)
-        if(hasattr(sys.stdout, "buffer")):
-            shutil.copyfileobj(fp, sys.stdout.buffer)
-        else:
-            shutil.copyfileobj(fp, sys.stdout)
-    elif(outfile is None):
-        fp.seek(0, 0)
-        outvar = fp.read()
-        fp.close()
-        return outvar
-    elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressArchiveFile(
-            fp, compression, compressionlevel, formatspecs)
-        fp.seek(0, 0)
-        upload_file_to_internet_file(fp, outfile)
-    if(returnfp):
-        fp.seek(0, 0)
-        return fp
-    else:
-        fp.close()
-        return True
-
-
-def AppendInFileWithContentToOutFile(infile, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, filevalues=[], extradata=[], followlink=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
-    inlist = ReadInFileWithContentToList(infile, "auto", 0, 0, False, False, True, False, formatspecs)
-    return AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, filevalues, extradata, followlink, checksumtype, formatspecs, verbose, returnfp)
 
 
 def PrintPermissionString(fchmode, ftype):
@@ -8027,7 +7485,7 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
     fcompresstype = compresscheck
     if(fcompresstype==formatspecs['format_magic']):
         fcompresstype = ""
-    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextralist': fextrafieldslist, 'ffilelist': []}
+    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextradata': fextrafieldslist, 'ffilelist': []}
     if(seekto >= fnumfiles):
         seekto = fnumfiles - 1
     if(seekto < 0):
@@ -8327,7 +7785,7 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
     fcompresstype = compresscheck
     if(fcompresstype==formatspecs['format_magic']):
         fcompresstype = ""
-    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextralist': fextrafieldslist, 'ffilelist': []}
+    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextradata': fextrafieldslist, 'ffilelist': []}
     seekto = fnumfiles - 1
     filefound = False
     if(seekto >= 0):
@@ -8986,7 +8444,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
     fcompresstype = compresscheck
     if(fcompresstype==formatspecs['format_magic']):
         fcompresstype = ""
-    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextralist': fextrafieldslist, 'ffilelist': []}
+    outlist = {'fnumfiles': fnumfiles, 'fformat': formversions[0], 'fcompression': fcompresstype, 'fencoding': fhencoding, 'fversion': formversions[1], 'fostype': fostype, 'fheadersize': fheadsize, 'fsize': CatSizeEnd, 'fnumfields': fnumfields + 2, 'fformatspecs': formatspecs, 'fchecksumtype': fprechecksumtype, 'fheaderchecksum': fprechecksum, 'frawheader': [formstring] + inheader, 'fextrafields': fnumextrafields, 'fextrafieldsize': fnumextrafieldsize, 'fextradata': fextrafieldslist, 'ffilelist': []}
     if(seekstart < 0 and seekstart > fnumfiles):
         seekstart = 0
     if(seekend == 0 or seekend > fnumfiles and seekend < seekstart):
@@ -9222,7 +8680,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         outfcontents.seek(0, 0)
         if(not contentasfile):
             outfcontents = outfcontents.read()
-        outlist['ffilelist'].append({'fid': realidnum, 'fidalt': fileidnum, 'fheadersize': outfheadsize, 'fhstart': outfhstart, 'fhend': outfhend, 'ftype': outftype, 'fencoding': outfencoding, 'fcencoding': outfcencoding, 'fname': outfname, 'fbasedir': outfbasedir, 'flinkname': outflinkname, 'fsize': outfsize, 'fatime': outfatime, 'fmtime': outfmtime, 'fctime': outfctime, 'fbtime': outfbtime, 'fmode': outfmode, 'fchmode': outfchmode, 'ftypemod': outftypemod, 'fwinattributes': outfwinattributes, 'fcompression': outfcompression, 'fcsize': outfcsize, 'fuid': outfuid, 'funame': outfuname, 'fgid': outfgid, 'fgname': outfgname, 'finode': outfinode, 'flinkcount': outflinkcount, 'fdev': outfdev, 'fminor': outfdev_minor, 'fmajor': outfdev_major, 'fseeknextfile': outfseeknextfile, 'fheaderchecksumtype': inheaderdata[-4], 'fcontentchecksumtype': inheaderdata[-3], 'fnumfields': outfnumfields + 2, 'frawheader': inheaderdata, 'fextrafields': outfextrafields, 'fextrafieldsize': outfextrasize, 'fextralist': extrafieldslist, 'jsondata': outfjsoncontent, 'fheaderchecksum': outfcs, 'fcontentchecksum': outfccs, 'fhascontents': pyhascontents, 'fcontentstart': outfcontentstart, 'fcontentend': outfcontentend, 'fcontentasfile': contentasfile, 'fcontents': outfcontents})
+        outlist['ffilelist'].append({'fid': realidnum, 'fidalt': fileidnum, 'fheadersize': outfheadsize, 'fhstart': outfhstart, 'fhend': outfhend, 'ftype': outftype, 'fencoding': outfencoding, 'fcencoding': outfcencoding, 'fname': outfname, 'fbasedir': outfbasedir, 'flinkname': outflinkname, 'fsize': outfsize, 'fatime': outfatime, 'fmtime': outfmtime, 'fctime': outfctime, 'fbtime': outfbtime, 'fmode': outfmode, 'fchmode': outfchmode, 'ftypemod': outftypemod, 'fwinattributes': outfwinattributes, 'fcompression': outfcompression, 'fcsize': outfcsize, 'fuid': outfuid, 'funame': outfuname, 'fgid': outfgid, 'fgname': outfgname, 'finode': outfinode, 'flinkcount': outflinkcount, 'fdev': outfdev, 'fminor': outfdev_minor, 'fmajor': outfdev_major, 'fseeknextfile': outfseeknextfile, 'fheaderchecksumtype': inheaderdata[-4], 'fcontentchecksumtype': inheaderdata[-3], 'fnumfields': outfnumfields + 2, 'frawheader': inheaderdata, 'fextrafields': outfextrafields, 'fextrafieldsize': outfextrasize, 'fextradata': extrafieldslist, 'fjsondata': outfjsoncontent, 'fheaderchecksum': outfcs, 'fcontentchecksum': outfccs, 'fhascontents': pyhascontents, 'fcontentstart': outfcontentstart, 'fcontentend': outfcontentend, 'fcontentasfile': contentasfile, 'fcontents': outfcontents})
         fileidnum = fileidnum + 1
         realidnum = realidnum + 1
     if(returnfp):
