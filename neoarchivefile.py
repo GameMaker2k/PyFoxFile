@@ -112,7 +112,7 @@ if primary_action == 'create':
         ], pyarchivefile.__file_format_dict__, args.verbose, False)
     else:
         pyarchivefile.PackArchiveFile(args.input, args.output, args.verbose, args.compression, args.level, pyarchivefile.compressionlistalt,
-                                  False, [args.checksum, args.checksum, args.checksum], [], pyarchivefile.__file_format_dict__, args.verbose, False)
+                                  False, [args.checksum, args.checksum, args.checksum], [], {}, pyarchivefile.__file_format_dict__, args.verbose, False)
 elif primary_action == 'repack':
     pyarchivefile.RePackArchiveFile(
         input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], args.verbose)

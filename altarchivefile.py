@@ -132,7 +132,7 @@ def main():
 
     # Determine operation
     if args.create:
-        pyarchivefile.PackArchiveFile(args.input, args.output, False, __file_format_default__, args.compression, args.level, pyarchivefile.compressionlistalt, False, [args.checksum, args.checksum, args.checksum], [], format_dict, args.verbose, False)
+        pyarchivefile.PackArchiveFile(args.input, args.output, False, __file_format_default__, args.compression, args.level, pyarchivefile.compressionlistalt, False, [args.checksum, args.checksum, args.checksum], [], {}, format_dict, args.verbose, False)
     elif args.repack:
         pyarchivefile.RePackArchiveFile( input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], args.verbose)
     elif args.extract:
