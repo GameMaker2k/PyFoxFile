@@ -27,6 +27,7 @@ import stat
 import zlib
 import base64
 import shutil
+import struct
 import socket
 import hashlib
 import inspect
@@ -435,6 +436,9 @@ except ImportError:
 compressionsupport.append("zlib")
 compressionsupport.append("zl")
 compressionsupport.append("zz")
+compressionsupport.append("zcompress")
+compressionsupport.append("Z")
+compressionsupport.append("z")
 
 compressionlist = ['auto']
 compressionlistalt = []
@@ -489,6 +493,13 @@ if('zlib' in compressionsupport):
     outextlistwd.append('.zl')
     outextlist.append('zlib')
     outextlistwd.append('.zlib')
+if('zcompress' in compressionsupport):
+    compressionlist.append('zcompress')
+    compressionlistalt.append('zcompress')
+    outextlist.append('Z')
+    outextlistwd.append('.Z')
+    outextlist.append('z')
+    outextlistwd.append('.z')
 
 
 if __name__ == "__main__":
@@ -1163,6 +1174,402 @@ class GzipFile(object):
             compressed = _gzip_compress(self._write_buffer, compresslevel=self.level)
             self.file.write(compressed)
 
+        if self.file_path:
+            self.file.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+
+# Detect Python 2 vs Python 3
+PY2 = (sys.version_info[0] == 2)
+
+
+# A small helper to produce a bytes-like single-character string from an integer.
+# In Python 3, bytes([x]) is a single byte; in Python 2, we can just do chr(x).
+def single_byte(x):
+    if PY2:
+        return chr(x)  # 'chr' returns a one-character string
+    else:
+        return bytes([x])
+
+
+# ====================================================
+# Core LZW functions that work directly on bytes data
+# ====================================================
+
+def lzw_compress_bytes_core(data, max_table_size=4096):
+    """
+    Compress a bytes/str object into a list of integer codes using LZW.
+    This version works on raw bytes (each value is 0-255).
+    
+    :param data: The input bytes to compress (str in Py2, bytes in Py3).
+    :param max_table_size: Maximum allowed size of the dictionary (default 4096).
+    :return: A list of integer codes.
+    """
+    if not data:
+        return []
+    
+    # Initialize dictionary with single-byte entries: {b'\x00':0, b'\x01':1, ...}
+    dict_size = 256
+    dictionary = {}
+    for i in range(dict_size):
+        dictionary[single_byte(i)] = i
+
+    w = b"" if not PY2 else ""  # empty bytes (Py3) or empty str (Py2)
+    result = []
+
+    # Iterate over data as a sequence of ints (0..255), uniformly in Py2/3
+    for b in bytearray(data):
+        c = single_byte(b)
+        wc = w + c  # string/bytes concatenation works fine in both Py2/3
+        if wc in dictionary:
+            w = wc
+        else:
+            result.append(dictionary[w])
+            if dict_size < max_table_size:
+                dictionary[wc] = dict_size
+                dict_size += 1
+            w = c
+
+    if w:
+        result.append(dictionary[w])
+    
+    return result
+
+
+def lzw_decompress_bytes_core(codes, max_table_size=4096):
+    """
+    Decompress a list of integer codes (produced by lzw_compress_bytes_core) back into bytes.
+    
+    :param codes: List of integer codes.
+    :param max_table_size: Maximum allowed size of the dictionary (default 4096).
+    :return: The decompressed bytes (as str in Py2, bytes in Py3).
+    """
+    if not codes:
+        return b"" if not PY2 else ""
+    
+    dict_size = 256
+    dictionary = []
+    # Initialize dictionary: index -> single-byte
+    for i in range(dict_size):
+        dictionary.append(single_byte(i))
+
+    result = []
+    w = dictionary[codes[0]]
+    result.append(w)
+
+    for k in codes[1:]:
+        if k < len(dictionary):
+            entry = dictionary[k]
+        elif k == dict_size:
+            # Special case: code refers to new entry "w + w[:1]"
+            entry = w + w[:1]
+        else:
+            raise ValueError("Bad compressed code: {}".format(k))
+        
+        result.append(entry)
+        
+        if dict_size < max_table_size:
+            dictionary.append(w + entry[:1])
+            dict_size += 1
+        w = entry
+    
+    # In Py2, join is on str; in Py3, join is on bytes
+    return b"".join(result) if not PY2 else "".join(result)
+
+
+def lzw_compress_bytes(data, max_table_size=4096):
+    """
+    Compress a bytes/str object using LZW and pack the resulting integer codes into a bytes object.
+    
+    Each code is stored as an unsigned 16-bit (2 bytes) integer in big-endian order.
+    
+    :param data: Input bytes/str to compress (str in Py2, bytes in Py3).
+    :param max_table_size: Maximum allowed size of the dictionary.
+    :return: A bytes object (str in Py2) containing the packed codes.
+    """
+    codes = lzw_compress_bytes_core(data, max_table_size=max_table_size)
+    # 'H' is the format for an unsigned short (16 bits), big-endian.
+    return struct.pack('>' + 'H' * len(codes), *codes)
+
+
+def lzw_decompress_bytes(data, max_table_size=4096):
+    """
+    Unpack a bytes/str object (produced by lzw_compress_bytes) into integer codes
+    and decompress them using LZW.
+    
+    :param data: The packed compressed data (str in Py2, bytes in Py3).
+    :param max_table_size: Maximum allowed size of the dictionary.
+    :return: The decompressed data as bytes/str.
+    """
+    if not data:
+        return b"" if not PY2 else ""
+    
+    # Each code is 2 bytes
+    num_codes = len(data) // 2
+    codes = list(struct.unpack('>' + 'H' * num_codes, data))
+    return lzw_decompress_bytes_core(codes, max_table_size=max_table_size)
+
+
+LZW_MAGIC = b"\x1f\x9d"
+
+def lzw_compress_bytes_with_magic(data, max_table_size=4096):
+    # do the normal compression
+    raw_lzw = lzw_compress_bytes(data, max_table_size)
+    return LZW_MAGIC + raw_lzw
+
+def lzw_decompress_bytes_with_magic(data, max_table_size=4096):
+    if not data.startswith(LZW_MAGIC):
+        raise ValueError("Missing magic 0x1f9d")
+    raw_lzw = data[len(LZW_MAGIC):]
+    return lzw_decompress_bytes(raw_lzw, max_table_size)
+
+
+# ====================================================
+# Wrapper functions for Unicode strings (with magic header)
+# ====================================================
+
+def lzw_compress_str_to_bytes(uncompressed, max_table_size=4096):
+    """
+    Compress a (Unicode) string using LZW.
+    
+    1. Encodes the string to UTF-8.
+    2. Compresses the resulting bytes.
+    3. Prepends the magic header (0x1f, 0x9d) to the compressed data.
+    
+    :param uncompressed: The input (Unicode) string in Py2 or Py3.
+    :param max_table_size: Maximum dictionary size for LZW.
+    :return: A bytes/str object containing the magic header + the compressed data.
+    """
+    # Encode the string to UTF-8 bytes (str in Py2, bytes in Py3)
+    data = uncompressed.encode('utf-8')
+    compressed_data = lzw_compress_bytes(data, max_table_size=max_table_size)
+    return MAGIC_BYTES + compressed_data
+
+
+def lzw_decompress_bytes_to_bytes(compressed, max_table_size=4096):
+    """
+    Decompress a bytes/str object (with the magic header) produced by compress_str_to_bytes.
+    
+    :param compressed: The data to decompress (with the leading magic header).
+    :param max_table_size: Maximum dictionary size for LZW.
+    :return: Raw decompressed bytes/str.
+    :raises ValueError: If the magic header is missing.
+    """
+    if not compressed.startswith(MAGIC_BYTES):
+        raise ValueError("Compressed data is missing the magic header 0x1f9d")
+    
+    data_without_magic = compressed[len(MAGIC_BYTES):]
+    return lzw_decompress_bytes(data_without_magic, max_table_size=max_table_size)
+
+
+def lzw_decompress_bytes_to_str(compressed, max_table_size=4096):
+    """
+    Decompress a bytes/str object (with the magic header) into a Unicode string.
+    
+    1. Strips the magic header.
+    2. LZW decompresses the remaining bytes.
+    3. Decodes from UTF-8 to get a Python (Unicode) string.
+    
+    :param compressed: The data to decompress (with magic header).
+    :param max_table_size: Maximum dictionary size for LZW.
+    :return: The decompressed Unicode string.
+    """
+    raw_bytes = decompress_bytes_to_bytes(compressed, max_table_size=max_table_size)
+    return raw_bytes.decode('utf-8')
+
+
+class LzwFile(object):
+    """
+    A file-like object that uses LZW compression/decompression instead of gzip.
+    It reads/writes the entire file in one shot for simplicity, storing
+    decompressed data (read mode) or uncompressed data (write mode) in memory.
+    
+    - If reading ('r'), loads entire file, checks for LZW magic, and decompresses.
+    - If writing ('w'), buffers uncompressed data; on close(), compresses and writes the LZW file.
+    - 'level' is accepted but currently unused (LZW does not have a direct "level" parameter).
+    - Supports text mode ('t') vs binary mode ('b').
+    """
+    LZW_MAGIC = b'\x1f\x9d'
+
+    def __init__(self, file_path=None, fileobj=None, mode='rb',
+                 level=9, encoding=None, errors=None, newline=None):
+        """
+        :param file_path:  Path to a file on disk (optional).
+        :param fileobj:    An existing file-like object (optional).
+        :param mode:       e.g. 'rb', 'wb', 'rt', 'wt', etc.
+        :param level:      Compression level (not used for LZW, kept for signature).
+        :param encoding:   If 't' in mode, text encoding to use.
+        :param errors:     Error handling for text encode/decode.
+        :param newline:    Placeholder for signature compatibility.
+        """
+        if file_path is None and fileobj is None:
+            raise ValueError("Either file_path or fileobj must be provided")
+        if file_path is not None and fileobj is not None:
+            raise ValueError("Only one of file_path or fileobj should be provided")
+
+        self.file_path = file_path
+        self.fileobj = fileobj
+        self.mode = mode
+        self.level = level
+        self.encoding = encoding
+        self.errors = errors
+        self.newline = newline
+
+        # Buffers
+        self._decompressed_data = b''  # for read mode
+        self._write_buffer = b''       # for write mode
+        self._position = 0            # read pointer in decompressed data
+
+        self._text_mode = ('t' in mode)
+        internal_mode = mode.replace('t', 'b')  # force binary I/O
+
+        # Open file or use provided file object
+        if any(m in mode for m in ('w', 'a', 'x')):
+            # Write/append
+            if file_path:
+                self.file = open(file_path, internal_mode)
+            else:
+                self.file = fileobj
+        elif 'r' in mode:
+            # Read
+            if file_path:
+                if os.path.exists(file_path):
+                    self.file = open(file_path, internal_mode)
+                    self._load_file()
+                else:
+                    raise FileNotFoundError("No such file: '{}'".format(file_path))
+            else:
+                self.file = fileobj
+                self._load_file()
+        else:
+            raise ValueError("Mode should be 'rb'/'rt' or 'wb'/'wt'")
+
+    def _load_file(self):
+        """
+        Read the entire compressed file from the underlying file,
+        check the LZW magic header, decompress, store in memory.
+        """
+        self.file.seek(0)
+        compressed_data = self.file.read()
+
+        if not compressed_data.startswith(self.LZW_MAGIC):
+            raise ValueError("Invalid LZW header (magic bytes missing)")
+
+        # Strip off the magic header:
+        data_without_magic = compressed_data[len(self.LZW_MAGIC):]
+
+        # Decompress in one shot:
+        self._decompressed_data = lzw_decompress_bytes(data_without_magic)
+
+        if self._text_mode:
+            # Decode to text (Unicode string in Py3, or unicode in Py2)
+            enc = self.encoding or 'utf-8'
+            err = self.errors or 'strict'
+            self._decompressed_data = self._decompressed_data.decode(enc, err)
+
+    def write(self, data):
+        """
+        Write data into our in-memory buffer (uncompressed).
+        Actual compression occurs when close() is called.
+        """
+        if 'r' in self.mode:
+            raise IOError("File not open for writing")
+
+        if self._text_mode:
+            # Encode to bytes
+            enc = self.encoding or 'utf-8'
+            err = self.errors or 'strict'
+            data = data.encode(enc, err)
+
+        self._write_buffer += data
+
+    def read(self, size=-1):
+        """
+        Read from the in-memory decompressed buffer.
+        """
+        if 'r' not in self.mode:
+            raise IOError("File not open for reading")
+
+        if size < 0:
+            size = len(self._decompressed_data) - self._position
+        data = self._decompressed_data[self._position : self._position + size]
+        self._position += size
+        return data
+
+    def seek(self, offset, whence=0):
+        """
+        Seek within the decompressed data buffer.
+        """
+        if 'r' not in self.mode:
+            raise IOError("File not open for reading")
+
+        if whence == 0:   # absolute
+            new_pos = offset
+        elif whence == 1: # relative
+            new_pos = self._position + offset
+        elif whence == 2: # from end
+            new_pos = len(self._decompressed_data) + offset
+        else:
+            raise ValueError("Invalid 'whence' value")
+
+        self._position = max(0, min(new_pos, len(self._decompressed_data)))
+
+    def tell(self):
+        """
+        Return the current read position.
+        """
+        return self._position
+
+    def flush(self):
+        """
+        Flush the underlying file if possible.
+        (No partial compression flush is done here.)
+        """
+        if hasattr(self.file, 'flush'):
+            self.file.flush()
+
+    def fileno(self):
+        """
+        Return the underlying file descriptor if available.
+        """
+        if hasattr(self.file, 'fileno'):
+            return self.file.fileno()
+        raise OSError("The underlying file object does not support fileno()")
+
+    def isatty(self):
+        """
+        Return whether the underlying file is a TTY.
+        """
+        if hasattr(self.file, 'isatty'):
+            return self.file.isatty()
+        return False
+
+    def truncate(self, size=None):
+        """
+        Truncate the underlying file if possible.
+        """
+        if hasattr(self.file, 'truncate'):
+            return self.file.truncate(size)
+        raise OSError("The underlying file object does not support truncate()")
+
+    def close(self):
+        """
+        If in write mode, compress the entire buffer, prepend the LZW magic
+        header, and write to the underlying file. Then close it if we opened it.
+        """
+        if any(m in self.mode for m in ('w', 'a', 'x')):
+            # Compress
+            compressed = lzw_compress_bytes(self._write_buffer)
+            # Prepend magic header
+            final_data = self.LZW_MAGIC + compressed
+            self.file.write(final_data)
+
+        # Close underlying file if we opened it by path
         if self.file_path:
             self.file.close()
 
@@ -3331,7 +3738,7 @@ def MakeEmptyFile(outfile, fmttype="auto", compression="auto", compresswholefile
             return False
     AppendFileHeader(fp, 0, "UTF-8", [], checksumtype, formatspecs)
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -3355,7 +3762,7 @@ def MakeEmptyFile(outfile, fmttype="auto", compression="auto", compresswholefile
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -3668,7 +4075,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressCatFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -3686,7 +4093,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressCatFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -3715,7 +4122,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressCatFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -3733,7 +4140,7 @@ def AppendFilesWithContent(infiles, fp, dirlistfromtxt=False, filevalues=[], ext
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressCatFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -3877,7 +4284,7 @@ def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmtt
     AppendFilesWithContent(infiles, fp, dirlistfromtxt, filevalues, extradata, jsondata, compression,
                                    compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, formatspecs, verbose)
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -3901,7 +4308,7 @@ def AppendFilesWithContentToOutFile(infiles, outfile, dirlistfromtxt=False, fmtt
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -3957,7 +4364,7 @@ def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmtty
     AppendListsWithContent(inlist, fp, dirlistfromtxt, filevalues, extradata, jsondata, compression,
                                    compresswholefile, compressionlevel, followlink, checksumtype, formatspecs, verbose)
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -3981,7 +4388,7 @@ def AppendListsWithContentToOutFile(inlist, outfile, dirlistfromtxt=False, fmtty
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -4237,7 +4644,7 @@ def CheckCompressionType(infile, formatspecs=__file_format_multi_dict__, closefp
     elif(prefp == binascii.unhexlify("78da")):
         filetype = "zlib"
     elif(prefp == binascii.unhexlify("1f9d")):
-        filetype = "compress"
+        filetype = "zcompress"
     fp.seek(0, 0)
     prefp = fp.read(3)
     if(prefp == binascii.unhexlify("425a68")):
@@ -4415,881 +4822,8 @@ def CheckCompressionSubType(infile, formatspecs=__file_format_multi_dict__, clos
                     fp = pyzstd.zstdfile.ZstdFile(infile, mode="rb")
                 else:
                     return Flase
-            elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
-                fp = LzopFile(infile, mode="rb")
-            elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
-                fp = lzma.open(infile, "rb")
-            elif(compresscheck == "zlib" and compresscheck in compressionsupport):
-                fp = ZlibFile(infile, mode="rb")
-            else:
-                fp = open(infile, "rb")
-        except FileNotFoundError:
-            return False
-    filetype = False
-    prefp = fp.read(5)
-    if(prefp == binascii.unhexlify("7573746172")):
-        filetype = "tarfile"
-    fp.seek(0, 0)
-    if(IsNestedDict(formatspecs)):
-        for key, value in formatspecs.items():
-            prefp = fp.read(formatspecs[key]['format_len'])
-            if(prefp == binascii.unhexlify(formatspecs[key]['format_hex'])):
-                inheaderver = str(int(formatspecs[key]['format_ver'].replace(".", "")))
-                formstring = fp.read(len(inheaderver)).decode("UTF-8")
-                formdelszie = len(formatspecs[key]['format_delimiter'])
-                formdel = fp.read(formdelszie).decode("UTF-8")
-                if(formstring != inheaderver):
-                    break
-                if(formdel != formatspecs[key]['format_delimiter']):
-                    break
-                if(formstring == inheaderver and formdel == formatspecs[key]['format_delimiter']):
-                    filetype = formatspecs[key]['format_magic']
-                    continue
-            fp.seek(0, 0)
-    elif(IsSingleDict(formatspecs)):
-        prefp = fp.read(formatspecs['format_len'])
-        if(prefp == binascii.unhexlify(formatspecs['format_hex'])):
-            inheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-            formstring = fp.read(len(inheaderver)).decode("UTF-8")
-            formdelszie = len(formatspecs['format_delimiter'])
-            formdel = fp.read(formdelszie).decode("UTF-8")
-            if(formstring != inheaderver):
-                return False
-            if(formdel != formatspecs['format_delimiter']):
-                return False
-            filetype = formatspecs['format_magic']
-    else:
-        pass
-    fp.seek(0, 0)
-    prefp = fp.read(10)
-    if(prefp == binascii.unhexlify("7061785f676c6f62616c")):
-        filetype = "tarfile"
-    fp.seek(0, 0)
-    if(closefp):
-        fp.close()
-    return filetype
-
-
-def CheckCompressionTypeFromString(instring, formatspecs=__file_format_multi_dict__, closefp=True):
-    try:
-        instringsfile = BytesIO(instring)
-    except TypeError:
-        instringsfile = BytesIO(instring.encode("UTF-8"))
-    return CheckCompressionType(instringsfile, formatspecs, closefp)
-
-
-def CheckCompressionTypeFromBytes(instring, formatspecs=__file_format_multi_dict__, closefp=True):
-    try:
-        instringsfile = BytesIO(instring)
-    except TypeError:
-        instringsfile = BytesIO(instring.decode("UTF-8"))
-    return CheckCompressionType(instringsfile, formatspecs, closefp)
-
-
-def UncompressCatFile(fp, formatspecs=__file_format_multi_dict__):
-    if(not hasattr(fp, "read")):
-        return False
-    compresscheck = CheckCompressionType(fp, formatspecs, False)
-    if(IsNestedDict(formatspecs) and compresscheck in formatspecs):
-        formatspecs = formatspecs[compresscheck]
-    if(compresscheck == "gzip" and compresscheck in compressionsupport):
-        fp = gzip.GzipFile(fileobj=fp, mode="rb")
-    elif(compresscheck == "bzip2" and compresscheck in compressionsupport):
-        fp = bz2.BZ2File(fp)
-    elif(compresscheck == "zstd" and compresscheck in compressionsupport):
-        if 'zstandard' in sys.modules:
-            fp = ZstdFile(fileobj=fp, mode="rb")
-        elif 'pyzstd' in sys.modules:
-            fp = pyzstd.zstdfile.ZstdFile(fileobj=fp, mode="rb")
-        else:
-            return Flase
-    elif(compresscheck == "lz4" and compresscheck in compressionsupport):
-        fp = lz4.frame.LZ4FrameFile(fp, mode='rb')
-    elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
-        fp = LzopFile(fileobj=fp, mode="rb")
-    elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
-        fp = lzma.LZMAFile(fp)
-    elif(compresscheck == "zlib" and compresscheck in compressionsupport):
-        fp = ZlibFile(fileobj=fp, mode="rb")
-    elif(compresscheck == formatspecs['format_magic']):
-        fp = fp
-    elif(not compresscheck):
-        try:
-            fp = lz4.frame.LZ4FrameFile(fp, mode='rb')
-        except lzma.LZMAError:
-            return False
-        if(compresscheck != formatspecs['format_magic']):
-            fp.close()
-    return fp
-
-
-def UncompressFile(infile, formatspecs=__file_format_multi_dict__, mode="rb"):
-    compresscheck = CheckCompressionType(infile, formatspecs, False)
-    if(IsNestedDict(formatspecs) and compresscheck in formatspecs):
-        formatspecs = formatspecs[compresscheck]
-    if(sys.version_info[0] == 2 and compresscheck):
-        if(mode == "rt"):
-            mode = "r"
-        elif(mode == "wt"):
-            mode = "w"
-    try:
-        if(compresscheck == "gzip" and compresscheck in compressionsupport):
-            if sys.version_info[0] == 2:
-                filefp = GzipFile(infile, mode=mode)
-            else:
-                filefp = gzip.open(infile, mode)
-        elif(compresscheck == "bzip2" and compresscheck in compressionsupport):
-            filefp = bz2.open(infile, mode)
-        elif(compresscheck == "zstd" and compresscheck in compressionsupport):
-            if 'zstandard' in sys.modules:
-                filefp = ZstdFile(infile, mode=mode)
-            elif 'pyzstd' in sys.modules:
-                filefp = pyzstd.zstdfile.ZstdFile(infile, mode=mode)
-            else:
-                return Flase
-        elif(compresscheck == "lz4" and compresscheck in compressionsupport):
-            filefp = lz4.frame.open(infile, mode)
-        elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
-            filefp = LzopFile(infile, mode=mode)
-        elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
-            filefp = lzma.open(infile, mode)
-        elif(compresscheck == "zlib" and compresscheck in compressionsupport):
-            filefp = ZlibFile(infile, mode=mode)
-        elif(compresscheck == formatspecs['format_magic']):
-            filefp = open(infile, mode)
-        elif(not compresscheck):
-            filefp = open(infile, mode)
-        else:
-            filefp = open(infile, mode)
-    except FileNotFoundError:
-        return False
-    try:
-        filefp.write_through = True
-    except AttributeError:
-        pass
-    return filefp
-
-
-def UncompressString(infile, formatspecs=__file_format_multi_dict__):
-    compresscheck = CheckCompressionTypeFromString(infile, formatspecs, False)
-    if(IsNestedDict(formatspecs) and compresscheck in formatspecs):
-        formatspecs = formatspecs[compresscheck]
-    if(compresscheck == "gzip" and compresscheck in compressionsupport):
-        fileuz = GzipDecompressData(infile)
-    elif(compresscheck == "bzip2" and compresscheck in compressionsupport):
-        fileuz = BzipDecompressData(infile)
-    elif(compresscheck == "zstd" and compresscheck in compressionsupport):
-        decompressor = zstandard.ZstdDecompressor()
-        fileuz = decompressor.decompress(infile)
-    elif(compresscheck == "lz4" and compresscheck in compressionsupport):
-        fileuz = lz4.frame.decompress(infile)
-    elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
-        fileuz = lzo.decompress(infile)
-    elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
-        fileuz = lzma.decompress(infile)
-    elif(compresscheck == "zlib" and compresscheck in compressionsupport):
-        fileuz = zlib.decompress(infile)
-    elif(not compresscheck):
-        fileuz = infile
-    else:
-        fileuz = infile
-    if(hasattr(fileuz, 'decode')):
-        fileuz = fileuz.decode("UTF-8")
-    return fileuz
-
-
-def UncompressStringAlt(instring, formatspecs=__file_format_multi_dict__):
-    filefp = StringIO()
-    outstring = UncompressString(instring, formatspecs)
-    filefp.write(outstring)
-    filefp.seek(0, 0)
-    return filefp
-
-def UncompressStringAltFP(fp, formatspecs=__file_format_multi_dict__):
-    if(not hasattr(fp, "read")):
-        return False
-    prechck = CheckCompressionType(fp, formatspecs, False)
-    if(IsNestedDict(formatspecs) and prechck in formatspecs):
-        formatspecs = formatspecs[prechck]
-    fp.seek(0, 0)
-    if(prechck!="zstd"):
-        return UncompressCatFile(fp, formatspecs)
-    filefp = StringIO()
-    fp.seek(0, 0)
-    outstring = UncompressString(fp.read(), formatspecs)
-    filefp.write(outstring)
-    filefp.seek(0, 0)
-    return filefp
-
-
-def UncompressBytes(infile, formatspecs=__file_format_multi_dict__):
-    compresscheck = CheckCompressionTypeFromBytes(infile, formatspecs, False)
-    if(IsNestedDict(formatspecs) and compresscheck in formatspecs):
-        formatspecs = formatspecs[compresscheck]
-    if(compresscheck == "gzip" and compresscheck in compressionsupport):
-        fileuz = GzipDecompressData(infile)
-    elif(compresscheck == "bzip2" and compresscheck in compressionsupport):
-        fileuz = BzipDecompressData(infile)
-    elif(compresscheck == "zstd" and compresscheck in compressionsupport):
-        decompressor = zstandard.ZstdDecompressor()
-        fileuz = decompressor.decompress(infile)
-    elif(compresscheck == "lz4" and compresscheck in compressionsupport):
-        fileuz = lz4.frame.decompress(infile)
-    elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
-        fileuz = lzo.decompress(infile)
-    elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
-        fileuz = lzma.decompress(infile)
-    elif(compresscheck == "zlib" and compresscheck in compressionsupport):
-        fileuz = zlib.decompress(infile)
-    elif(not compresscheck):
-        fileuz = infile
-    else:
-        fileuz = infile
-    return fileuz
-
-
-def UncompressBytesAlt(inbytes, formatspecs=__file_format_multi_dict__):
-    filefp = BytesIO()
-    outstring = UncompressBytes(inbytes, formatspecs)
-    filefp.write(outstring)
-    filefp.seek(0, 0)
-    return filefp
-
-
-def UncompressBytesAltFP(fp, formatspecs=__file_format_multi_dict__):
-    if(not hasattr(fp, "read")):
-        return False
-    prechck = CheckCompressionType(fp, formatspecs, False)
-    if(IsNestedDict(formatspecs) and prechck in formatspecs):
-        formatspecs = formatspecs[prechck]
-    fp.seek(0, 0)
-    if(prechck!="zstd"):
-        return UncompressCatFile(fp, formatspecs)
-    filefp = BytesIO()
-    fp.seek(0, 0)
-    outstring = UncompressBytes(fp.read(), formatspecs)
-    filefp.write(outstring)
-    filefp.seek(0, 0)
-    return filefp
-
-
-def CompressCatFile(fp, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
-    if(not hasattr(fp, "read")):
-        return False
-    fp.seek(0, 0)
-    if(not compression or compression == formatspecs['format_magic']):
-        compression = "auto"
-    if(compression not in compressionlist and compression is None):
-        compression = "auto"
-    if(compression == "gzip" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        bytesfp.write(GzipCompressData(
-            fp.read(), compresslevel=compressionlevel))
-    elif(compression == "bzip2" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        bytesfp.write(BzipCompressData(
-            fp.read(), compresslevel=compressionlevel))
-    elif(compression == "lz4" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        bytesfp.write(lz4.frame.compress(
-            fp.read(), compression_level=compressionlevel))
-    elif((compression == "lzo" or compression == "lzop") and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        bytesfp.write(lzo.compress(fp.read(), compressionlevel))
-    elif(compression == "zstd" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        compressor = zstandard.ZstdCompressor(compressionlevel, threads=get_default_threads())
-        bytesfp.write(compressor.compress(fp.read()))
-    elif(compression == "lzma" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        try:
-            bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_ALONE, filters=[{"id": lzma.FILTER_LZMA1, "preset": compressionlevel}]))
-        except (NotImplementedError, lzma.LZMAError):
-            bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_ALONE))
-    elif(compression == "xz" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        try:
-            bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_XZ, filters=[{"id": lzma.FILTER_LZMA2, "preset": compressionlevel}]))
-        except (NotImplementedError, lzma.LZMAError):
-            bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_XZ))
-    elif(compression == "zlib" and compression in compressionsupport):
-        bytesfp = BytesIO()
-        if(compressionlevel is None):
-            compressionlevel = 9
-        else:
-            compressionlevel = int(compressionlevel)
-        bytesfp.write(zlib.compress(fp.read(), compressionlevel))
-    elif(compression == "auto" or compression is None):
-        bytesfp = fp
-    else:
-        bytesfp = fp
-    bytesfp.seek(0, 0)
-    return bytesfp
-
-
-def CompressOpenFile(outfile, compressionenable=True, compressionlevel=None):
-    if(outfile is None):
-        return False
-    fbasename = os.path.splitext(outfile)[0]
-    fextname = os.path.splitext(outfile)[1]
-    if(compressionlevel is None):
-        compressionlevel = 9
-    else:
-        compressionlevel = int(compressionlevel)
-    if(sys.version_info[0] == 2):
-        mode = "w"
-    else:
-        mode = "wb"
-    try:
-        if(fextname not in outextlistwd or not compressionenable):
-            outfp = open(outfile, "wb")
-        elif(fextname == ".gz" and "gzip" in compressionsupport):
-            if sys.version_info[0] == 2:
-                outfp = GzipFile(outfile, mode=mode, level=compressionlevel)
-            else:
-                outfp = gzip.open(outfile, mode, compressionlevel)
-        elif(fextname == ".bz2" and "bzip2" in compressionsupport):
-            outfp = bz2.open(outfile, mode, compressionlevel)
-        elif(fextname == ".zst" and "zstandard" in compressionsupport):
-            if 'zstandard' in sys.modules:
-                outfp = ZstdFile(outfile, mode=mode, level=compressionlevel)
-            elif 'pyzstd' in sys.modules:
-                outfp = pyzstd.zstdfile.ZstdFile(outfile, mode=mode, level=compressionlevel)
-            else:
-                return Flase
-        elif(fextname == ".xz" and "xz" in compressionsupport):
-            try:
-                outfp = lzma.open(outfile, mode, format=lzma.FORMAT_XZ, filters=[{"id": lzma.FILTER_LZMA2, "preset": compressionlevel}])
-            except (NotImplementedError, lzma.LZMAError):
-                outfp = lzma.open(outfile, mode, format=lzma.FORMAT_XZ)
-        elif(fextname == ".lz4" and "lz4" in compressionsupport):
-            outfp = lz4.frame.open(
-                    outfile, mode, compression_level=compressionlevel)
-        elif(fextname == ".lzo" and "lzop" in compressionsupport):
-            outfp = LzopFile(outfile, mode=mode, level=compressionlevel)
-        elif(fextname == ".lzma" and "lzma" in compressionsupport):
-            try:
-                outfp = lzma.open(outfile, mode, format=lzma.FORMAT_ALONE, filters=[{"id": lzma.FILTER_LZMA1, "preset": compressionlevel}])
-            except (NotImplementedError, lzma.LZMAError):
-                outfp = lzma.open(outfile, mode, format=lzma.FORMAT_ALONE)
-        elif((fextname == ".zz" or fextname == ".zl" or fextname == ".zlib") and "zlib" in compressionsupport):
-            outfp = ZlibFile(outfile, mode=mode, level=compressionlevel)
-    except FileNotFoundError:
-        return False
-    try:
-        outfp.write_through = True
-    except AttributeError:
-        pass
-    return outfp
-
-
-def MakeDevAlt(major, minor):
-    """
-    Replicates os.makedev functionality to create a device number.
-    :param major: Major device number
-    :param minor: Minor device number
-    :return: Device number
-    """
-    # The device number is typically represented as:
-    # (major << 8) | minor
-    return (major << 8) | minor
-
-
-def GetDevMajorMinor(fdev):
-    retdev = []
-    if(hasattr(os, "minor")):
-        retdev.append(os.minor(fdev))
-    else:
-        retdev.append(0)
-    if(hasattr(os, "major")):
-        retdev.append(os.major(fdev))
-    else:
-        retdev.append(0)
-    return retdev
-
-
-def CheckSumSupport(checkfor, guaranteed=True):
-    if(guaranteed):
-        try:
-            hash_list = sorted(list(hashlib.algorithms_guaranteed))
-        except AttributeError:
-            hash_list = sorted(list(hashlib.algorithms))
-    else:
-        try:
-            hash_list = sorted(list(hashlib.algorithms_available))
-        except AttributeError:
-            hash_list = sorted(list(hashlib.algorithms))
-    checklistout = sorted(hash_list + ['adler32', 'crc16', 'crc16_ansi', 'crc16_ibm',
-                          'crc16_ccitt', 'crc32', 'crc64', 'crc64_ecma', 'crc64_iso', 'none'])
-    if(checkfor in checklistout):
-        return True
-    else:
-        return False
-
-
-def CheckSumSupportAlt(checkfor, guaranteed=True):
-    if(guaranteed):
-        try:
-            hash_list = sorted(list(hashlib.algorithms_guaranteed))
-        except AttributeError:
-            hash_list = sorted(list(hashlib.algorithms))
-    else:
-        try:
-            hash_list = sorted(list(hashlib.algorithms_available))
-        except AttributeError:
-            hash_list = sorted(list(hashlib.algorithms))
-    checklistout = hash_list
-    if(checkfor in checklistout):
-        return True
-    else:
-        return False
-
-
-def PrintPermissionString(fchmode, ftype):
-    permissions = {'access': {'0': ('---'), '1': ('--x'), '2': ('-w-'), '3': ('-wx'), '4': (
-        'r--'), '5': ('r-x'), '6': ('rw-'), '7': ('rwx')}, 'roles': {0: 'owner', 1: 'group', 2: 'other'}}
-    permissionstr = ""
-    for fmodval in str(oct(fchmode))[-3:]:
-        permissionstr = permissionstr + \
-            permissions['access'].get(fmodval, '---')
-    if(ftype == 0 or ftype == 7):
-        permissionstr = "-" + permissionstr
-    if(ftype == 1):
-        permissionstr = "h" + permissionstr
-    if(ftype == 2):
-        permissionstr = "l" + permissionstr
-    if(ftype == 3):
-        permissionstr = "c" + permissionstr
-    if(ftype == 4):
-        permissionstr = "b" + permissionstr
-    if(ftype == 5):
-        permissionstr = "d" + permissionstr
-    if(ftype == 6):
-        permissionstr = "f" + permissionstr
-    if(ftype == 8):
-        permissionstr = "D" + permissionstr
-    if(ftype == 9):
-        permissionstr = "p" + permissionstr
-    if(ftype == 10):
-        permissionstr = "w" + permissionstr
-    try:
-        permissionoutstr = stat.filemode(fchmode)
-    except AttributeError:
-        permissionoutstr = permissionstr
-    except KeyError:
-        permissionoutstr = permissionstr
-    return permissionoutstr
-
-
-def PrintPermissionStringAlt(fchmode, ftype):
-    permissions = {
-        '0': '---', '1': '--x', '2': '-w-', '3': '-wx',
-        '4': 'r--', '5': 'r-x', '6': 'rw-', '7': 'rwx'
-    }
-    # Translate file mode into permission string
-    permissionstr = ''.join([permissions[i] for i in str(oct(fchmode))[-3:]])
-    # Append file type indicator
-    type_indicators = {
-        0: '-', 1: 'h', 2: 'l', 3: 'c', 4: 'b',
-        5: 'd', 6: 'f', 8: 'D', 9: 'p', 10: 'w'
-    }
-    file_type = type_indicators.get(ftype, '-')
-    permissionstr = file_type + permissionstr
-    try:
-        permissionoutstr = stat.filemode(fchmode)
-    except AttributeError:
-        permissionoutstr = permissionstr
-    return permissionoutstr
-
-
-def GzipCompressData(data, compresslevel=9):
-    try:
-        # Try using modern gzip.compress if available
-        compressed_data = gzip.compress(data, compresslevel=compresslevel)
-    except AttributeError:
-        # Fallback to older method for Python 2.x and older 3.x versions
-        out = BytesIO()
-        with gzip.GzipFile(fileobj=out, mode="wb", compresslevel=compresslevel) as f:
-            f.write(data)
-        compressed_data = out.getvalue()
-    return compressed_data
-
-
-def GzipDecompressData(compressed_data):
-    try:
-        # Try using modern gzip.decompress if available
-        decompressed_data = gzip.decompress(compressed_data)
-    except AttributeError:
-        # Fallback to older method for Python 2.x and older 3.x versions
-        inp = BytesIO(compressed_data)
-        with gzip.GzipFile(fileobj=inp, mode="rb") as f:
-            decompressed_data = f.read()
-    return decompressed_data
-
-
-def BzipCompressData(data, compresslevel=9):
-    try:
-        # Try using modern bz2.compress if available
-        compressed_data = bz2.compress(data, compresslevel=compresslevel)
-    except AttributeError:
-        # Fallback to older method for Python 2.x and older 3.x versions
-        compressor = bz2.BZ2Compressor(compresslevel)
-        compressed_data = compressor.compress(data)
-        compressed_data += compressor.flush()
-    return compressed_data
-
-
-def BzipDecompressData(compressed_data):
-    try:
-        # Try using modern bz2.decompress if available
-        decompressed_data = bz2.decompress(compressed_data)
-    except AttributeError:
-        # Fallback to older method for Python 2.x and older 3.x versions
-        decompressor = bz2.BZ2Decompressor()
-        decompressed_data = decompressor.decompress(compressed_data)
-    return decompressed_data
-
-
-def GetKeyByFormatExtension(format_extension, formatspecs=__file_format_multi_dict__):
-    for key, value in formatspecs.items():
-        if value.get('format_extension') == format_extension:
-            return key
-    return None
-
-
-def IsNestedDict(variable):
-    """
-    Check if a variable is a single dictionary or a dictionary containing dictionaries.
-    
-    :param variable: The variable to check.
-    :return: "single_dict" if it's a single dictionary, 
-             "nested_dict" if it contains other dictionaries, 
-             or "not_a_dict" if it's not a dictionary.
-    """
-    if not isinstance(variable, dict):
-        return False
-
-    # Check if any value in the dictionary is itself a dictionary
-    for value in variable.values():
-        if isinstance(value, dict):
-            return True
-
-    return False
-
-def IsNestedDictAlt(variable):
-    """
-    Check if the input 'variable' (which is expected to be a list) contains
-    any dictionary or list elements. Works in Python 2 and 3.
-
-    :param variable: list to check
-    :return: True if there's at least one dict or list in 'variable', otherwise False
-    """
-    for elem in variable:
-        if isinstance(elem, (dict, list)):
-            return True
-    return False
-
-def IsSingleDict(variable):
-    """
-    Check if a variable is a single dictionary or a dictionary containing dictionaries.
-    
-    :param variable: The variable to check.
-    :return: "single_dict" if it's a single dictionary, 
-             "nested_dict" if it contains other dictionaries, 
-             or "not_a_dict" if it's not a dictionary.
-    """
-    if not isinstance(variable, dict):
-        return False
-
-    # Check if any value in the dictionary is itself a dictionary
-    for value in variable.values():
-        if isinstance(value, dict):
-            return False
-
-    return True
-
-
-def GetFileEncoding(infile, closefp=True):
-    if(hasattr(infile, "read") or hasattr(infile, "write")):
-        fp = infile
-    else:
-        try:
-            fp = open(infile, "rb")
-        except FileNotFoundError:
-            return False
-    file_encoding = "UTF-8"
-    fp.seek(0, 0)
-    prefp = fp.read(2)
-    if(prefp == binascii.unhexlify("fffe")):
-        file_encoding = "UTF-16LE"
-    elif(prefp == binascii.unhexlify("feff")):
-        file_encoding = "UTF-16BE"
-    fp.seek(0, 0)
-    prefp = fp.read(3)
-    if(prefp == binascii.unhexlify("efbbbf")):
-        file_encoding = "UTF-8"
-    elif(prefp == binascii.unhexlify("0efeff")):
-        file_encoding = "SCSU"
-    fp.seek(0, 0)
-    prefp = fp.read(4)
-    if(prefp == binascii.unhexlify("fffe0000")):
-        file_encoding = "UTF-32LE"
-    elif(prefp == binascii.unhexlify("0000feff")):
-        file_encoding = "UTF-32BE"
-    elif(prefp == binascii.unhexlify("dd736673")):
-        file_encoding = "UTF-EBCDIC"
-    elif(prefp == binascii.unhexlify("2b2f7638")):
-        file_encoding = "UTF-7"
-    elif(prefp == binascii.unhexlify("2b2f7639")):
-        file_encoding = "UTF-7"
-    elif(prefp == binascii.unhexlify("2b2f762b")):
-        file_encoding = "UTF-7"
-    elif(prefp == binascii.unhexlify("2b2f762f")):
-        file_encoding = "UTF-7"
-    fp.seek(0, 0)
-    if(closefp):
-        fp.close()
-    return file_encoding
-
-
-def GetFileEncodingFromString(instring, closefp=True):
-    try:
-        instringsfile = BytesIO(instring)
-    except TypeError:
-        instringsfile = BytesIO(instring.encode("UTF-8"))
-    return GetFileEncoding(instringsfile, closefp)
-
-
-def CheckCompressionType(infile, formatspecs=__file_format_multi_dict__, closefp=True):
-    if(hasattr(infile, "read") or hasattr(infile, "write")):
-        fp = infile
-    else:
-        try:
-            fp = open(infile, "rb")
-        except FileNotFoundError:
-            return False
-    filetype = False
-    fp.seek(0, 0)
-    prefp = fp.read(2)
-    if(prefp == binascii.unhexlify("1f8b")):
-        filetype = "gzip"
-    elif(prefp == binascii.unhexlify("60ea")):
-        filetype = "ajr"
-    elif(prefp == binascii.unhexlify("7801")):
-        filetype = "zlib"
-    elif(prefp == binascii.unhexlify("785e")):
-        filetype = "zlib"
-    elif(prefp == binascii.unhexlify("789c")):
-        filetype = "zlib"
-    elif(prefp == binascii.unhexlify("78da")):
-        filetype = "zlib"
-    elif(prefp == binascii.unhexlify("1f9d")):
-        filetype = "compress"
-    fp.seek(0, 0)
-    prefp = fp.read(3)
-    if(prefp == binascii.unhexlify("425a68")):
-        filetype = "bzip2"
-    elif(prefp == binascii.unhexlify("5d0000")):
-        filetype = "lzma"
-    fp.seek(0, 0)
-    prefp = fp.read(4)
-    if(prefp == binascii.unhexlify("28b52ffd")):
-        filetype = "zstd"
-    elif(prefp == binascii.unhexlify("04224d18")):
-        filetype = "lz4"
-    elif(prefp == binascii.unhexlify("504b0304")):
-        filetype = "zipfile"
-    elif(prefp == binascii.unhexlify("504b0506")):
-        filetype = "zipfile"
-    elif(prefp == binascii.unhexlify("504b0708")):
-        filetype = "zipfile"
-    fp.seek(0, 0)
-    prefp = fp.read(5)
-    if(prefp == binascii.unhexlify("7573746172")):
-        filetype = "tarfile"
-    if(prefp == binascii.unhexlify("7573746172")):
-        filetype = "tarfile"
-    fp.seek(0, 0)
-    prefp = fp.read(6)
-    if(prefp == binascii.unhexlify("fd377a585a00")):
-        filetype = "xz"
-    elif(prefp == binascii.unhexlify("377abcaf271c")):
-        filetype = "7zipfile"
-    fp.seek(0, 0)
-    prefp = fp.read(7)
-    if(prefp == binascii.unhexlify("526172211a0700")):
-        filetype = "rarfile"
-    elif(prefp == binascii.unhexlify("2a2a4143452a2a")):
-        filetype = "ace"
-    fp.seek(0, 0)
-    prefp = fp.read(7)
-    if(prefp == binascii.unhexlify("894c5a4f0d0a1a")):
-        filetype = "lzo"
-    fp.seek(0, 0)
-    prefp = fp.read(8)
-    if(prefp == binascii.unhexlify("7573746172003030")):
-        filetype = "tarfile"
-    if(prefp == binascii.unhexlify("7573746172202000")):
-        filetype = "tarfile"
-    if(prefp == binascii.unhexlify("526172211a070100")):
-        filetype = "rarfile"
-    fp.seek(0, 0)
-    if(IsNestedDict(formatspecs)):
-        for key, value in formatspecs.items():
-            prefp = fp.read(formatspecs[key]['format_len'])
-            if(prefp == binascii.unhexlify(formatspecs[key]['format_hex'])):
-                inheaderver = str(int(formatspecs[key]['format_ver'].replace(".", "")))
-                formstring = fp.read(len(inheaderver)).decode("UTF-8")
-                formdelszie = len(formatspecs[key]['format_delimiter'])
-                formdel = fp.read(formdelszie).decode("UTF-8")
-                if(formstring != inheaderver):
-                    break
-                if(formdel != formatspecs[key]['format_delimiter']):
-                    break
-                if(formstring == inheaderver and formdel == formatspecs[key]['format_delimiter']):
-                    filetype = formatspecs[key]['format_magic']
-                    continue
-            fp.seek(0, 0)
-    elif(IsSingleDict(formatspecs)):
-        prefp = fp.read(formatspecs['format_len'])
-        if(prefp == binascii.unhexlify(formatspecs['format_hex'])):
-            inheaderver = str(int(formatspecs['format_ver'].replace(".", "")))
-            formstring = fp.read(len(inheaderver)).decode("UTF-8")
-            formdelszie = len(formatspecs['format_delimiter'])
-            formdel = fp.read(formdelszie).decode("UTF-8")
-            if(formstring != inheaderver):
-                return False
-            if(formdel != formatspecs['format_delimiter']):
-                return False
-            filetype = formatspecs['format_magic']
-    else:
-        pass
-    fp.seek(0, 0)
-    prefp = fp.read(9)
-    if(prefp == binascii.unhexlify("894c5a4f000d0a1a0a")):
-        filetype = "lzo"
-    fp.seek(0, 0)
-    prefp = fp.read(10)
-    if(prefp == binascii.unhexlify("7061785f676c6f62616c")):
-        filetype = "tarfile"
-    fp.seek(0, 0)
-    if(filetype == "gzip" or filetype == "bzip2" or filetype == "lzma" or filetype == "zstd" or filetype == "lz4" or filetype == "zlib"):
-        if(TarFileCheck(fp)):
-            filetype = "tarfile"
-    elif(not filetype):
-        if(TarFileCheck(fp)):
-            filetype = "tarfile"
-        elif(zipfile.is_zipfile(fp)):
-            filetype = "zipfile"
-        elif(rarfile_support and (rarfile.is_rarfile(fp) or rarfile.is_rarfile_sfx(fp))):
-            filetype = "rarile"
-        elif(py7zr_support and py7zr.is_7zfile(fp)):
-            return "7zipfile"
-        else:
-            filetype = False
-    fp.seek(0, 0)
-    if(closefp):
-        fp.close()
-    return filetype
-
-
-def CheckCompressionSubType(infile, formatspecs=__file_format_multi_dict__, closefp=True):
-    compresscheck = CheckCompressionType(infile, formatspecs, False)
-    if(not compresscheck):
-        fextname = os.path.splitext(infile)[1]
-        if(fextname == ".gz"):
-            compresscheck = "gzip"
-        elif(fextname == ".bz2"):
-            compresscheck = "bzip2"
-        elif(fextname == ".zst"):
-            compresscheck = "zstd"
-        elif(fextname == ".lz4"):
-            compresscheck = "lz4"
-        elif(fextname == ".lzo" or fextname == ".lzop"):
-            compresscheck = "lzo"
-        elif(fextname == ".lzma"):
-            compresscheck = "lzma"
-        elif(fextname == ".xz"):
-            compresscheck = "xz"
-        elif(fextname == ".zz" or fextname == ".zl" or fextname == ".zlib"):
-            compresscheck = "zlib"
-        else:
-            return False
-    if(compresscheck == "gzip" or compresscheck == "bzip2" or compresscheck == "lzma" or compresscheck == "zstd" or compresscheck == "lz4" or compresscheck == "zlib"):
-        if(TarFileCheck(infile)):
-            filetype = "tarfile"
-    elif(not compresscheck):
-        if(TarFileCheck(infile)):
-            return "tarfile"
-        elif(zipfile.is_zipfile(infile)):
-            return "zipfile"
-        elif(rarfile_support and (rarfile.is_rarfile(infile) or rarfile.is_rarfile_sfx(infile))):
-            return "rarile"
-        elif(py7zr_support and py7zr.is_7zfile(infile)):
-            return "7zipfile"
-        else:
-            return False
-        return False
-    elif(IsNestedDict(formatspecs) and compresscheck in formatspecs):
-        return formatspecs[compresscheck]['format_magic']
-    elif(IsSingleDict(formatspecs) and compresscheck == formatspecs['format_magic']):
-        return formatspecs['format_magic']
-    elif(compresscheck == "tarfile"):
-        return "tarfile"
-    elif(compresscheck == "zipfile"):
-        return "zipfile"
-    elif(rarfile_support and compresscheck == "rarfile"):
-        return "rarfile"
-    elif(py7zr_support and compresscheck == "7zipfile" and py7zr.is_7zfile(infile)):
-        return "7zipfile"
-    if(hasattr(infile, "read") or hasattr(infile, "write")):
-        fp = UncompressArchiveFile(infile, formatspecs)
-    else:
-        try:
-            if(compresscheck == "gzip" and compresscheck in compressionsupport):
-                if sys.version_info[0] == 2:
-                    fp = GzipFile(infile, mode="rb")
-                else:
-                    fp = gzip.GzipFile(infile, "rb")
-            elif(compresscheck == "bzip2" and compresscheck in compressionsupport):
-                fp = bz2.BZ2File(infile, "rb")
-            elif(compresscheck == "lz4" and compresscheck in compressionsupport):
-                fp = lz4.frame.open(infile, "rb")
-            elif(compresscheck == "zstd" and compresscheck in compressionsupport):
-                if 'zstandard' in sys.modules:
-                    fp = ZstdFile(infile, mode="rb")
-                elif 'pyzstd' in sys.modules:
-                    fp = pyzstd.zstdfile.ZstdFile(infile, mode="rb")
-                else:
-                    return Flase
+            elif(compresscheck == "zcompress" and compresscheck in compressionsupport):
+                fp = LzwFile(infile, mode="rb")
             elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
                 fp = LzopFile(infile, mode="rb")
             elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
@@ -5378,6 +4912,8 @@ def UncompressArchiveFile(fp, formatspecs=__file_format_multi_dict__):
             fp = pyzstd.zstdfile.ZstdFile(fileobj=fp, mode="rb")
         else:
             return Flase
+    elif(compresscheck == "zcompress" and compresscheck in compressionsupport):
+        fp = LzwFile(fileobj=fp, mode="rb")
     elif(compresscheck == "lz4" and compresscheck in compressionsupport):
         fp = lz4.frame.LZ4FrameFile(fp, mode='rb')
     elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
@@ -5422,6 +4958,8 @@ def UncompressFile(infile, formatspecs=__file_format_multi_dict__, mode="rb"):
                 filefp = pyzstd.zstdfile.ZstdFile(infile, mode=mode)
             else:
                 return Flase
+        elif(compresscheck == "zcompress" and compresscheck in compressionsupport):
+            filefp = LzwFile(infile, mode=mode)
         elif(compresscheck == "lz4" and compresscheck in compressionsupport):
             filefp = lz4.frame.open(infile, mode)
         elif((compresscheck == "lzo" or compresscheck == "lzop") and compresscheck in compressionsupport):
@@ -5462,6 +5000,8 @@ def UncompressString(infile, formatspecs=__file_format_multi_dict__):
         fileuz = lzo.decompress(infile)
     elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
         fileuz = lzma.decompress(infile)
+    elif((compresscheck == "zcompress" or compresscheck == "xz") and compresscheck in compressionsupport):
+        fileuz = lzw_decompress_bytes_with_magic(infile)
     elif(compresscheck == "zlib" and compresscheck in compressionsupport):
         fileuz = zlib.decompress(infile)
     elif(not compresscheck):
@@ -5514,6 +5054,8 @@ def UncompressBytes(infile, formatspecs=__file_format_multi_dict__):
         fileuz = lzo.decompress(infile)
     elif((compresscheck == "lzma" or compresscheck == "xz") and compresscheck in compressionsupport):
         fileuz = lzma.decompress(infile)
+    elif((compresscheck == "zcompress" or compresscheck == "xz") and compresscheck in compressionsupport):
+        fileuz = lzw_decompress_bytes_with_magic(infile)
     elif(compresscheck == "zlib" and compresscheck in compressionsupport):
         fileuz = zlib.decompress(infile)
     elif(not compresscheck):
@@ -5548,7 +5090,7 @@ def UncompressBytesAltFP(fp, formatspecs=__file_format_multi_dict__):
     return filefp
 
 
-def CompressArchiveFile(fp, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
+def CompressOpenFileAlt(fp, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
     if(not hasattr(fp, "read")):
         return False
     fp.seek(0, 0)
@@ -5605,6 +5147,13 @@ def CompressArchiveFile(fp, compression="auto", compressionlevel=None, formatspe
             bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_ALONE, filters=[{"id": lzma.FILTER_LZMA1, "preset": compressionlevel}]))
         except (NotImplementedError, lzma.LZMAError):
             bytesfp.write(lzma.compress(fp.read(), format=lzma.FORMAT_ALONE))
+    elif(compression == "zcompress" and compression in compressionsupport):
+        bytesfp = BytesIO()
+        if(compressionlevel is None):
+            compressionlevel = 9
+        else:
+            compressionlevel = int(compressionlevel)
+        bytesfp.write(lzw_compress_bytes_with_magic(fp.read()))
     elif(compression == "xz" and compression in compressionsupport):
         bytesfp = BytesIO()
         if(compressionlevel is None):
@@ -5660,6 +5209,8 @@ def CompressOpenFile(outfile, compressionenable=True, compressionlevel=None):
                 outfp = pyzstd.zstdfile.ZstdFile(outfile, mode=mode, level=compressionlevel)
             else:
                 return Flase
+        elif((fextname == ".Z" or fextname == ".z") and "zcompress" in compressionsupport):
+            outfp = LzwFile(outfile, mode=mode, level=compressionlevel)
         elif(fextname == ".xz" and "xz" in compressionsupport):
             try:
                 outfp = lzma.open(outfile, mode, format=lzma.FORMAT_XZ, filters=[{"id": lzma.FILTER_LZMA2, "preset": compressionlevel}])
@@ -6005,7 +5556,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressCatFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -6023,7 +5574,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressCatFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -6054,7 +5605,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressCatFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -6072,7 +5623,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressCatFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -6095,7 +5646,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
         except OSError:
             return False
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -6119,7 +5670,7 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressCatFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -6235,6 +5786,9 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
                 elif 'pyzstd' in sys.modules:
                     fp = pyzstd.zstdfile.ZstdFile(fileobj=infile, mode="rb")
                 tarfp = tarfile.open(fileobj=infile, mode="r")
+            elif(compresscheck=="zcompress"):
+                infile = LzwFile(fileobj=infile, mode="rb")
+                tarfp = tarfile.open(fileobj=infile, mode="r")
             else:
                 tarfp = tarfile.open(fileobj=infile, mode="r")
         else:
@@ -6246,6 +5800,9 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
                     infile = ZstdFile(fileobj=infile, mode="rb")
                 elif 'pyzstd' in sys.modules:
                     fp = pyzstd.zstdfile.ZstdFile(fileobj=infile, mode="rb")
+                tarfp = tarfile.open(fileobj=infile, mode="r")
+            elif(compresscheck=="zcompress"):
+                infile = LzwFile(fileobj=infile, mode="rb")
                 tarfp = tarfile.open(fileobj=infile, mode="r")
             else:
                 tarfp = tarfile.open(infile, "r")
@@ -6352,7 +5909,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
                         shutil.copyfileobj(fcontents, cfcontents)
                         fcontents.seek(0, 0)
                         cfcontents.seek(0, 0)
-                        cfcontents = CompressArchiveFile(
+                        cfcontents = CompressOpenFileAlt(
                             cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                         if(cfcontents):
                             cfcontents.seek(0, 2)
@@ -6370,7 +5927,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
                 cfcontents = BytesIO()
                 shutil.copyfileobj(fcontents, cfcontents)
                 cfcontents.seek(0, 0)
-                cfcontents = CompressArchiveFile(
+                cfcontents = CompressOpenFileAlt(
                     cfcontents, curcompression, compressionlevel, formatspecs)
                 cfcontents.seek(0, 2)
                 cfsize = cfcontents.tell()
@@ -6395,7 +5952,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
         except OSError:
             return False
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -6419,7 +5976,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -6649,7 +6206,7 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
                         shutil.copyfileobj(fcontents, cfcontents)
                         fcontents.seek(0, 0)
                         cfcontents.seek(0, 0)
-                        cfcontents = CompressArchiveFile(
+                        cfcontents = CompressOpenFileAlt(
                             cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                         cfcontents.seek(0, 2)
                         ilcsize.append(cfcontents.tell())
@@ -6661,7 +6218,7 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
                 cfcontents = BytesIO()
                 shutil.copyfileobj(fcontents, cfcontents)
                 cfcontents.seek(0, 0)
-                cfcontents = CompressArchiveFile(
+                cfcontents = CompressOpenFileAlt(
                     cfcontents, curcompression, compressionlevel, formatspecs)
                 cfcontents.seek(0, 2)
                 cfsize = cfcontents.tell()
@@ -6686,7 +6243,7 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
         except OSError:
             return False
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -6710,7 +6267,7 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -6963,7 +6520,7 @@ if(rarfile_support):
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressArchiveFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -6981,7 +6538,7 @@ if(rarfile_support):
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressArchiveFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -7006,7 +6563,7 @@ if(rarfile_support):
             except OSError:
                 return False
         if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-            fp = CompressArchiveFile(
+            fp = CompressOpenFileAlt(
                 fp, compression, compressionlevel, formatspecs)
             try:
                 fp.flush()
@@ -7030,7 +6587,7 @@ if(rarfile_support):
             fp.close()
             return outvar
         elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-            fp = CompressArchiveFile(
+            fp = CompressOpenFileAlt(
                 fp, compression, compressionlevel, formatspecs)
             fp.seek(0, 0)
             upload_file_to_internet_file(fp, outfile)
@@ -7216,7 +6773,7 @@ if(py7zr_support):
                             shutil.copyfileobj(fcontents, cfcontents)
                             fcontents.seek(0, 0)
                             cfcontents.seek(0, 0)
-                            cfcontents = CompressArchiveFile(
+                            cfcontents = CompressOpenFileAlt(
                                 cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                             if(cfcontents):
                                 cfcontents.seek(0, 2)
@@ -7234,7 +6791,7 @@ if(py7zr_support):
                     cfcontents = BytesIO()
                     shutil.copyfileobj(fcontents, cfcontents)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressArchiveFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, curcompression, compressionlevel, formatspecs)
                     cfcontents.seek(0, 2)
                     cfsize = cfcontents.tell()
@@ -7259,7 +6816,7 @@ if(py7zr_support):
             except OSError:
                 return False
         if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-            fp = CompressArchiveFile(
+            fp = CompressOpenFileAlt(
                 fp, compression, compressionlevel, formatspecs)
             try:
                 fp.flush()
@@ -7283,7 +6840,7 @@ if(py7zr_support):
             fp.close()
             return outvar
         elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-            fp = CompressArchiveFile(
+            fp = CompressOpenFileAlt(
                 fp, compression, compressionlevel, formatspecs)
             fp.seek(0, 0)
             upload_file_to_internet_file(fp, outfile)
@@ -9021,7 +8578,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                     shutil.copyfileobj(fcontents, cfcontents)
                     fcontents.seek(0, 0)
                     cfcontents.seek(0, 0)
-                    cfcontents = CompressArchiveFile(
+                    cfcontents = CompressOpenFileAlt(
                         cfcontents, compressionuselist[ilmin], compressionlevel, formatspecs)
                     if(cfcontents):
                         cfcontents.seek(0, 2)
@@ -9039,7 +8596,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
             cfcontents = BytesIO()
             shutil.copyfileobj(fcontents, cfcontents)
             cfcontents.seek(0, 0)
-            cfcontents = CompressArchiveFile(
+            cfcontents = CompressOpenFileAlt(
                 cfcontents, curcompression, compressionlevel, formatspecs)
             cfcontents.seek(0, 2)
             cfsize = cfcontents.tell()
@@ -9119,7 +8676,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         except OSError:
             return False
     if(outfile == "-" or outfile is None or hasattr(outfile, "read") or hasattr(outfile, "write")):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         try:
             fp.flush()
@@ -9143,7 +8700,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         fp.close()
         return outvar
     elif(re.findall("^(ftp|ftps|sftp):\\/\\/", outfile)):
-        fp = CompressArchiveFile(
+        fp = CompressOpenFileAlt(
             fp, compression, compressionlevel, formatspecs)
         fp.seek(0, 0)
         upload_file_to_internet_file(fp, outfile)
@@ -9537,6 +9094,9 @@ def TarFileListFiles(infile, verbose=False, returnfp=False):
                 elif 'pyzstd' in sys.modules:
                     fp = pyzstd.zstdfile.ZstdFile(fileobj=infile, mode="rb")
                 tarfp = tarfile.open(fileobj=infile, mode="r")
+            elif(compresscheck=="zcompress"):
+                infile = LzwFile(fileobj=infile, mode="rb")
+                tarfp = tarfile.open(fileobj=infile, mode="r")
             else:
                 tarfp = tarfile.open(fileobj=infile, mode="r")
         else:
@@ -9548,6 +9108,9 @@ def TarFileListFiles(infile, verbose=False, returnfp=False):
                     infile = ZstdFile(fileobj=infile, mode="rb")
                 elif 'pyzstd' in sys.modules:
                     fp = pyzstd.zstdfile.ZstdFile(fileobj=infile, mode="rb")
+                tarfp = tarfile.open(fileobj=infile, mode="r")
+            elif(compresscheck=="zcompress"):
+                infile = LzwFile(fileobj=infile, mode="rb")
                 tarfp = tarfile.open(fileobj=infile, mode="r")
             else:
                 tarfp = tarfile.open(infile, "r")
@@ -10545,7 +10108,7 @@ def upload_file_to_internet_file(ifp, url):
 
 
 def upload_file_to_internet_compress_file(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
-    fp = CompressArchiveFile(
+    fp = CompressOpenFileAlt(
         fp, compression, compressionlevel, formatspecs)
     if(not archivefileout):
         return False
@@ -10571,7 +10134,7 @@ def upload_file_to_internet_string(ifp, url):
 
 
 def upload_file_to_internet_compress_string(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
-    fp = CompressArchiveFile(
+    fp = CompressOpenFileAlt(
         BytesIO(ifp), compression, compressionlevel, formatspecs)
     if(not archivefileout):
         return False
