@@ -2088,10 +2088,10 @@ def ReadFileHeaderDataWithContent(fp, listonly=False, uncompress=True, skipcheck
     fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
     if(fjsonsize > 0):
         try:
-            fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
+            fjsoncontent = json.loads(base64.b64decode(fprejsoncontent.encode("UTF-8")).decode("UTF-8"))
         except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
             try:
-                fjsoncontent = json.loads(fprejsoncontent.decode("UTF-8"))
+                fjsoncontent = json.loads(fprejsoncontent)
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                 fprejsoncontent = ""
                 fjsoncontent = {}
@@ -2230,16 +2230,39 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
         fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
         if(fjsonsize > 0):
             try:
-                fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
+                fjsonrawcontent = base64.b64decode(fprejsoncontent.encode("UTF-8")).decode("UTF-8")
+                fjsoncontent = json.loads(base64.b64decode(fprejsoncontent.encode("UTF-8")).decode("UTF-8"))
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                 try:
-                    fjsoncontent = json.loads(fprejsoncontent.decode("UTF-8"))
+                    fjsonrawcontent = fprejsoncontent
+                    fjsoncontent = json.loads(fprejsoncontent)
                 except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                     fprejsoncontent = ""
+                    fjsonrawcontent = fprejsoncontent 
                     fjsoncontent = {}
         else:
             fprejsoncontent = ""
+            fjsonrawcontent = fprejsoncontent 
             fjsoncontent = {}
+    elif(fjsontype=="list"):
+        fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
+        flisttmp = BytesIO()
+        flisttmp.write(fprejsoncontent.encode())
+        flisttmp.seek(0)
+        fjsoncontent = ReadFileHeaderData(flisttmp, fjsonlen, delimiter)
+        flisttmp.close()
+        fjsonrawcontent = fjsoncontent
+        if(outfjsonlen==1):
+            try:
+                fjsonrawcontent = base64.b64decode(fjsoncontent[0]).decode("UTF-8")
+                fjsoncontent = json.loads(base64.b64decode(fjsoncontent[0]).decode("UTF-8"))
+                outfjsonlen = len(fjsoncontent)
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                try:
+                    fjsonrawcontent = fjsoncontent[0]
+                    fjsoncontent = json.loads(fjsoncontent[0])
+                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                    pass
     fp.seek(len(delimiter), 1)
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
@@ -2310,7 +2333,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     if(not contentasfile):
         fcontents = fcontents.read()
     outlist = {'fheadersize': fheadsize, 'fhstart': fheaderstart, 'fhend': fhend, 'ftype': ftype, 'fencoding': fencoding, 'fcencoding': fcencoding, 'fname': fname, 'fbasedir': fbasedir, 'flinkname': flinkname, 'fsize': fsize, 'fatime': fatime, 'fmtime': fmtime, 'fctime': fctime, 'fbtime': fbtime, 'fmode': fmode, 'fchmode': fchmode, 'ftypemod': ftypemod, 'fwinattributes': fwinattributes, 'fcompression': fcompression, 'fcsize': fcsize, 'fuid': fuid, 'funame': funame, 'fgid': fgid, 'fgname': fgname, 'finode': finode, 'flinkcount': flinkcount,
-               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextradata': fextrafieldslist, 'fjsontype': fjsontype, 'fjsonlen': fjsonlen, 'fjsonsize': fjsonsize, 'fjsondata': fjsoncontent, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
+               'fdev': fdev, 'fminor': fdev_minor, 'fmajor': fdev_major, 'fseeknextfile': fseeknextfile, 'fheaderchecksumtype': HeaderOut[-4], 'fcontentchecksumtype': HeaderOut[-3], 'fnumfields': fnumfields + 2, 'frawheader': HeaderOut, 'fextrafields': fextrafields, 'fextrafieldsize': fextrasize, 'fextradata': fextrafieldslist, 'fjsontype': fjsontype, 'fjsonlen': fjsonlen, 'fjsonsize': fjsonsize, 'fjsonrawdata': fjsonrawcontent, 'fjsondata': fjsoncontent, 'fheaderchecksum': fcs, 'fcontentchecksum': fccs, 'fhascontents': pyhascontents, 'fcontentstart': fcontentstart, 'fcontentend': fcontentend, 'fcontentasfile': contentasfile, 'fcontents': fcontents}
     return outlist
 
 
@@ -2383,16 +2406,39 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
         fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
         if(fjsonsize > 0):
             try:
-                fjsoncontent = json.loads(base64.b64decode(fprejsoncontent).decode("UTF-8"))
+                fjsonrawcontent = base64.b64decode(fprejsoncontent.encode("UTF-8")).decode("UTF-8")
+                fjsoncontent = json.loads(base64.b64decode(fprejsoncontent.encode("UTF-8")).decode("UTF-8"))
             except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                 try:
-                    fjsoncontent = json.loads(fprejsoncontent.decode("UTF-8"))
+                    fjsonrawcontent = fprejsoncontent
+                    fjsoncontent = json.loads(fprejsoncontent)
                 except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
                     fprejsoncontent = ""
+                    fjsonrawcontent = fprejsoncontent 
                     fjsoncontent = {}
         else:
             fprejsoncontent = ""
+            fjsonrawcontent = fprejsoncontent 
             fjsoncontent = {}
+    elif(fjsontype=="list"):
+        fprejsoncontent = fp.read(fjsonsize).decode("UTF-8")
+        flisttmp = BytesIO()
+        flisttmp.write(fprejsoncontent.encode())
+        flisttmp.seek(0)
+        fjsoncontent = ReadFileHeaderData(flisttmp, fjsonlen, delimiter)
+        flisttmp.close()
+        fjsonrawcontent = fjsoncontent
+        if(outfjsonlen==1):
+            try:
+                fjsonrawcontent = base64.b64decode(fjsoncontent[0]).decode("UTF-8")
+                fjsoncontent = json.loads(base64.b64decode(fjsoncontent[0]).decode("UTF-8"))
+                outfjsonlen = len(fjsoncontent)
+            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                try:
+                    fjsonrawcontent = fjsoncontent[0]
+                    fjsoncontent = json.loads(fjsoncontent[0])
+                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                    pass
     fp.seek(len(delimiter), 1)
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
@@ -7287,17 +7333,9 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
         outfjsoncontent = {}
         outfprejsoncontent = fp.read(outfjsonsize).decode("UTF-8")
         if(outfjsonsize > 0):
-            try:
-                outfjsoncontent = json.loads(base64.b64decode(outfprejsoncontent.encode("UTF-8")).decode("UTF-8"))
-            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-                try:
-                    outfjsoncontent = json.loads(outfprejsoncontent)
-                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-                    outfprejsoncontent = ""
-                    outfjsoncontent = {}
+            pass
         else:
             outfprejsoncontent = ""
-            outfjsoncontent = {}
         fp.seek(len(formatspecs['format_delimiter']), 1)
         outfextrasize = int(inheaderdata[30], 16)
         outfextrafields = int(inheaderdata[31], 16)
@@ -7716,20 +7754,44 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         outfjsontype = inheaderdata[27]
         outfjsonlen = int(inheaderdata[28], 16)
         outfjsonsize = int(inheaderdata[29], 16)
-        outfjsoncontent = {}
-        outfprejsoncontent = fp.read(outfjsonsize).decode("UTF-8")
-        if(outfjsonsize > 0):
-            try:
-                outfjsoncontent = json.loads(base64.b64decode(outfprejsoncontent.encode("UTF-8")).decode("UTF-8"))
-            except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-                try:
-                    outfjsoncontent = json.loads(outfprejsoncontent)
-                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
-                    outfprejsoncontent = ""
-                    outfjsoncontent = {}
-        else:
-            outfprejsoncontent = ""
+        if(outfjsontype=="json"):
             outfjsoncontent = {}
+            outfprejsoncontent = fp.read(outfjsonsize).decode("UTF-8")
+            if(outfjsonsize > 0):
+                try:
+                    outfjsonrawcontent = base64.b64decode(outfprejsoncontent.encode("UTF-8")).decode("UTF-8")
+                    outfjsoncontent = json.loads(base64.b64decode(outfprejsoncontent.encode("UTF-8")).decode("UTF-8"))
+                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                    try:
+                        outfjsonrawcontent = outfprejsoncontent
+                        outfjsoncontent = json.loads(outfprejsoncontent)
+                    except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                        outfprejsoncontent = ""
+                        outfjsonrawcontent = outfprejsoncontent 
+                        outfjsoncontent = {}
+            else:
+                outfprejsoncontent = ""
+                outfjsonrawcontent = outfprejsoncontent 
+                outfjsoncontent = {}
+        elif(outfjsontype=="list"):
+            outfprejsoncontent = fp.read(outfjsonsize).decode("UTF-8")
+            flisttmp = BytesIO()
+            flisttmp.write(outfprejsoncontent.encode())
+            flisttmp.seek(0)
+            outfjsoncontent = ReadFileHeaderData(flisttmp, outfjsonlen, formatspecs['format_delimiter'])
+            flisttmp.close()
+            outfjsonrawcontent = outfjsoncontent
+            if(fextrafields==1):
+                try:
+                    outfjsonrawcontent = base64.b64decode(outfjsoncontent[0]).decode("UTF-8")
+                    outfjsoncontent = json.loads(base64.b64decode(outfjsoncontent[0]).decode("UTF-8"))
+                    fextrafields = len(outfjsoncontent)
+                except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                    try:
+                        outfjsonrawcontent = outfjsoncontent[0]
+                        outfjsoncontent = json.loads(outfjsoncontent[0])
+                    except (binascii.Error, json.decoder.JSONDecodeError, UnicodeDecodeError):
+                        pass
         fp.seek(len(formatspecs['format_delimiter']), 1)
         outfextrasize = int(inheaderdata[30], 16)
         outfextrafields = int(inheaderdata[31], 16)
@@ -7818,7 +7880,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         outfcontents.seek(0, 0)
         if(not contentasfile):
             outfcontents = outfcontents.read()
-        outlist['ffilelist'].append({'fid': realidnum, 'fidalt': fileidnum, 'fheadersize': outfheadsize, 'fhstart': outfhstart, 'fhend': outfhend, 'ftype': outftype, 'fencoding': outfencoding, 'fcencoding': outfcencoding, 'fname': outfname, 'fbasedir': outfbasedir, 'flinkname': outflinkname, 'fsize': outfsize, 'fatime': outfatime, 'fmtime': outfmtime, 'fctime': outfctime, 'fbtime': outfbtime, 'fmode': outfmode, 'fchmode': outfchmode, 'ftypemod': outftypemod, 'fwinattributes': outfwinattributes, 'fcompression': outfcompression, 'fcsize': outfcsize, 'fuid': outfuid, 'funame': outfuname, 'fgid': outfgid, 'fgname': outfgname, 'finode': outfinode, 'flinkcount': outflinkcount, 'fdev': outfdev, 'fminor': outfdev_minor, 'fmajor': outfdev_major, 'fseeknextfile': outfseeknextfile, 'fheaderchecksumtype': inheaderdata[-4], 'fcontentchecksumtype': inheaderdata[-3], 'fnumfields': outfnumfields + 2, 'frawheader': inheaderdata, 'fextrafields': outfextrafields, 'fextrafieldsize': outfextrasize, 'fextradata': extrafieldslist, 'fjsontype': outfjsontype, 'fjsonlen': outfjsonlen, 'fjsonsize': outfjsonsize, 'fjsondata': outfjsoncontent, 'fheaderchecksum': outfcs, 'fcontentchecksum': outfccs, 'fhascontents': pyhascontents, 'fcontentstart': outfcontentstart, 'fcontentend': outfcontentend, 'fcontentasfile': contentasfile, 'fcontents': outfcontents})
+        outlist['ffilelist'].append({'fid': realidnum, 'fidalt': fileidnum, 'fheadersize': outfheadsize, 'fhstart': outfhstart, 'fhend': outfhend, 'ftype': outftype, 'fencoding': outfencoding, 'fcencoding': outfcencoding, 'fname': outfname, 'fbasedir': outfbasedir, 'flinkname': outflinkname, 'fsize': outfsize, 'fatime': outfatime, 'fmtime': outfmtime, 'fctime': outfctime, 'fbtime': outfbtime, 'fmode': outfmode, 'fchmode': outfchmode, 'ftypemod': outftypemod, 'fwinattributes': outfwinattributes, 'fcompression': outfcompression, 'fcsize': outfcsize, 'fuid': outfuid, 'funame': outfuname, 'fgid': outfgid, 'fgname': outfgname, 'finode': outfinode, 'flinkcount': outflinkcount, 'fdev': outfdev, 'fminor': outfdev_minor, 'fmajor': outfdev_major, 'fseeknextfile': outfseeknextfile, 'fheaderchecksumtype': inheaderdata[-4], 'fcontentchecksumtype': inheaderdata[-3], 'fnumfields': outfnumfields + 2, 'frawheader': inheaderdata, 'fextrafields': outfextrafields, 'fextrafieldsize': outfextrasize, 'fextradata': extrafieldslist, 'fjsontype': outfjsontype, 'fjsonlen': outfjsonlen, 'fjsonsize': outfjsonsize, 'fjsonrawdata': outfjsonrawcontent, 'fjsondata': outfjsoncontent, 'fheaderchecksum': outfcs, 'fcontentchecksum': outfccs, 'fhascontents': pyhascontents, 'fcontentstart': outfcontentstart, 'fcontentend': outfcontentend, 'fcontentasfile': contentasfile, 'fcontents': outfcontents})
         fileidnum = fileidnum + 1
         realidnum = realidnum + 1
     if(returnfp):
@@ -8122,7 +8184,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         if(not followlink and len(extradata) < 0):
             extradata = listarchivefiles['ffilelist'][reallcfi]['fextralist']
         if(not followlink and len(jsondata) <= 0):
-            jsondata = listarchivefiles['ffilelist'][reallcfi]['jsondata']
+            jsondata = listarchivefiles['ffilelist'][reallcfi]['fjsondata']
         fcontents = listarchivefiles['ffilelist'][reallcfi]['fcontents']
         if(not listarchivefiles['ffilelist'][reallcfi]['fcontentasfile']):
             fcontents = BytesIO(fcontents)
@@ -8204,7 +8266,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 if(len(extradata) < 0):
                     extradata = flinkinfo['fextralist']
                 if(len(jsondata) < 0):
-                    extradata = flinkinfo['jsondata']
+                    extradata = flinkinfo['fjsondata']
                 fcontents = flinkinfo['fcontents']
                 if(not flinkinfo['fcontentasfile']):
                     fcontents = BytesIO(fcontents)
