@@ -2133,7 +2133,7 @@ def ReadFileHeaderDataWithContent(fp, listonly=False, uncompress=True, skipcheck
     else:
         fcontents.seek(0, 0)
         if(uncompress):
-            cfcontents = UncompressArchiveFile(fcontents, formatspecs)
+            cfcontents = UncompressFileAlt(fcontents, formatspecs)
             cfcontents.seek(0, 0)
             cfcontents.seek(0, 0)
             shutil.copyfileobj(cfcontents, fcontents)
@@ -4529,7 +4529,7 @@ def CheckCompressionTypeFromBytes(instring, formatspecs=__file_format_multi_dict
     return CheckCompressionType(instringsfile, formatspecs, closefp)
 
 
-def UncompressArchiveFile(fp, formatspecs=__file_format_multi_dict__):
+def UncompressFileAlt(fp, formatspecs=__file_format_multi_dict__):
     if(not hasattr(fp, "read")):
         return False
     compresscheck = CheckCompressionType(fp, formatspecs, False)
@@ -4656,7 +4656,7 @@ def UncompressStringAltFP(fp, formatspecs=__file_format_multi_dict__):
         formatspecs = formatspecs[prechck]
     fp.seek(0, 0)
     if(prechck!="zstd"):
-        return UncompressArchiveFile(fp, formatspecs)
+        return UncompressFileAlt(fp, formatspecs)
     filefp = StringIO()
     fp.seek(0, 0)
     outstring = UncompressString(fp.read(), formatspecs)
@@ -4707,7 +4707,7 @@ def UncompressBytesAltFP(fp, formatspecs=__file_format_multi_dict__):
         formatspecs = formatspecs[prechck]
     fp.seek(0, 0)
     if(prechck!="zstd"):
-        return UncompressArchiveFile(fp, formatspecs)
+        return UncompressFileAlt(fp, formatspecs)
     filefp = BytesIO()
     fp.seek(0, 0)
     outstring = UncompressBytes(fp.read(), formatspecs)
@@ -9680,7 +9680,7 @@ def download_file_from_internet_file(url, headers=geturls_headers_pyarchivefile_
 
 def download_file_from_internet_uncompress_file(url, headers=geturls_headers_pyarchivefile_python_alt, formatspecs=__file_format_dict__):
     fp = download_file_from_internet_file(url)
-    fp = UncompressArchiveFile(fp, formatspecs)
+    fp = UncompressFileAlt(fp, formatspecs)
     fp.seek(0, 0)
     if(not fp):
         return False
@@ -9705,7 +9705,7 @@ def download_file_from_internet_string(url, headers=geturls_headers_pyarchivefil
 
 def download_file_from_internet_uncompress_string(url, headers=geturls_headers_pyarchivefile_python_alt, formatspecs=__file_format_dict__):
     fp = download_file_from_internet_string(url)
-    fp = UncompressArchiveFile(fp, formatspecs)
+    fp = UncompressFileAlt(fp, formatspecs)
     fp.seek(0, 0)
     if(not fp):
         return False
