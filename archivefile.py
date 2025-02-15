@@ -209,26 +209,26 @@ if active_action:
                 sys.exit(1)
             input_file = tempout
         pyarchivefile.UnPackArchiveFile(input_file, getargs.output, False, 0, 0, getargs.skipchecksum,
-                                    fnamedict, getargs.verbose, getargs.preserve, getargs.preserve, False)
+                                    fnamedict, getargs.verbose, getargs.preserve, getargs.preserve, False, False)
     elif active_action == 'list':
         if getargs.convert:
             checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
+                tmpout = pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
             else:
-                tmpout = pyarchivefile.InFileListFiles(input_file, getargs.verbose, fnamedict, False)
+                tmpout = pyarchivefile.InFileListFiles(input_file, getargs.verbose, fnamedict, False, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, getargs.verbose, False)
+            pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
     elif active_action == 'validate':
         if getargs.convert:
             checkcompressfile = pyarchivefile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             tempout = BytesIO()
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False)
+                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False, False)
             else:
                 tmpout = pyarchivefile.PackArchiveFileFromInFile(
                     input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, False, False)

@@ -115,10 +115,10 @@ if primary_action == 'create':
                                   False, [args.checksum, args.checksum, args.checksum], [], {}, pyarchivefile.__file_format_dict__, args.verbose, False)
 elif primary_action == 'repack':
     pyarchivefile.RePackArchiveFile(
-        input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], args.verbose)
+        input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], False, args.verbose)
 elif primary_action == 'extract':
     pyarchivefile.UnPackArchiveFile(
-        input_file, args.output, args.verbose, args.preserve)
+        input_file, args.output, False, args.verbose, args.preserve)
 elif primary_action == 'list':
     if args.convert == 'tar':
         pyarchivefile.TarFileListFiles(input_file, verbose=args.verbose)

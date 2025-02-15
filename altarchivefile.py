@@ -134,11 +134,11 @@ def main():
     if args.create:
         pyarchivefile.PackArchiveFile(args.input, args.output, False, __file_format_default__, args.compression, args.level, pyarchivefile.compressionlistalt, False, [args.checksum, args.checksum, args.checksum], [], {}, format_dict, args.verbose, False)
     elif args.repack:
-        pyarchivefile.RePackArchiveFile( input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], args.verbose)
+        pyarchivefile.RePackArchiveFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], False, args.verbose)
     elif args.extract:
         pyarchivefile.UnPackArchiveFile(input_file, args.output, args.verbose, args.preserve)
     elif args.list:
-        pyarchivefile.ArchiveFileListFiles(input_file, verbose=args.verbose)
+        pyarchivefile.ArchiveFileListFiles(input_file, False, verbose=args.verbose)
     elif args.validate:
         is_valid = pyarchivefile.ArchiveFileValidate(input_file, verbose=args.verbose)
         result_msg = "Validation result for {}: {}".format(input_file, 'Valid' if is_valid else 'Invalid')
