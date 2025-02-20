@@ -14,7 +14,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: neoarchivefile.py - Last Update: 2/7/2025 Ver. 0.18.2 RC 1 - Author: cooldude2k $
+    $FileInfo: neoarchivefile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
@@ -24,7 +24,6 @@ import pyarchivefile
 __project__ = pyarchivefile.__project__
 __program_name__ = pyarchivefile.__program_name__
 __file_format_name__ = pyarchivefile.__file_format_name__
-__file_format_lower__ = pyarchivefile.__file_format_lower__
 __file_format_magic__ = pyarchivefile.__file_format_magic__
 __file_format_len__ = pyarchivefile.__file_format_len__
 __file_format_hex__ = pyarchivefile.__file_format_hex__
@@ -99,23 +98,23 @@ input_file = args.input[0]
 # Functionality mappings
 if primary_action == 'create':
     if args.convert == 'tar':
-        pyarchivefile.PackArchiveFileFromTarFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], [
+        pyarchivefile.PackArchiveFileFromTarFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], [
         ], pyarchivefile.__file_format_dict__, args.verbose, False)
     elif args.convert == 'zip':
-        pyarchivefile.PackArchiveFileFromZipFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], [
+        pyarchivefile.PackArchiveFileFromZipFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], [
         ], pyarchivefile.__file_format_dict__, args.verbose, False)
     elif py7zr_support and args.convert == '7zip':
-        pyarchivefile.PackArchiveFileFromSevenZipFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], [
+        pyarchivefile.PackArchiveFileFromSevenZipFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], [
         ], pyarchivefile.__file_format_dict__, args.verbose, False)
     elif rarfile_support and args.convert == 'rar':
-        pyarchivefile.PackArchiveFileFromRarFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], [
+        pyarchivefile.PackArchiveFileFromRarFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], [
         ], pyarchivefile.__file_format_dict__, args.verbose, False)
     else:
         pyarchivefile.PackArchiveFile(args.input, args.output, args.verbose, args.compression, args.level, pyarchivefile.compressionlistalt,
-                                  False, [args.checksum, args.checksum, args.checksum], [], {}, pyarchivefile.__file_format_dict__, args.verbose, False)
+                                  False, [args.checksum, args.checksum, args.checksum, args.checksum], [], {}, pyarchivefile.__file_format_dict__, args.verbose, False)
 elif primary_action == 'repack':
     pyarchivefile.RePackArchiveFile(
-        input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum], False, args.verbose)
+        input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], False, args.verbose)
 elif primary_action == 'extract':
     pyarchivefile.UnPackArchiveFile(
         input_file, args.output, False, args.verbose, args.preserve)
