@@ -1940,7 +1940,7 @@ def ReadFileHeaderDataWithContent(fp, listonly=False, uncompress=True, skipcheck
         return False
     fp.seek(len(delimiter), 1)
     newfcs = GetHeaderChecksum(
-        HeaderOut[:-2] + [fprejsoncontent], HeaderOut[-4].lower(), True, formatspecs)
+        HeaderOut[:-2], HeaderOut[-4].lower(), True, formatspecs)
     HeaderOut.append(fjsoncontent)
     if(fcs != newfcs and not skipchecksum):
         VerbosePrintOut("File Header Checksum Error with file " +
@@ -2115,7 +2115,7 @@ def ReadFileHeaderDataWithContentToArray(fp, listonly=False, contentasfile=True,
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
     newfcs = GetHeaderChecksum(
-        HeaderOut[:-2] + [fprejsoncontent], HeaderOut[-4].lower(), True, formatspecs)
+        HeaderOut[:-2], HeaderOut[-4].lower(), True, formatspecs)
     if(fcs != newfcs and not skipchecksum):
         VerbosePrintOut("File Header Checksum Error with file " +
                         fname + " at offset " + str(fheaderstart))
@@ -2299,7 +2299,7 @@ def ReadFileHeaderDataWithContentToList(fp, listonly=False, contentasfile=False,
     fcs = HeaderOut[-2].lower()
     fccs = HeaderOut[-1].lower()
     newfcs = GetHeaderChecksum(
-        HeaderOut[:-2] + [fprejsoncontent], HeaderOut[-4].lower(), True, formatspecs)
+        HeaderOut[:-2], HeaderOut[-4].lower(), True, formatspecs)
     if(fcs != newfcs and not skipchecksum):
         VerbosePrintOut("File Header Checksum Error with file " +
                         fname + " at offset " + str(fheaderstart))
@@ -2521,7 +2521,7 @@ def ReadFileDataWithContentToArray(fp, seekstart=0, seekend=0, listonly=False, c
                 VerbosePrintOut("'" + prefjsonchecksum + "' != " + "'" + prejsonfcs + "'")
                 return False
             prenewfcs = GetHeaderChecksum(
-                preheaderdata[:-2] + prefprejsoncontent, preheaderdata[-4].lower(), True, formatspecs)
+                preheaderdata[:-2], preheaderdata[-4].lower(), True, formatspecs)
             prefcs = preheaderdata[-2]
             if(prefcs != prenewfcs and not skipchecksum):
                 VVerbosePrintOut("File Header Checksum Error with file " +
@@ -3310,7 +3310,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, fi
         extrasizestr = extrasizestr + \
             AppendNullBytes(extradata, formatspecs['format_delimiter'])
     extrasizelen = format(len(extrasizestr), 'x').lower()
-    tmpoutlen = len(filevalues) + len(extradata) + 12
+    tmpoutlen = len(filevalues) + len(extradata) + 11
     tmpoutlenhex = format(tmpoutlen, 'x').lower()
     tmpoutlist = filevalues
     fjsontype = "json"
@@ -3329,9 +3329,10 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, fi
     tmpoutlist.append(fjsonsize)
     if(len(jsondata) > 0):
         tmpoutlist.append(checksumtype[2])
+        tmpoutlist.append(GetFileChecksum(fjsoncontent, checksumtype[2], True, formatspecs))
     else:
         tmpoutlist.append("none")
-    tmpoutlist.append(GetFileChecksum(fjsoncontent, checksumtype[2], True, formatspecs))
+        tmpoutlist.append(GetFileChecksum(fjsoncontent, "none", True, formatspecs))
     tmpoutlist.append(extrasizelen)
     tmpoutlist.append(extrafields)
     outfileoutstr = AppendNullBytes(
@@ -3347,7 +3348,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, fi
         AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
     nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
     outfileheadercshex = GetFileChecksum(
-        outfileoutstr + fjsoncontent + nullstrecd, checksumtype[0], True, formatspecs)
+        outfileoutstr, checksumtype[0], True, formatspecs)
     if(len(filecontent) == 0):
         outfilecontentcshex = GetFileChecksum(
             filecontent, "none", False, formatspecs)
@@ -3361,7 +3362,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, fi
     outfileoutstr = AppendNullByte(
         formheaersize, formatspecs['format_delimiter']) + outfileoutstr
     outfileheadercshex = GetFileChecksum(
-        outfileoutstr + fjsoncontent + nullstrecd, checksumtype[0], True, formatspecs)
+        outfileoutstr, checksumtype[0], True, formatspecs)
     outfileoutstr = outfileoutstr + \
         AppendNullBytes([outfileheadercshex, outfilecontentcshex],
                         formatspecs['format_delimiter'])
@@ -6614,7 +6615,7 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
-                preheaderdata[:-2] + [prefjoutfprejsoncontent], preheaderdata[-4].lower(), True, formatspecs)
+                preheaderdata[:-2], preheaderdata[-4].lower(), True, formatspecs)
             if(prefcs != prenewfcs and not skipchecksum):
                 VerbosePrintOut("File Header Checksum Error with file " +
                                 prefname + " at offset " + str(prefhstart))
@@ -6926,7 +6927,7 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
-                preheaderdata[:-2] + [prefjoutfprejsoncontent], preheaderdata[-4].lower(), True, formatspecs)
+                preheaderdata[:-2], preheaderdata[-4].lower(), True, formatspecs)
             if(prefcs != prenewfcs and not skipchecksum):
                 VerbosePrintOut("File Header Checksum Error with file " +
                                 prefname + " at offset " + str(prefhstart))
@@ -7248,7 +7249,7 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
         outfcs = inheaderdata[-2].lower()
         outfccs = inheaderdata[-1].lower()
         infcs = GetHeaderChecksum(
-            inheaderdata[:-2] + [outfprejsoncontent], inheaderdata[-4].lower(), True, formatspecs)
+            inheaderdata[:-2], inheaderdata[-4].lower(), True, formatspecs)
         if(verbose):
             VerbosePrintOut(outfname)
             VerbosePrintOut("Record Number " + str(il) + "; File ID " +
@@ -7582,7 +7583,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
             prefcs = preheaderdata[-2].lower()
             prenewfcs = preheaderdata[-1].lower()
             prenewfcs = GetHeaderChecksum(
-                preheaderdata[:-2] + [prefjoutfprejsoncontent], preheaderdata[-4].lower(), True, formatspecs)
+                preheaderdata[:-2], preheaderdata[-4].lower(), True, formatspecs)
             if(prefcs != prenewfcs and not skipchecksum):
                 VerbosePrintOut("File Header Checksum Error with file " +
                                 prefname + " at offset " + str(prefhstart))
@@ -7741,7 +7742,7 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
         outfcs = inheaderdata[-2].lower()
         outfccs = inheaderdata[-1].lower()
         infcs = GetHeaderChecksum(
-            inheaderdata[:-2] + [outfprejsoncontent], inheaderdata[-4].lower(), True, formatspecs)
+            inheaderdata[:-2], inheaderdata[-4].lower(), True, formatspecs)
         if(outfcs != infcs and not skipchecksum):
             VerbosePrintOut("File Header Checksum Error with file " +
                             outfname + " at offset " + str(outfhstart))
