@@ -3342,7 +3342,7 @@ def AppendFileHeaderWithContent(fp, filevalues=[], extradata=[], jsondata={}, fi
     if(len(filecontent) == 0):
         checksumlist = [checksumtype[0], "none"]
     else:
-        checksumlist = checksumtype
+        checksumlist = [checksumtype[0], checksumtype[1]]
     outfileoutstr = outfileoutstr + \
         AppendNullBytes(checksumlist, formatspecs['format_delimiter'])
     nullstrecd = formatspecs['format_delimiter'].encode('UTF-8')
@@ -7268,18 +7268,18 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
             valid_archive = False
             invalid_archive = True
         if(outfjsonsize > 0):
-            if(outfcs == infcs):
+            if(outfjsonchecksum == injsonfcs):
                 if(verbose):
                     VerbosePrintOut(
                         "File JSON Data Checksum Passed at offset " + str(outfjstart))
-                    VerbosePrintOut("'" + outfcs + "' == " +
-                                    "'" + infcs + "'")
+                    VerbosePrintOut("'" + outfjsonchecksum + "' == " +
+                                    "'" + injsonfcs + "'")
             else:
                 if(verbose):
                     VerbosePrintOut(
                         "File JSON Data Checksum Error at offset " + str(outfjstart))
-                    VerbosePrintOut("'" + outfcs + "' != " +
-                                    "'" + infcs + "'")
+                    VerbosePrintOut("'" + outfjsonchecksum + "' != " +
+                                    "'" + injsonfcs + "'")
                 valid_archive = False
                 invalid_archive = True
         outfcontentstart = fp.tell()
