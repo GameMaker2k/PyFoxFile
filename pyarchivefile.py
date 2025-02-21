@@ -262,8 +262,8 @@ __use_alt_format__ = False
 __use_env_file__ = True
 __use_ini_file__ = True
 __use_ini_name__ = "archivefile.ini"
-if('PYCATFILE_CONFIG_FILE' in os.environ and os.path.exists(os.environ['PYCATFILE_CONFIG_FILE']) and __use_env_file__):
-    scriptconf = os.environ['PYCATFILE_CONFIG_FILE']
+if('PYARCHIVEFILE_CONFIG_FILE' in os.environ and os.path.exists(os.environ['PYARCHIVEFILE_CONFIG_FILE']) and __use_env_file__):
+    scriptconf = os.environ['PYARCHIVEFILE_CONFIG_FILE']
 else:
     prescriptpath = get_importing_script_path()
     if(prescriptpath is not None):
