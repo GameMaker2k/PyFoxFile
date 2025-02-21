@@ -27,3 +27,4 @@
 *.woff binary
 *.pyc binary
 *.pdf binary
+*.arc binary
