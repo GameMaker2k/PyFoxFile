@@ -14,34 +14,34 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: altarchivefile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
+    $FileInfo: altfoxfile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
 import os
 import argparse
-import pyarchivefile
+import pyfoxfile
 import configparser
 from io import BytesIO
 
-__project__ = pyarchivefile.__project__
-__program_name__ = pyarchivefile.__program_name__
-__file_format_name__ = pyarchivefile.__file_format_name__
-__file_format_magic__ = pyarchivefile.__file_format_magic__
-__file_format_len__ = pyarchivefile.__file_format_len__
-__file_format_hex__ = pyarchivefile.__file_format_hex__
-__file_format_delimiter__ = pyarchivefile.__file_format_delimiter__
-__file_format_dict__ = pyarchivefile.__file_format_dict__
-__file_format_default__ = pyarchivefile.__file_format_default__
-__use_new_style__ = pyarchivefile.__use_new_style__
-__use_advanced_list__ = pyarchivefile.__use_advanced_list__
-__use_alt_inode__ = pyarchivefile.__use_alt_inode__
-__project_url__ = pyarchivefile.__project_url__
-__version_info__ = pyarchivefile.__version_info__
-__version_date_info__ = pyarchivefile.__version_date_info__
-__version_date__ = pyarchivefile.__version_date__
-__version_date_plusrc__ = pyarchivefile.__version_date_plusrc__
-__version__ = pyarchivefile.__version__
+__project__ = pyfoxfile.__project__
+__program_name__ = pyfoxfile.__program_name__
+__file_format_name__ = pyfoxfile.__file_format_name__
+__file_format_magic__ = pyfoxfile.__file_format_magic__
+__file_format_len__ = pyfoxfile.__file_format_len__
+__file_format_hex__ = pyfoxfile.__file_format_hex__
+__file_format_delimiter__ = pyfoxfile.__file_format_delimiter__
+__file_format_dict__ = pyfoxfile.__file_format_dict__
+__file_format_default__ = pyfoxfile.__file_format_default__
+__use_new_style__ = pyfoxfile.__use_new_style__
+__use_advanced_list__ = pyfoxfile.__use_advanced_list__
+__use_alt_inode__ = pyfoxfile.__use_alt_inode__
+__project_url__ = pyfoxfile.__project_url__
+__version_info__ = pyfoxfile.__version_info__
+__version_date_info__ = pyfoxfile.__version_date_info__
+__version_date__ = pyfoxfile.__version_date__
+__version_date_plusrc__ = pyfoxfile.__version_date_plusrc__
+__version__ = pyfoxfile.__version__
 
 
 def decode_unicode_escape(value):
@@ -55,7 +55,7 @@ def load_config():
     if 'PYCATFILE_CONFIG_FILE' in os.environ and os.path.exists(os.environ['PYCATFILE_CONFIG_FILE']):
         scriptconf = os.environ['PYCATFILE_CONFIG_FILE']
     else:
-        scriptconf = os.path.join(os.path.dirname(__file__), "archivefile.ini")
+        scriptconf = os.path.join(os.path.dirname(__file__), "foxfile.ini")
     
     config = configparser.ConfigParser()
     __file_format_default__ = decode_unicode_escape(config.get('config', 'default'))
@@ -69,7 +69,7 @@ def load_config():
         }
     else:
         return {
-            'name': "ArchiveFile",
+            'name': "FoxFile",
             'delimiter': "\x00",
             'version': "001",
             'extension': ".cat"
@@ -82,7 +82,7 @@ def main():
 
     # Argument Parsing
     parser = argparse.ArgumentParser(
-        description="Combined utility for ArchiveFile operations with dynamic and static modes."
+        description="Combined utility for FoxFile operations with dynamic and static modes."
     )
     parser.add_argument("-i", "--input", nargs="+", required=True, help="Input file(s) for processing.")
     parser.add_argument("-o", "--output", help="Output file name.")
@@ -131,15 +131,15 @@ def main():
 
     # Determine operation
     if args.create:
-        pyarchivefile.PackArchiveFile(args.input, args.output, False, __file_format_default__, args.compression, args.level, pyarchivefile.compressionlistalt, False, [args.checksum, args.checksum, args.checksum, args.checksum], [], {}, format_dict, args.verbose, False)
+        pyfoxfile.PackFoxFile(args.input, args.output, False, __file_format_default__, args.compression, args.level, pyfoxfile.compressionlistalt, False, [args.checksum, args.checksum, args.checksum, args.checksum], [], {}, format_dict, args.verbose, False)
     elif args.repack:
-        pyarchivefile.RePackArchiveFile(input_file, args.output, args.compression, args.level, pyarchivefile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], False, args.verbose)
+        pyfoxfile.RePackFoxFile(input_file, args.output, args.compression, args.level, pyfoxfile.compressionlistalt, [args.checksum, args.checksum, args.checksum, args.checksum], False, args.verbose)
     elif args.extract:
-        pyarchivefile.UnPackArchiveFile(input_file, args.output, args.verbose, args.preserve)
+        pyfoxfile.UnPackFoxFile(input_file, args.output, args.verbose, args.preserve)
     elif args.list:
-        pyarchivefile.ArchiveFileListFiles(input_file, False, verbose=args.verbose)
+        pyfoxfile.FoxFileListFiles(input_file, False, verbose=args.verbose)
     elif args.validate:
-        is_valid = pyarchivefile.ArchiveFileValidate(input_file, verbose=args.verbose)
+        is_valid = pyfoxfile.FoxFileValidate(input_file, verbose=args.verbose)
         result_msg = "Validation result for {}: {}".format(input_file, 'Valid' if is_valid else 'Invalid')
         print(result_msg)
     else:

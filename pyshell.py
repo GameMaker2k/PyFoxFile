@@ -23,9 +23,9 @@ import traceback
 import code
 import re
 import readline
-import pyarchivefile
+import pyfoxfile
 from sys import argv
-from pyarchivefile import *
+from pyfoxfile import *
 
 taskfound = False
 if(len(sys.argv) < 2):
@@ -35,7 +35,7 @@ if(len(sys.argv) < 2):
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform+os.linesep+"Loaded Python module " +
-          pyarchivefile.__program_name__+" "+pyarchivefile.__version__+os.linesep)
+          pyfoxfile.__program_name__+" "+pyfoxfile.__version__+os.linesep)
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)
@@ -60,7 +60,7 @@ if(sys.argv[1] == "sh" or sys.argv[1] == "shell" or sys.argv[1] == "pysh" or sys
                                          )+"."+str(sys.version_info[2])+"> "
     cmdinput = None
     print("PyShell "+sys.version+" on "+sys.platform+os.linesep+"Loaded Python module " +
-          pyarchivefile.__program_name__+" "+pyarchivefile.__version__+os.linesep)
+          pyfoxfile.__program_name__+" "+pyfoxfile.__version__+os.linesep)
     while(True):
         try:
             cmdinput = code.InteractiveConsole().raw_input(ps1)
@@ -90,7 +90,7 @@ if(sys.argv[1] == "shebang" or sys.argv[1] == "shabang" or sys.argv[1] == "hashb
 
 if(sys.argv[1] == "version" or sys.argv[1] == "ver" or sys.argv[1] == "getversion" or sys.argv[1] == "getver"):
     taskfound = True
-    print(pyarchivefile.__version__)
+    print(pyfoxfile.__version__)
     sys.exit(0)
 
 if(sys.argv[1] == "exec" or sys.argv[1] == "run" or sys.argv[1] == "execute"):

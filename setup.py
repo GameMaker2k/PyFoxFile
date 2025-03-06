@@ -23,7 +23,7 @@ import pkg_resources
 from setuptools import setup
 
 # Open and read the version info file in a Python 2/3 compatible way
-verinfofilename = os.path.realpath("."+os.path.sep+os.path.sep+"pyarchivefile.py")
+verinfofilename = os.path.realpath("."+os.path.sep+os.path.sep+"pyfoxfile.py")
 
 # Use `with` to ensure the file is properly closed after reading
 # In Python 2, open defaults to text mode; in Python 3, it’s better to specify encoding
@@ -65,22 +65,22 @@ pymodule['verdate'] = str(setuppy_dateinfo_exp[0])+"." + \
 pymodule['verdaterc'] = int(setuppy_dateinfo_exp[4])
 pymodule['verdatelist'] = (int(setuppy_dateinfo_exp[0]), int(setuppy_dateinfo_exp[1]), int(
     setuppy_dateinfo_exp[2]), str(setuppy_dateinfo_exp[3]), int(setuppy_dateinfo_exp[4]))
-pymodule['name'] = 'PyArchiveFile'
+pymodule['name'] = 'PyFoxFile'
 pymodule['author'] = 'Kazuki Przyborowski'
 pymodule['authoremail'] = 'kazuki.przyborowski@gmail.com'
 pymodule['maintainer'] = 'Kazuki Przyborowski'
 pymodule['maintaineremail'] = 'kazuki.przyborowski@gmail.com'
-pymodule['description'] = 'A tar like file format name archivefile.'
+pymodule['description'] = 'A tar like file format name foxfile.'
 pymodule['license'] = 'Revised BSD License'
-pymodule['keywords'] = 'archivefile archive archivefile-archive pyarchivefile python python-archivefile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite'
-pymodule['url'] = 'https://github.com/GameMaker2k/PyArchiveFile'
-pymodule['downloadurl'] = 'https://github.com/GameMaker2k/PyArchiveFile/archive/master.tar.gz'
+pymodule['keywords'] = 'foxfile archive foxfile-archive pyfoxfile python python-foxfile neko nekofile neko-archive nekofile-archive pynekofile python python-nekofile compression tarball gzip tar bzip2 tar-archive lzma xz gz lzma2 xz2 tarlike tarlite'
+pymodule['url'] = 'https://github.com/GameMaker2k/PyFoxFile'
+pymodule['downloadurl'] = 'https://github.com/GameMaker2k/PyFoxFile/archive/master.tar.gz'
 pymodule[
-    'longdescription'] = 'A tar like file format name archivefile.'
+    'longdescription'] = 'A tar like file format name foxfile.'
 pymodule['platforms'] = 'OS Independent'
 pymodule['zipsafe'] = True
-pymodule['pymodules'] = ['pyarchivefile']
-pymodule['scripts'] = ['archivefile.py', 'neoarchivefile.py']
+pymodule['pymodules'] = ['pyfoxfile']
+pymodule['scripts'] = ['foxfile.py', 'neofoxfile.py']
 pymodule['classifiers'] = [
     'Development Status :: 5 - Production/Stable',
     'Intended Audience :: Developers',

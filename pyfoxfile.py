@@ -14,7 +14,7 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: pyarchivefile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
+    $FileInfo: pyfoxfile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
@@ -261,7 +261,7 @@ __use_pysftp__ = False
 __use_alt_format__ = False
 __use_env_file__ = True
 __use_ini_file__ = True
-__use_ini_name__ = "archivefile.ini"
+__use_ini_name__ = "foxfile.ini"
 if('PYARCHIVEFILE_CONFIG_FILE' in os.environ and os.path.exists(os.environ['PYARCHIVEFILE_CONFIG_FILE']) and __use_env_file__):
     scriptconf = os.environ['PYARCHIVEFILE_CONFIG_FILE']
 else:
@@ -288,7 +288,7 @@ all_np_chars = [chr(i) for i in range(128)]
 def is_only_nonprintable(var):
     return all(not c.isprintable() for c in var)
 __file_format_multi_dict__ = {}
-__file_format_default__ = "ArchiveFile"
+__file_format_default__ = "FoxFile"
 __include_defaults__ = True
 __program_name__ = "Py"+__file_format_default__
 if __use_ini_file__ and os.path.exists(__config_file__):
@@ -322,8 +322,12 @@ elif __use_ini_file__ and not os.path.exists(__config_file__):
 if not __use_ini_file__ and not __include_defaults__:
     __include_defaults__ = True
 if(__include_defaults__):
-    if("ArchiveFile" not in __file_format_multi_dict__):
-        __file_format_multi_dict__.update( { 'ArchiveFile': {'format_name': "ArchiveFile", 'format_magic': "ArchiveFile", 'format_len': 11, 'format_hex': "4172636869766546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".arc" } } )
+    if("FoxFile" not in __file_format_multi_dict__):
+        __file_format_multi_dict__.update( { 'FoxFile': {'format_name': "FoxFile", 'format_magic': "FoxFile", 'format_len': 7, 'format_hex': "466f7846696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".fox" } } )
+    if("KitsuneFile" not in __file_format_multi_dict__):
+        __file_format_multi_dict__.update( { 'KitsuneFile': {'format_name': "KitsuneFile", 'format_magic': "KitsuneFile", 'format_len': 11, 'format_hex': "4b697473756e6546696c65", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".kitsune" } } )
+    if("キツネファイル" not in __file_format_multi_dict__):
+        __file_format_multi_dict__.update( { 'キツネファイル': {'format_name': "KitsuneFairu", 'format_magic': "キツネファイル", 'format_len': 21, 'format_hex': "e382ade38384e3838de38395e382a1e382a4e383ab", 'format_delimiter': "\x00", 'format_ver': "001", 'new_style': True, 'use_advanced_list': True, 'use_alt_inode': False, 'format_extension': ".キツネ" } } )
 if(__file_format_default__ not in __file_format_multi_dict__):
     __file_format_default__ = next(iter(__file_format_multi_dict__))
 __file_format_name__ = __file_format_multi_dict__[__file_format_default__]['format_name']
@@ -338,7 +342,7 @@ __use_alt_inode__ = __file_format_multi_dict__[__file_format_default__]['use_alt
 __file_format_extension__ = __file_format_multi_dict__[__file_format_default__]['format_extension']
 __file_format_dict__ = __file_format_multi_dict__[__file_format_default__]
 __project__ = __program_name__
-__project_url__ = "https://github.com/GameMaker2k/PyArchiveFile"
+__project_url__ = "https://github.com/GameMaker2k/PyFoxFile"
 __version_info__ = (0, 18, 6, "RC 1", 1)
 __version_date_info__ = (2025, 2, 20, "RC 1", 1)
 __version_date__ = str(__version_date_info__[0]) + "." + str(
@@ -502,7 +506,7 @@ if __name__ == "__main__":
     if(os.sep == "\\"):
         curscrpath = curscrpath.replace(os.sep, "/")
     curscrpath = curscrpath + "/"
-    scrfile = curscrpath + "archivefile.py"
+    scrfile = curscrpath + "foxfile.py"
     if(os.path.exists(scrfile) and os.path.isfile(scrfile)):
         scrcmd = subprocess.Popen([sys.executable, scrfile] + sys.argv[1:])
         scrcmd.wait()
@@ -1665,9 +1669,9 @@ def GetFileChecksum(instr, checksumtype="crc32", encodedata=True, formatspecs=__
 
 
 def ValidateHeaderChecksum(inlist=[], checksumtype="crc32", inchecksum="0", formatspecs=__file_format_dict__):
-    archivefileheadercshex = GetHeaderChecksum(
+    foxfileheadercshex = GetHeaderChecksum(
         inlist, checksumtype, True, formatspecs).lower()
-    return inchecksum.lower() == archivefileheadercshex
+    return inchecksum.lower() == foxfileheadercshex
 
 
 def ValidateFileChecksum(infile, checksumtype="crc32", inchecksum="0", formatspecs=__file_format_dict__):
@@ -3210,7 +3214,7 @@ def MakeEmptyFilePointer(fp, fmttype=__file_format_default__, checksumtype="crc3
     return fp
 
 
-def MakeEmptyArchiveFilePointer(fp, fmttype=__file_format_default__, checksumtype="crc32", formatspecs=__file_format_multi_dict__):
+def MakeEmptyFoxFilePointer(fp, fmttype=__file_format_default__, checksumtype="crc32", formatspecs=__file_format_multi_dict__):
     return MakeEmptyFilePointer(fp, fmttype, checksumtype, formatspecs)
 
 
@@ -3293,7 +3297,7 @@ def MakeEmptyFile(outfile, fmttype="auto", compression="auto", compresswholefile
         return True
 
 
-def MakeEmptyArchiveFile(outfile, compression="auto", compresswholefile=True, compressionlevel=None, checksumtype="crc32", formatspecs=__file_format_dict__, returnfp=False):
+def MakeEmptyFoxFile(outfile, compression="auto", compresswholefile=True, compressionlevel=None, checksumtype="crc32", formatspecs=__file_format_dict__, returnfp=False):
     return MakeEmptyFile(outfile, compression, compresswholefile, compressionlevel, checksumtype, formatspecs, returnfp)
 
 
@@ -4802,7 +4806,7 @@ def CheckSumSupportAlt(checkfor, guaranteed=True):
         return False
 
 
-def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+def PackFoxFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -5185,11 +5189,11 @@ def PackArchiveFile(infiles, outfile, dirlistfromtxt=False, fmttype="auto", comp
         return True
 
 
-def PackArchiveFileFromDirList(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
-    return PackArchiveFile(infiles, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, extradata, formatspecs, verbose, returnfp)
+def PackFoxFileFromDirList(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    return PackFoxFile(infiles, outfile, dirlistfromtxt, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, followlink, checksumtype, extradata, formatspecs, verbose, returnfp)
 
 
-def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackFoxFileFromTarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -5485,7 +5489,7 @@ def PackArchiveFileFromTarFile(infile, outfile, fmttype="auto", compression="aut
         return True
 
 
-def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackFoxFileFromZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype=="auto" and 
         (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
         get_in_ext = os.path.splitext(outfile)
@@ -5777,11 +5781,11 @@ def PackArchiveFileFromZipFile(infile, outfile, fmttype="auto", compression="aut
 
 
 if(not rarfile_support):
-    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackFoxFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         return False
 
 if(rarfile_support):
-    def PackArchiveFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackFoxFileFromRarFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         if(IsNestedDict(formatspecs) and fmttype=="auto" and 
             (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
             get_in_ext = os.path.splitext(outfile)
@@ -6097,11 +6101,11 @@ if(rarfile_support):
 
 
 if(not py7zr_support):
-    def PackArchiveFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackFoxFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         return False
 
 if(py7zr_support):
-    def PackArchiveFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+    def PackFoxFileFromSevenZipFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32", "crc32"], extradata=[], jsondata={}, formatspecs=__file_format_dict__, verbose=False, returnfp=False):
         if(IsNestedDict(formatspecs) and fmttype=="auto" and 
             (outfile != "-" and outfile is not None and not hasattr(outfile, "read") and not hasattr(outfile, "write"))):
             get_in_ext = os.path.splitext(outfile)
@@ -6349,28 +6353,28 @@ if(py7zr_support):
             return True
 
 
-def PackArchiveFileFromInFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackFoxFileFromInFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     checkcompressfile = CheckCompressionSubType(infile, formatspecs, True)
     if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
         formatspecs = formatspecs[checkcompressfile]
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(checkcompressfile == "tarfile" and TarFileCheck(infile)):
-        return PackArchiveFileFromTarFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
+        return PackFoxFileFromTarFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
     elif(checkcompressfile == "zipfile" and zipfile.is_zipfile(infile)):
-        return PackArchiveFileFromZipFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
+        return PackFoxFileFromZipFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
     elif(rarfile_support and checkcompressfile == "rarfile" and (rarfile.is_rarfile(infile) or rarfile.is_rarfile_sfx(infile))):
-        return PackArchiveFileFromRarFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
+        return PackFoxFileFromRarFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
     elif(py7zr_support and checkcompressfile == "7zipfile" and py7zr.is_7zfile(infile)):
-        return PackArchiveFileFromSevenZipFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
+        return PackFoxFileFromSevenZipFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist, checksumtype, extradata, formatspecs, verbose, returnfp)
     elif(IsSingleDict(formatspecs) and checkcompressfile == formatspecs['format_magic']):
-        return RePackArchiveFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, False, 0, 0, checksumtype, False, extradata, formatspecs, verbose, returnfp)
+        return RePackFoxFile(infile, outfile, fmttype, compression, compresswholefile, compressionlevel, False, 0, 0, checksumtype, False, extradata, formatspecs, verbose, returnfp)
     else:
         return False
     return False
 
 
-def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+def FoxFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype in formatspecs):
         formatspecs = formatspecs[fmttype]
     elif(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype not in formatspecs):
@@ -6685,7 +6689,7 @@ def ArchiveFileSeekToFileNum(infile, fmttype="auto", seekto=0, listonly=False, c
     return outlist
 
 
-def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+def FoxFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype in formatspecs):
         formatspecs = formatspecs[fmttype]
     elif(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype not in formatspecs):
@@ -7004,7 +7008,7 @@ def ArchiveFileSeekToFileName(infile, fmttype="auto", seekfile=None, listonly=Fa
     return outlist
 
 
-def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
+def FoxFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype in formatspecs):
@@ -7339,26 +7343,26 @@ def ArchiveFileValidate(infile, fmttype="auto", formatspecs=__file_format_multi_
         return False
 
 
-def ArchiveFileValidateFile(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
-    return ArchiveFileValidate(infile, fmttype, formatspecs, verbose, returnfp)
+def FoxFileValidateFile(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+    return FoxFileValidate(infile, fmttype, formatspecs, verbose, returnfp)
 
 
-def ArchiveFileValidateMultiple(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+def FoxFileValidateMultiple(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
     if(isinstance(infile, (list, tuple, ))):
         pass
     else:
         infile = [infile]
     outretval = True
     for curfname in infile:
-        curretfile = ArchiveFileValidate(curfname, fmttype, formatspecs, verbose, returnfp)
+        curretfile = FoxFileValidate(curfname, fmttype, formatspecs, verbose, returnfp)
         if(not curretfile):
             outretval = False
     return outretval
 
-def ArchiveFileValidateMultipleFiles(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
-    return ArchiveFileValidateMultiple(infile, fmttype, formatspecs, verbose, returnfp)
+def FoxFileValidateMultipleFiles(infile, fmttype="auto", formatspecs=__file_format_multi_dict__, verbose=False, returnfp=False):
+    return FoxFileValidateMultiple(infile, fmttype, formatspecs, verbose, returnfp)
 
-def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+def FoxFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
     if(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype in formatspecs):
         formatspecs = formatspecs[fmttype]
     elif(IsNestedDict(formatspecs) and fmttype!="auto" and fmttype not in formatspecs):
@@ -7823,27 +7827,27 @@ def ArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=
     return outlist
 
 
-def MultipleArchiveFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+def MultipleFoxFileToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
     if(isinstance(infile, (list, tuple, ))):
         pass
     else:
         infile = [infile]
     outretval = {}
     for curfname in infile:
-        curretfile = outretval.update({curfname: ArchiveFileToArray(curfname, fmttype, seekstart, seekend, listonly, contentasfile, uncompress, skipchecksum, formatspecs, seektoend, returnfp)})
+        curretfile = outretval.update({curfname: FoxFileToArray(curfname, fmttype, seekstart, seekend, listonly, contentasfile, uncompress, skipchecksum, formatspecs, seektoend, returnfp)})
     return outretval
 
-def MultipleArchiveFilesToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
-    return MultipleArchiveFileToArray(infile, fmttype, seekstart, seekend, listonly, contentasfile, uncompress, skipchecksum, formatspecs, seektoend, returnfp)
+def MultipleFoxFilesToArray(infile, fmttype="auto", seekstart=0, seekend=0, listonly=False, contentasfile=True, uncompress=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+    return MultipleFoxFileToArray(infile, fmttype, seekstart, seekend, listonly, contentasfile, uncompress, skipchecksum, formatspecs, seektoend, returnfp)
 
 
-def ArchiveFileStringToArray(instr, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
+def FoxFileStringToArray(instr, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
     checkcompressfile = CheckCompressionSubType(infile, formatspecs, True)
     if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
         formatspecs = formatspecs[checkcompressfile]
     fp = BytesIO(instr)
-    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
-    return listarchivefiles
+    listfoxfiles = FoxFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+    return listfoxfiles
 
 
 def TarFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, seektoend=False, returnfp=False):
@@ -7851,10 +7855,10 @@ def TarFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile
     if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
         formatspecs = formatspecs[checkcompressfile]
     fp = BytesIO()
-    fp = PackArchiveFileFromTarFile(
+    fp = PackFoxFileFromTarFile(
         infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
-    return listarchivefiles
+    listfoxfiles = FoxFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+    return listfoxfiles
 
 
 def ZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, seektoend=False, returnfp=False):
@@ -7862,10 +7866,10 @@ def ZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile
     if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
         formatspecs = formatspecs[checkcompressfile]
     fp = BytesIO()
-    fp = PackArchiveFileFromZipFile(
+    fp = PackFoxFileFromZipFile(
         infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-    listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
-    return listarchivefiles
+    listfoxfiles = FoxFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+    return listfoxfiles
 
 
 if(not rarfile_support):
@@ -7878,10 +7882,10 @@ if(rarfile_support):
         if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
             formatspecs = formatspecs[checkcompressfile]
         fp = BytesIO()
-        fp = PackArchiveFileFromRarFile(
+        fp = PackFoxFileFromRarFile(
             infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-        listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
-        return listarchivefiles
+        listfoxfiles = FoxFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+        return listfoxfiles
 
 if(not py7zr_support):
     def SevenZipFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_dict__, seektoend=False, returnfp=False):
@@ -7893,10 +7897,10 @@ if(py7zr_support):
         if(IsNestedDict(formatspecs) and checkcompressfile in formatspecs):
             formatspecs = formatspecs[checkcompressfile]
         fp = BytesIO()
-        fp = PackArchiveFileFromSevenZipFile(
+        fp = PackFoxFileFromSevenZipFile(
             infile, fp, "auto", True, None, compressionlistalt, "crc32", [], formatspecs, False, True)
-        listarchivefiles = ArchiveFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
-        return listarchivefiles
+        listfoxfiles = FoxFileToArray(fp, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+        return listfoxfiles
 
 
 def InFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=True, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, returnfp=False):
@@ -7912,7 +7916,7 @@ def InFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=
     elif(py7zr_support and checkcompressfile == "7zipfile" and py7zr.is_7zfile(infile)):
         return SevenZipFileToArray(infile, seekstart, seekend, listonly, contentasfile, skipchecksum, formatspecs, seektoend, returnfp)
     elif(checkcompressfile == formatspecs['format_magic']):
-        return ArchiveFileToArray(infile, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
+        return FoxFileToArray(infile, "auto", seekstart, seekend, listonly, contentasfile, True, skipchecksum, formatspecs, seektoend, returnfp)
     else:
         return False
     return False
@@ -7920,70 +7924,70 @@ def InFileToArray(infile, seekstart=0, seekend=0, listonly=False, contentasfile=
 
 def ListDirToArray(infiles, dirlistfromtxt=False, fmttype=__file_format_default__, compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, seekstart=0, seekend=0, listonly=False, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, seektoend=False, returnfp=False):
     outarray = BytesIO()
-    packform = PackArchiveFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
+    packform = PackFoxFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
                               compressionlevel, followlink, checksumtype, extradata, formatspecs, verbose, True)
-    listarchivefiles = ArchiveFileToArray(outarray, "auto", seekstart, seekend, listonly, True, skipchecksum, formatspecs, seektoend, returnfp)
-    return listarchivefiles
+    listfoxfiles = FoxFileToArray(outarray, "auto", seekstart, seekend, listonly, True, skipchecksum, formatspecs, seektoend, returnfp)
+    return listfoxfiles
 
 
-def ArchiveFileArrayToArrayIndex(inarray, returnfp=False):
+def FoxFileArrayToArrayIndex(inarray, returnfp=False):
     if(isinstance(inarray, dict)):
-        listarchivefiles = inarray
+        listfoxfiles = inarray
     else:
         return False
-    if(not listarchivefiles):
+    if(not listfoxfiles):
         return False
-    outarray = {'list': listarchivefiles, 'filetoid': {}, 'idtofile': {}, 'filetypes': {'directories': {'filetoid': {}, 'idtofile': {}}, 'files': {'filetoid': {}, 'idtofile': {}}, 'links': {'filetoid': {}, 'idtofile': {}}, 'symlinks': {'filetoid': {
+    outarray = {'list': listfoxfiles, 'filetoid': {}, 'idtofile': {}, 'filetypes': {'directories': {'filetoid': {}, 'idtofile': {}}, 'files': {'filetoid': {}, 'idtofile': {}}, 'links': {'filetoid': {}, 'idtofile': {}}, 'symlinks': {'filetoid': {
     }, 'idtofile': {}}, 'hardlinks': {'filetoid': {}, 'idtofile': {}}, 'character': {'filetoid': {}, 'idtofile': {}}, 'block': {'filetoid': {}, 'idtofile': {}}, 'fifo': {'filetoid': {}, 'idtofile': {}}, 'devices': {'filetoid': {}, 'idtofile': {}}}}
     if(returnfp):
-        outarray.update({'fp': listarchivefiles['fp']})
-    lenlist = len(listarchivefiles['ffilelist'])
+        outarray.update({'fp': listfoxfiles['fp']})
+    lenlist = len(listfoxfiles['ffilelist'])
     lcfi = 0
-    lcfx = int(listarchivefiles['fnumfiles'])
-    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
+    lcfx = int(listfoxfiles['fnumfiles'])
+    if(lenlist > listfoxfiles['fnumfiles'] or lenlist < listfoxfiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listarchivefiles['fnumfiles'])
+        lcfx = int(listfoxfiles['fnumfiles'])
     while(lcfi < lcfx):
-        filetoidarray = {listarchivefiles['ffilelist'][lcfi]
-                         ['fname']: listarchivefiles['ffilelist'][lcfi]['fid']}
-        idtofilearray = {listarchivefiles['ffilelist'][lcfi]
-                         ['fid']: listarchivefiles['ffilelist'][lcfi]['fname']}
+        filetoidarray = {listfoxfiles['ffilelist'][lcfi]
+                         ['fname']: listfoxfiles['ffilelist'][lcfi]['fid']}
+        idtofilearray = {listfoxfiles['ffilelist'][lcfi]
+                         ['fid']: listfoxfiles['ffilelist'][lcfi]['fname']}
         outarray['filetoid'].update(filetoidarray)
         outarray['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 0 or listarchivefiles['ffilelist'][lcfi]['ftype'] == 7):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 0 or listfoxfiles['ffilelist'][lcfi]['ftype'] == 7):
             outarray['filetypes']['files']['filetoid'].update(filetoidarray)
             outarray['filetypes']['files']['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 1):
             outarray['filetypes']['hardlinks']['filetoid'].update(
                 filetoidarray)
             outarray['filetypes']['hardlinks']['idtofile'].update(
                 idtofilearray)
             outarray['filetypes']['links']['filetoid'].update(filetoidarray)
             outarray['filetypes']['links']['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 2):
             outarray['filetypes']['symlinks']['filetoid'].update(filetoidarray)
             outarray['filetypes']['symlinks']['idtofile'].update(idtofilearray)
             outarray['filetypes']['links']['filetoid'].update(filetoidarray)
             outarray['filetypes']['links']['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 3):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 3):
             outarray['filetypes']['character']['filetoid'].update(
                 filetoidarray)
             outarray['filetypes']['character']['idtofile'].update(
                 idtofilearray)
             outarray['filetypes']['devices']['filetoid'].update(filetoidarray)
             outarray['filetypes']['devices']['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 4):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 4):
             outarray['filetypes']['block']['filetoid'].update(filetoidarray)
             outarray['filetypes']['block']['idtofile'].update(idtofilearray)
             outarray['filetypes']['devices']['filetoid'].update(filetoidarray)
             outarray['filetypes']['devices']['idtofile'].update(idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 5):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 5):
             outarray['filetypes']['directories']['filetoid'].update(
                 filetoidarray)
             outarray['filetypes']['directories']['idtofile'].update(
                 idtofilearray)
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 6):
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 6):
             outarray['filetypes']['symlinks']['filetoid'].update(filetoidarray)
             outarray['filetypes']['symlinks']['idtofile'].update(idtofilearray)
             outarray['filetypes']['devices']['filetoid'].update(filetoidarray)
@@ -7992,13 +7996,13 @@ def ArchiveFileArrayToArrayIndex(inarray, returnfp=False):
     return outarray
 
 
-def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, seekstart=0, seekend=0, checksumtype=["crc32", "crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], jsondata={}, formatspecs=__file_format_dict__, seektoend=False, verbose=False, returnfp=False):
+def RePackFoxFile(infile, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, seekstart=0, seekend=0, checksumtype=["crc32", "crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], jsondata={}, formatspecs=__file_format_dict__, seektoend=False, verbose=False, returnfp=False):
     if(isinstance(infile, dict)):
-        listarchivefiles = infile
+        listfoxfiles = infile
     else:
         if(infile != "-" and not isinstance(infile, bytes) and not hasattr(infile, "read") and not hasattr(infile, "write")):
             infile = RemoveWindowsPath(infile)
-        listarchivefiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, seektoend, returnfp)
+        listfoxfiles = FoxFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, seektoend, returnfp)
     if(IsNestedDict(formatspecs) and fmttype in formatspecs):
         formatspecs = formatspecs[fmttype]
     elif(IsNestedDict(formatspecs) and fmttype not in formatspecs):
@@ -8024,7 +8028,7 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 os.unlink(outfile)
             except OSError:
                 pass
-    if(not listarchivefiles):
+    if(not listfoxfiles):
         return False
     if(outfile == "-" or outfile is None):
         verbose = False
@@ -8044,19 +8048,19 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
             return False
     formver = formatspecs['format_ver']
     fileheaderver = str(int(formver.replace(".", "")))
-    lenlist = len(listarchivefiles['ffilelist'])
-    fnumfiles = int(listarchivefiles['fnumfiles'])
+    lenlist = len(listfoxfiles['ffilelist'])
+    fnumfiles = int(listfoxfiles['fnumfiles'])
     if(lenlist > fnumfiles or lenlist < fnumfiles):
         fnumfiles = lenlist
-    AppendFileHeader(fp, fnumfiles, listarchivefiles['fencoding'], [], checksumtype[0], formatspecs)
-    lenlist = len(listarchivefiles['ffilelist'])
-    fnumfiles = int(listarchivefiles['fnumfiles'])
+    AppendFileHeader(fp, fnumfiles, listfoxfiles['fencoding'], [], checksumtype[0], formatspecs)
+    lenlist = len(listfoxfiles['ffilelist'])
+    fnumfiles = int(listfoxfiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listarchivefiles['fnumfiles'])
-    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
+    lcfx = int(listfoxfiles['fnumfiles'])
+    if(lenlist > listfoxfiles['fnumfiles'] or lenlist < listfoxfiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listarchivefiles['fnumfiles'])
+        lcfx = int(listfoxfiles['fnumfiles'])
     curinode = 0
     curfid = 0
     inodelist = []
@@ -8064,62 +8068,62 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
     filetoinode = {}
     reallcfi = 0
     while(lcfi < lcfx):
-        fencoding = listarchivefiles['ffilelist'][reallcfi]['fencoding']
-        fcencoding = listarchivefiles['ffilelist'][reallcfi]['fencoding']
-        if(re.findall("^[.|/]", listarchivefiles['ffilelist'][reallcfi]['fname'])):
-            fname = listarchivefiles['ffilelist'][reallcfi]['fname']
+        fencoding = listfoxfiles['ffilelist'][reallcfi]['fencoding']
+        fcencoding = listfoxfiles['ffilelist'][reallcfi]['fencoding']
+        if(re.findall("^[.|/]", listfoxfiles['ffilelist'][reallcfi]['fname'])):
+            fname = listfoxfiles['ffilelist'][reallcfi]['fname']
         else:
-            fname = "./"+listarchivefiles['ffilelist'][reallcfi]['fname']
+            fname = "./"+listfoxfiles['ffilelist'][reallcfi]['fname']
         if(verbose):
             VerbosePrintOut(fname)
         fheadersize = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fheadersize']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fheadersize']), 'x').lower()
         fsize = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fsize']), 'x').lower()
-        flinkname = listarchivefiles['ffilelist'][reallcfi]['flinkname']
+            int(listfoxfiles['ffilelist'][reallcfi]['fsize']), 'x').lower()
+        flinkname = listfoxfiles['ffilelist'][reallcfi]['flinkname']
         fatime = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fatime']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fatime']), 'x').lower()
         fmtime = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fmtime']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fmtime']), 'x').lower()
         fctime = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fctime']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fctime']), 'x').lower()
         fbtime = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fbtime']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fbtime']), 'x').lower()
         fmode = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fmode']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fmode']), 'x').lower()
         fchmode = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fchmode']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fchmode']), 'x').lower()
         fuid = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fuid']), 'x').lower()
-        funame = listarchivefiles['ffilelist'][reallcfi]['funame']
+            int(listfoxfiles['ffilelist'][reallcfi]['fuid']), 'x').lower()
+        funame = listfoxfiles['ffilelist'][reallcfi]['funame']
         fgid = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fgid']), 'x').lower()
-        fgname = listarchivefiles['ffilelist'][reallcfi]['fgname']
+            int(listfoxfiles['ffilelist'][reallcfi]['fgid']), 'x').lower()
+        fgname = listfoxfiles['ffilelist'][reallcfi]['fgname']
         finode = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['finode']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['finode']), 'x').lower()
         flinkcount = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['flinkcount']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['flinkcount']), 'x').lower()
         fwinattributes = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fwinattributes']), 'x').lower()
-        fcompression = listarchivefiles['ffilelist'][reallcfi]['fcompression']
+            int(listfoxfiles['ffilelist'][reallcfi]['fwinattributes']), 'x').lower()
+        fcompression = listfoxfiles['ffilelist'][reallcfi]['fcompression']
         fcsize = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fcsize']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fcsize']), 'x').lower()
         fdev = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fdev']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fdev']), 'x').lower()
         fdev_minor = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fminor']), 'x').lower()
+            int(listfoxfiles['ffilelist'][reallcfi]['fminor']), 'x').lower()
         fdev_major = format(
-            int(listarchivefiles['ffilelist'][reallcfi]['fmajor']), 'x').lower()
-        fseeknextfile = listarchivefiles['ffilelist'][reallcfi]['fseeknextfile']
-        if(len(listarchivefiles['ffilelist'][reallcfi]['fextralist']) > listarchivefiles['ffilelist'][reallcfi]['fextrafields'] and len(listarchivefiles['ffilelist'][reallcfi]['fextralist']) > 0):
-            listarchivefiles['ffilelist'][reallcfi]['fextrafields'] = len(
-                listarchivefiles['ffilelist'][reallcfi]['fextralist'])
+            int(listfoxfiles['ffilelist'][reallcfi]['fmajor']), 'x').lower()
+        fseeknextfile = listfoxfiles['ffilelist'][reallcfi]['fseeknextfile']
+        if(len(listfoxfiles['ffilelist'][reallcfi]['fextralist']) > listfoxfiles['ffilelist'][reallcfi]['fextrafields'] and len(listfoxfiles['ffilelist'][reallcfi]['fextralist']) > 0):
+            listfoxfiles['ffilelist'][reallcfi]['fextrafields'] = len(
+                listfoxfiles['ffilelist'][reallcfi]['fextralist'])
         if(not followlink and len(extradata) <= 0):
-            extradata = listarchivefiles['ffilelist'][reallcfi]['fextralist']
+            extradata = listfoxfiles['ffilelist'][reallcfi]['fextralist']
         if(not followlink and len(jsondata) <= 0):
-            jsondata = listarchivefiles['ffilelist'][reallcfi]['fjsondata']
-        fcontents = listarchivefiles['ffilelist'][reallcfi]['fcontents']
-        if(not listarchivefiles['ffilelist'][reallcfi]['fcontentasfile']):
+            jsondata = listfoxfiles['ffilelist'][reallcfi]['fjsondata']
+        fcontents = listfoxfiles['ffilelist'][reallcfi]['fcontents']
+        if(not listfoxfiles['ffilelist'][reallcfi]['fcontentasfile']):
             fcontents = BytesIO(fcontents)
         fcencoding = GetFileEncoding(fcontents, False)
         fcompression = ""
@@ -8166,10 +8170,10 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 fcontents.close()
                 fcontents = cfcontents
         if(followlink):
-            if(listarchivefiles['ffilelist'][reallcfi]['ftype'] == 1 or listarchivefiles['ffilelist'][reallcfi]['ftype'] == 2):
-                getflinkpath = listarchivefiles['ffilelist'][reallcfi]['flinkname']
-                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
-                flinkinfo = listarchivefiles['ffilelist'][flinkid]
+            if(listfoxfiles['ffilelist'][reallcfi]['ftype'] == 1 or listfoxfiles['ffilelist'][reallcfi]['ftype'] == 2):
+                getflinkpath = listfoxfiles['ffilelist'][reallcfi]['flinkname']
+                flinkid = prelistfoxfiles['filetoid'][getflinkpath]
+                flinkinfo = listfoxfiles['ffilelist'][flinkid]
                 fheadersize = format(
                     int(flinkinfo['fheadersize']), 'x').lower()
                 fsize = format(int(flinkinfo['fsize']), 'x').lower()
@@ -8206,10 +8210,10 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
                 ftypehex = format(flinkinfo['ftype'], 'x').lower()
         else:
             ftypehex = format(
-                listarchivefiles['ffilelist'][reallcfi]['ftype'], 'x').lower()
+                listfoxfiles['ffilelist'][reallcfi]['ftype'], 'x').lower()
         fcurfid = format(curfid, 'x').lower()
         if(not followlink and finode != 0):
-            if(listarchivefiles['ffilelist'][reallcfi]['ftype'] != 1):
+            if(listfoxfiles['ffilelist'][reallcfi]['ftype'] != 1):
                 fcurinode = format(int(curinode), 'x').lower()
                 inodetofile.update({curinode: fname})
                 filetoinode.update({fname: curinode})
@@ -8272,50 +8276,50 @@ def RePackArchiveFile(infile, outfile, fmttype="auto", compression="auto", compr
         return True
 
 
-def RePackArchiveFileFromString(instr, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def RePackFoxFileFromString(instr, outfile, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, checksumtype=["crc32", "crc32", "crc32"], skipchecksum=False, extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     fp = BytesIO(instr)
-    listarchivefiles = RePackArchiveFile(fp, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
+    listfoxfiles = RePackFoxFile(fp, outfile, fmttype, compression, compresswholefile, compressionlevel, compressionuselist,
                                      checksumtype, skipchecksum, extradata, formatspecs, verbose, returnfp)
-    return listarchivefiles
+    return listfoxfiles
 
 
-def PackArchiveFileFromListDir(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
+def PackFoxFileFromListDir(infiles, outfile, dirlistfromtxt=False, fmttype="auto", compression="auto", compresswholefile=True, compressionlevel=None, compressionuselist=compressionlistalt, followlink=False, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], extradata=[], formatspecs=__file_format_dict__, verbose=False, returnfp=False):
     outarray = BytesIO()
-    packform = PackArchiveFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
+    packform = PackFoxFile(infiles, outarray, dirlistfromtxt, fmttype, compression, compresswholefile,
                               compressionlevel, compressionuselist, followlink, checksumtype, extradata, formatspecs, verbose, True)
-    listarchivefiles = RePackArchiveFile(outarray, outfile, fmttype, compression, compresswholefile,
+    listfoxfiles = RePackFoxFile(outarray, outfile, fmttype, compression, compresswholefile,
                                      compressionlevel, checksumtype, skipchecksum, extradata, formatspecs, verbose, returnfp)
-    return listarchivefiles
+    return listfoxfiles
 
 
-def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, preservepermissions=True, preservetime=True, seektoend=False, verbose=False, returnfp=False):
+def UnPackFoxFile(infile, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, preservepermissions=True, preservetime=True, seektoend=False, verbose=False, returnfp=False):
     if(outdir is not None):
         outdir = RemoveWindowsPath(outdir)
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(isinstance(infile, dict)):
-        listarchivefiles = infile
+        listfoxfiles = infile
     else:
         if(infile != "-" and not hasattr(infile, "read") and not hasattr(infile, "write") and not (sys.version_info[0] >= 3 and isinstance(infile, bytes))):
             infile = RemoveWindowsPath(infile)
-        listarchivefiles = ArchiveFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, seektoend, returnfp)
-    if(not listarchivefiles):
+        listfoxfiles = FoxFileToArray(infile, "auto", seekstart, seekend, False, True, skipchecksum, formatspecs, seektoend, returnfp)
+    if(not listfoxfiles):
         return False
-    lenlist = len(listarchivefiles['ffilelist'])
-    fnumfiles = int(listarchivefiles['fnumfiles'])
+    lenlist = len(listfoxfiles['ffilelist'])
+    fnumfiles = int(listfoxfiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listarchivefiles['fnumfiles'])
-    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
+    lcfx = int(listfoxfiles['fnumfiles'])
+    if(lenlist > listfoxfiles['fnumfiles'] or lenlist < listfoxfiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listarchivefiles['fnumfiles'])
+        lcfx = int(listfoxfiles['fnumfiles'])
     while(lcfi < lcfx):
         funame = ""
         try:
             import pwd
             try:
                 userinfo = pwd.getpwuid(
-                    listarchivefiles['ffilelist'][lcfi]['fuid'])
+                    listfoxfiles['ffilelist'][lcfi]['fuid'])
                 funame = userinfo.pw_name
             except KeyError:
                 funame = ""
@@ -8326,7 +8330,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
             import grp
             try:
                 groupinfo = grp.getgrgid(
-                    listarchivefiles['ffilelist'][lcfi]['fgid'])
+                    listfoxfiles['ffilelist'][lcfi]['fgid'])
                 fgname = groupinfo.gr_name
             except KeyError:
                 fgname = ""
@@ -8334,15 +8338,15 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
             fgname = ""
         if(verbose):
             VerbosePrintOut(PrependPath(
-                outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 0 or listarchivefiles['ffilelist'][lcfi]['ftype'] == 7):
-            with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
-                if(not listarchivefiles['ffilelist'][lcfi]['fcontentasfile']):
-                    listarchivefiles['ffilelist'][lcfi]['fcontents'] = BytesIO(
-                        listarchivefiles['ffilelist'][lcfi]['fcontents'])
-                listarchivefiles['ffilelist'][lcfi]['fcontents'].seek(0, 0)
+                outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 0 or listfoxfiles['ffilelist'][lcfi]['ftype'] == 7):
+            with open(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                if(not listfoxfiles['ffilelist'][lcfi]['fcontentasfile']):
+                    listfoxfiles['ffilelist'][lcfi]['fcontents'] = BytesIO(
+                        listfoxfiles['ffilelist'][lcfi]['fcontents'])
+                listfoxfiles['ffilelist'][lcfi]['fcontents'].seek(0, 0)
                 shutil.copyfileobj(
-                    listarchivefiles['ffilelist'][lcfi]['fcontents'], fpc)
+                    listfoxfiles['ffilelist'][lcfi]['fcontents'], fpc)
                 try:
                     fpc.flush()
                     if(hasattr(os, "sync")):
@@ -8353,20 +8357,20 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                     pass
                 except OSError:
                     pass
-            if(hasattr(os, "chown") and funame == listarchivefiles['ffilelist'][lcfi]['funame'] and fgname == listarchivefiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
-                os.chown(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']),
-                         listarchivefiles['ffilelist'][lcfi]['fuid'], listarchivefiles['ffilelist'][lcfi]['fgid'])
+            if(hasattr(os, "chown") and funame == listfoxfiles['ffilelist'][lcfi]['funame'] and fgname == listfoxfiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
+                os.chown(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']),
+                         listfoxfiles['ffilelist'][lcfi]['fuid'], listfoxfiles['ffilelist'][lcfi]['fgid'])
             if(preservepermissions):
                 os.chmod(PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']), listfoxfiles['ffilelist'][lcfi]['fchmode'])
             if(preservetime):
-                os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
-                    listarchivefiles['ffilelist'][lcfi]['fatime'], listarchivefiles['ffilelist'][lcfi]['fmtime']))
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
+                os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
+                    listfoxfiles['ffilelist'][lcfi]['fatime'], listfoxfiles['ffilelist'][lcfi]['fmtime']))
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 1):
             if(followlink):
-                getflinkpath = listarchivefiles['ffilelist'][lcfi]['flinkname']
-                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
-                flinkinfo = listarchivefiles['ffilelist'][flinkid]
+                getflinkpath = listfoxfiles['ffilelist'][lcfi]['flinkname']
+                flinkid = prelistfoxfiles['filetoid'][getflinkpath]
+                flinkinfo = listfoxfiles['ffilelist'][flinkid]
                 funame = ""
                 try:
                     import pwd
@@ -8388,7 +8392,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                 except ImportError:
                     fgname = ""
                 if(flinkinfo['ftype'] == 0 or flinkinfo['ftype'] == 7):
-                    with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                    with open(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
                         if(not flinkinfo['fcontentasfile']):
                             flinkinfo['fcontents'] = BytesIO(
                                 flinkinfo['fcontents'])
@@ -8406,46 +8410,46 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                             pass
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 1):
                     os.link(flinkinfo['flinkname'], PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 2):
                     os.symlink(flinkinfo['flinkname'], PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 5):
                     if(preservepermissions):
                         os.mkdir(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     else:
                         os.mkdir(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 6 and hasattr(os, "mkfifo")):
                     os.mkfifo(PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
             else:
-                os.link(listarchivefiles['ffilelist'][lcfi]['flinkname'], PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
+                os.link(listfoxfiles['ffilelist'][lcfi]['flinkname'], PrependPath(
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 2):
             if(followlink):
-                getflinkpath = listarchivefiles['ffilelist'][lcfi]['flinkname']
-                flinkid = prelistarchivefiles['filetoid'][getflinkpath]
-                flinkinfo = listarchivefiles['ffilelist'][flinkid]
+                getflinkpath = listfoxfiles['ffilelist'][lcfi]['flinkname']
+                flinkid = prelistfoxfiles['filetoid'][getflinkpath]
+                flinkinfo = listfoxfiles['ffilelist'][flinkid]
                 funame = ""
                 try:
                     import pwd
@@ -8467,7 +8471,7 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                 except ImportError:
                     fgname = ""
                 if(flinkinfo['ftype'] == 0 or flinkinfo['ftype'] == 7):
-                    with open(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
+                    with open(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), "wb") as fpc:
                         if(not flinkinfo['fcontentasfile']):
                             flinkinfo['fcontents'] = BytesIO(
                                 flinkinfo['fcontents'])
@@ -8485,127 +8489,127 @@ def UnPackArchiveFile(infile, outdir=None, followlink=False, seekstart=0, seeken
                             pass
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 1):
                     os.link(flinkinfo['flinkname'], PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 2):
                     os.symlink(flinkinfo['flinkname'], PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                 if(flinkinfo['ftype'] == 5):
                     if(preservepermissions):
                         os.mkdir(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     else:
                         os.mkdir(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
                     if(hasattr(os, "chown") and funame == flinkinfo['funame'] and fgname == flinkinfo['fgname'] and preservepermissions):
                         os.chown(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fuid'], flinkinfo['fgid'])
                     if(preservepermissions):
                         os.chmod(PrependPath(
-                            outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                            outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
                     if(preservetime):
-                        os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
+                        os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
                             flinkinfo['fatime'], flinkinfo['fmtime']))
                 if(flinkinfo['ftype'] == 6 and hasattr(os, "mkfifo")):
                     os.mkfifo(PrependPath(
-                        outdir, listarchivefiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
+                        outdir, listfoxfiles['ffilelist'][lcfi]['fname']), flinkinfo['fchmode'])
             else:
-                os.symlink(listarchivefiles['ffilelist'][lcfi]['flinkname'], PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 5):
+                os.symlink(listfoxfiles['ffilelist'][lcfi]['flinkname'], PrependPath(
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 5):
             if(preservepermissions):
                 os.mkdir(PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']), listfoxfiles['ffilelist'][lcfi]['fchmode'])
             else:
                 os.mkdir(PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']))
-            if(hasattr(os, "chown") and funame == listarchivefiles['ffilelist'][lcfi]['funame'] and fgname == listarchivefiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
-                os.chown(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']),
-                         listarchivefiles['ffilelist'][lcfi]['fuid'], listarchivefiles['ffilelist'][lcfi]['fgid'])
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']))
+            if(hasattr(os, "chown") and funame == listfoxfiles['ffilelist'][lcfi]['funame'] and fgname == listfoxfiles['ffilelist'][lcfi]['fgname'] and preservepermissions):
+                os.chown(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']),
+                         listfoxfiles['ffilelist'][lcfi]['fuid'], listfoxfiles['ffilelist'][lcfi]['fgid'])
             if(preservepermissions):
                 os.chmod(PrependPath(
-                    outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
+                    outdir, listfoxfiles['ffilelist'][lcfi]['fname']), listfoxfiles['ffilelist'][lcfi]['fchmode'])
             if(preservetime):
-                os.utime(PrependPath(outdir, listarchivefiles['ffilelist'][lcfi]['fname']), (
-                    listarchivefiles['ffilelist'][lcfi]['fatime'], listarchivefiles['ffilelist'][lcfi]['fmtime']))
-        if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 6 and hasattr(os, "mkfifo")):
+                os.utime(PrependPath(outdir, listfoxfiles['ffilelist'][lcfi]['fname']), (
+                    listfoxfiles['ffilelist'][lcfi]['fatime'], listfoxfiles['ffilelist'][lcfi]['fmtime']))
+        if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 6 and hasattr(os, "mkfifo")):
             os.mkfifo(PrependPath(
-                outdir, listarchivefiles['ffilelist'][lcfi]['fname']), listarchivefiles['ffilelist'][lcfi]['fchmode'])
+                outdir, listfoxfiles['ffilelist'][lcfi]['fname']), listfoxfiles['ffilelist'][lcfi]['fchmode'])
         lcfi = lcfi + 1
     if(returnfp):
-        return listarchivefiles['ffilelist']['fp']
+        return listfoxfiles['ffilelist']['fp']
     else:
         return True
 
 
-def UnPackArchiveFileString(instr, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
+def UnPackFoxFileString(instr, outdir=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
     fp = BytesIO(instr)
-    listarchivefiles = UnPackArchiveFile(fp, outdir, followlink, seekstart, seekend, skipchecksum, formatspecs, seektoend, verbose, returnfp)
-    return listarchivefiles
+    listfoxfiles = UnPackFoxFile(fp, outdir, followlink, seekstart, seekend, skipchecksum, formatspecs, seektoend, verbose, returnfp)
+    return listfoxfiles
 
 
-def ArchiveFileListFiles(infile, fmttype="auto", seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
+def FoxFileListFiles(infile, fmttype="auto", seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
     if(verbose):
         logging.basicConfig(format="%(message)s", stream=sys.stdout, level=logging.DEBUG)
     if(isinstance(infile, dict)):
-        listarchivefiles = infile
+        listfoxfiles = infile
     else:
         if(infile != "-" and not hasattr(infile, "read") and not hasattr(infile, "write") and not (sys.version_info[0] >= 3 and isinstance(infile, bytes))):
             infile = RemoveWindowsPath(infile)
-        listarchivefiles = ArchiveFileToArray(infile, fmttype, seekstart, seekend, True, False, False, skipchecksum, formatspecs, seektoend, returnfp)
-    if(not listarchivefiles):
+        listfoxfiles = FoxFileToArray(infile, fmttype, seekstart, seekend, True, False, False, skipchecksum, formatspecs, seektoend, returnfp)
+    if(not listfoxfiles):
         return False
-    lenlist = len(listarchivefiles['ffilelist'])
-    fnumfiles = int(listarchivefiles['fnumfiles'])
+    lenlist = len(listfoxfiles['ffilelist'])
+    fnumfiles = int(listfoxfiles['fnumfiles'])
     lcfi = 0
-    lcfx = int(listarchivefiles['fnumfiles'])
-    if(lenlist > listarchivefiles['fnumfiles'] or lenlist < listarchivefiles['fnumfiles']):
+    lcfx = int(listfoxfiles['fnumfiles'])
+    if(lenlist > listfoxfiles['fnumfiles'] or lenlist < listfoxfiles['fnumfiles']):
         lcfx = int(lenlist)
     else:
-        lcfx = int(listarchivefiles['fnumfiles'])
+        lcfx = int(listfoxfiles['fnumfiles'])
     returnval = {}
     while(lcfi < lcfx):
-        returnval.update({lcfi: listarchivefiles['ffilelist'][lcfi]['fname']})
+        returnval.update({lcfi: listfoxfiles['ffilelist'][lcfi]['fname']})
         if(not verbose):
-            VerbosePrintOut(listarchivefiles['ffilelist'][lcfi]['fname'])
+            VerbosePrintOut(listfoxfiles['ffilelist'][lcfi]['fname'])
         if(verbose):
             permissions = {'access': {'0': ('---'), '1': ('--x'), '2': ('-w-'), '3': ('-wx'), '4': (
                 'r--'), '5': ('r-x'), '6': ('rw-'), '7': ('rwx')}, 'roles': {0: 'owner', 1: 'group', 2: 'other'}}
-            printfname = listarchivefiles['ffilelist'][lcfi]['fname']
-            if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 1):
-                printfname = listarchivefiles['ffilelist'][lcfi]['fname'] + \
-                    " link to " + listarchivefiles['ffilelist'][lcfi]['flinkname']
-            if(listarchivefiles['ffilelist'][lcfi]['ftype'] == 2):
-                printfname = listarchivefiles['ffilelist'][lcfi]['fname'] + \
-                    " -> " + listarchivefiles['ffilelist'][lcfi]['flinkname']
-            fuprint = listarchivefiles['ffilelist'][lcfi]['funame']
+            printfname = listfoxfiles['ffilelist'][lcfi]['fname']
+            if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 1):
+                printfname = listfoxfiles['ffilelist'][lcfi]['fname'] + \
+                    " link to " + listfoxfiles['ffilelist'][lcfi]['flinkname']
+            if(listfoxfiles['ffilelist'][lcfi]['ftype'] == 2):
+                printfname = listfoxfiles['ffilelist'][lcfi]['fname'] + \
+                    " -> " + listfoxfiles['ffilelist'][lcfi]['flinkname']
+            fuprint = listfoxfiles['ffilelist'][lcfi]['funame']
             if(len(fuprint) <= 0):
-                fuprint = listarchivefiles['ffilelist'][lcfi]['fuid']
-            fgprint = listarchivefiles['ffilelist'][lcfi]['fgname']
+                fuprint = listfoxfiles['ffilelist'][lcfi]['fuid']
+            fgprint = listfoxfiles['ffilelist'][lcfi]['fgname']
             if(len(fgprint) <= 0):
-                fgprint = listarchivefiles['ffilelist'][lcfi]['fgid']
-            VerbosePrintOut(PrintPermissionString(listarchivefiles['ffilelist'][lcfi]['fmode'], listarchivefiles['ffilelist'][lcfi]['ftype']) + " " + str(fuprint) + "/" + str(fgprint) + " " + str(
-                listarchivefiles['ffilelist'][lcfi]['fsize']).rjust(15) + " " + datetime.datetime.utcfromtimestamp(listarchivefiles['ffilelist'][lcfi]['fmtime']).strftime('%Y-%m-%d %H:%M') + " " + printfname)
+                fgprint = listfoxfiles['ffilelist'][lcfi]['fgid']
+            VerbosePrintOut(PrintPermissionString(listfoxfiles['ffilelist'][lcfi]['fmode'], listfoxfiles['ffilelist'][lcfi]['ftype']) + " " + str(fuprint) + "/" + str(fgprint) + " " + str(
+                listfoxfiles['ffilelist'][lcfi]['fsize']).rjust(15) + " " + datetime.datetime.utcfromtimestamp(listfoxfiles['ffilelist'][lcfi]['fmtime']).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listarchivefiles['fp']
+        return listfoxfiles['fp']
     else:
         return True
 
 
-def ArchiveFileStringListFiles(instr, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
+def FoxFileStringListFiles(instr, seekstart=0, seekend=0, skipchecksum=False, formatspecs=__file_format_multi_dict__, seektoend=False, verbose=False, returnfp=False):
     fp = BytesIO(instr)
-    listarchivefiles = ArchiveFileListFiles(
+    listfoxfiles = FoxFileListFiles(
         instr, seekstart, seekend, skipchecksum, formatspecs, seektoend, verbose, returnfp)
-    return listarchivefiles
+    return listfoxfiles
 
 
 def TarFileListFiles(infile, verbose=False, returnfp=False):
@@ -8728,7 +8732,7 @@ def TarFileListFiles(infile, verbose=False, returnfp=False):
                 member.size).rjust(15) + " " + datetime.datetime.utcfromtimestamp(member.mtime).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listarchivefiles['fp']
+        return listfoxfiles['fp']
     else:
         return True
 
@@ -8861,7 +8865,7 @@ def ZipFileListFiles(infile, verbose=False, returnfp=False):
                 15) + " " + datetime.datetime.utcfromtimestamp(int(time.mktime(member.date_time + (0, 0, -1)))).strftime('%Y-%m-%d %H:%M') + " " + printfname)
         lcfi = lcfi + 1
     if(returnfp):
-        return listarchivefiles['fp']
+        return listfoxfiles['fp']
     else:
         return True
 
@@ -8999,7 +9003,7 @@ if(rarfile_support):
                     member.file_size).rjust(15) + " " + member.mtime.strftime('%Y-%m-%d %H:%M') + " " + printfname)
             lcfi = lcfi + 1
         if(returnfp):
-            return listarchivefiles['fp']
+            return listfoxfiles['fp']
         else:
             return True
 
@@ -9106,7 +9110,7 @@ if(py7zr_support):
                     fsize).rjust(15) + " " + member.creationtime.strftime('%Y-%m-%d %H:%M') + " " + printfname)
             lcfi = lcfi + 1
         if(returnfp):
-            return listarchivefiles['fp']
+            return listfoxfiles['fp']
         else:
             return True
 
@@ -9126,7 +9130,7 @@ def InFileListFiles(infile, verbose=False, formatspecs=__file_format_multi_dict_
     elif(py7zr_support and checkcompressfile == "7zipfile" and py7zr.is_7zfile(infile)):
         return SevenZipFileListFiles(infile, verbose, returnfp)
     elif(checkcompressfile == formatspecs['format_magic']):
-        return ArchiveFileListFiles(infile, 0, 0, False, formatspecs, seektoend, verbose, returnfp)
+        return FoxFileListFiles(infile, 0, 0, False, formatspecs, seektoend, verbose, returnfp)
     else:
         return False
     return False
@@ -9134,11 +9138,11 @@ def InFileListFiles(infile, verbose=False, formatspecs=__file_format_multi_dict_
 
 def ListDirListFiles(infiles, dirlistfromtxt=False, compression="auto", compresswholefile=True, compressionlevel=None, followlink=False, seekstart=0, seekend=0, skipchecksum=False, checksumtype=["crc32", "crc32", "crc32"], formatspecs=__file_format_dict__, seektoend=False, verbose=False, returnfp=False):
     outarray = BytesIO()
-    packform = PackArchiveFile(infiles, outarray, dirlistfromtxt, compression, compresswholefile,
+    packform = PackFoxFile(infiles, outarray, dirlistfromtxt, compression, compresswholefile,
                               compressionlevel, followlink, checksumtype, formatspecs, False, True)
-    listarchivefiles = ArchiveFileListFiles(
+    listfoxfiles = FoxFileListFiles(
         outarray, seekstart, seekend, skipchecksum, formatspecs, seektoend, verbose, returnfp)
-    return listarchivefiles
+    return listfoxfiles
 
 
 def download_file_from_ftp_file(url):
@@ -9664,7 +9668,7 @@ def upload_file_to_internet_file(ifp, url):
 def upload_file_to_internet_compress_file(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
     fp = CompressOpenFileAlt(
         fp, compression, compressionlevel, formatspecs)
-    if(not archivefileout):
+    if(not foxfileout):
         return False
     fp.seek(0, 0)
     upload_file_to_internet_file(fp, outfile)
@@ -9690,7 +9694,7 @@ def upload_file_to_internet_string(ifp, url):
 def upload_file_to_internet_compress_string(ifp, url, compression="auto", compressionlevel=None, formatspecs=__file_format_dict__):
     fp = CompressOpenFileAlt(
         BytesIO(ifp), compression, compressionlevel, formatspecs)
-    if(not archivefileout):
+    if(not foxfileout):
         return False
     fp.seek(0, 0)
     upload_file_to_internet_file(fp, outfile)

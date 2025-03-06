@@ -85,15 +85,15 @@ if(len(sys.argv) > 2):
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
     elif(os.path.exists("./"+sys.argv[2]) and os.path.isdir("./"+sys.argv[2])):
-        infile = "archivefile.py"
+        infile = "foxfile.py"
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
     else:
-        infile = "archivefile.py"
+        infile = "foxfile.py"
         outfilebin = os.path.splitext(infile)[0]
         outfilezip = outfilebin+".zip"
 else:
-    infile = "archivefile.py"
+    infile = "foxfile.py"
     outfilebin = os.path.splitext(infile)[0]
     outfilezip = outfilebin+".zip"
 if(os.path.exists(tempdir+"/pybundle") and os.path.isfile(tempdir+"/pybundle")):
@@ -106,11 +106,11 @@ if(os.path.exists(tempdir+"/pybundle/__main__.py") and os.path.isfile(tempdir+"/
 if(os.path.exists(tempdir+"/pybundle/__main__.py") and os.path.isdir(tempdir+"/pybundle/__main__.py")):
     shutil.rmtree(tempdir+"/pybundle/__main__.py")
 shutil.copy2("./"+infile, tempdir+"/pybundle/__main__.py")
-if(os.path.exists(tempdir+"/pybundle/pyarchivefile.py") and os.path.isfile(tempdir+"/pybundle/pyarchivefile.py")):
-    os.unlink(tempdir+"/pybundle/pyarchivefile.py")
-if(os.path.exists(tempdir+"/pybundle/pyarchivefile.py") and os.path.isdir(tempdir+"/pybundle/pyarchivefile.py")):
-    shutil.rmtree(tempdir+"/pybundle/pyarchivefile.py")
-shutil.copy2("./pyarchivefile.py", tempdir+"/pybundle/pyarchivefile.py")
+if(os.path.exists(tempdir+"/pybundle/pyfoxfile.py") and os.path.isfile(tempdir+"/pybundle/pyfoxfile.py")):
+    os.unlink(tempdir+"/pybundle/pyfoxfile.py")
+if(os.path.exists(tempdir+"/pybundle/pyfoxfile.py") and os.path.isdir(tempdir+"/pybundle/pyfoxfile.py")):
+    shutil.rmtree(tempdir+"/pybundle/pyfoxfile.py")
+shutil.copy2("./pyfoxfile.py", tempdir+"/pybundle/pyfoxfile.py")
 if(os.path.exists(tempdir+"/"+outfilezip) and os.path.isfile(tempdir+"/"+outfilezip)):
     os.unlink(tempdir+"/"+outfilezip)
 if(os.path.exists(tempdir+"/"+outfilezip) and os.path.isdir(tempdir+"/"+outfilezip)):
@@ -150,7 +150,7 @@ elif(os.path.sep == "\\"):
 curscrpath = curscrpath+os.path.sep
 scrfile = curscrpath+outfilebin
 '''
-if(os.path.exists(scrfile) and os.path.isfile(scrfile) and infile=="archivefile.py"):
+if(os.path.exists(scrfile) and os.path.isfile(scrfile) and infile=="foxfile.py"):
  scrcmd = subprocess.Popen([sys.executable, scrfile, "mksymlinks"]);
  scrcmd.wait();
 '''

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-function PackArchiveFile {
+function PackFoxFile {
  shopt -s globstar
  curinode=0
  numfiles=$(find "${1}" -mindepth 1 -print | wc -l)
- echo -n -e 'ArchiveFile1\x00${numfiles}\x00' > ${2}
+ echo -n -e 'FoxFile1\x00${numfiles}\x00' > ${2}
  for file in ${1}/**; do
   fname="${file%/}"
   echo "${fname}"
@@ -107,86 +107,86 @@ function PackArchiveFile {
   if [ "${4}" == "none" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex="0"
-   archivefilecontentcshex="0"
+   foxfileheadercshex="0"
+   foxfilecontentcshex="0"
   elif [ "${4}" == "crc32" ] || [ "${4}" == "" ]; then
    echo -n "" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(crc32 ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(crc32 ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(crc32 ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(crc32 ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(crc32 /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(crc32 /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "md5" ]; then
    echo -n "md5" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(md5sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(md5sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(md5sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(md5sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(md5sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(md5sum /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "sha1" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(sha1sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(sha1sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(sha1sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha1sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(sha1sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha1sum /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "sha224" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(sha224sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(sha224sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(sha224sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha224sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(sha224sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha224sum /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "sha256" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(sha256sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(sha256sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(sha256sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha256sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(sha256sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha256sum /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "sha384" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(sha384sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(sha384sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(sha384sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha384sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(sha384sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha384sum /dev/null | cut -d ' ' -f 1)
    fi
   elif [ "${4}" == "sha512" ]; then
    echo -n "${4}" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(sha512sum ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(sha512sum ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(sha512sum ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha512sum ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(sha512sum /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(sha512sum /dev/null | cut -d ' ' -f 1)
    fi
   else
    echo -n "crc32" >> ${tmpfile}
    echo -n -e '\x00' >> ${tmpfile}
-   archivefileheadercshex=$(crc32 ${tmpfile} | cut -d ' ' -f 1)
+   foxfileheadercshex=$(crc32 ${tmpfile} | cut -d ' ' -f 1)
    if [ -f ${fname} ]; then
-    archivefilecontentcshex=$(crc32 ${fname} | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(crc32 ${fname} | cut -d ' ' -f 1)
    else
-    archivefilecontentcshex=$(crc32 /dev/null | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(crc32 /dev/null | cut -d ' ' -f 1)
    fi
   fi
   cat ${tmpfile} >> ${2}
   rm -rf ${tmpfile}
-  echo -n "${archivefileheadercshex}" >> ${2}
+  echo -n "${foxfileheadercshex}" >> ${2}
   echo -n -e '\x00' >> ${2}
-  echo -n "${archivefilecontentcshex}" >> ${2}
+  echo -n "${foxfilecontentcshex}" >> ${2}
   echo -n -e '\x00' >> ${2}
   if [ -f ${fname} ]; then
    cat ${fname} >> ${2}
@@ -212,4 +212,4 @@ function PackArchiveFile {
  fi
 }
 
-PackArchiveFile "${1}" "${2}" "${3}" "${4}"
+PackFoxFile "${1}" "${2}" "${3}" "${4}"

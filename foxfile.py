@@ -14,14 +14,14 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: archivefile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
+    $FileInfo: foxfile.py - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
 '''
 
 from __future__ import absolute_import, division, print_function, unicode_literals, generators, with_statement, nested_scopes
 import os
 import sys
 import argparse
-import pyarchivefile
+import pyfoxfile
 import binascii
 
 # Conditional import and signal handling for Unix-like systems
@@ -29,13 +29,13 @@ if os.name != 'nt':  # Not Windows
     import signal
 
     def handler(signum, frame):
-        pyarchivefile.VerbosePrintOut(
+        pyfoxfile.VerbosePrintOut(
             "Received SIGPIPE, exiting gracefully.", "info")
         sys.exit(0)
 signal.signal(signal.SIGPIPE, handler)
 
-rarfile_support = pyarchivefile.rarfile_support
-py7zr_support = pyarchivefile.py7zr_support
+rarfile_support = pyfoxfile.rarfile_support
+py7zr_support = pyfoxfile.py7zr_support
 
 if(sys.version[0] == "2"):
     try:
@@ -70,25 +70,25 @@ else:
         except ImportError:
             teststringio = 0
 
-__project__ = pyarchivefile.__project__
-__program_name__ = pyarchivefile.__program_name__
-__file_format_name__ = pyarchivefile.__file_format_name__
-__file_format_magic__ = pyarchivefile.__file_format_magic__
-__file_format_len__ = pyarchivefile.__file_format_len__
-__file_format_hex__ = pyarchivefile.__file_format_hex__
-__file_format_delimiter__ = pyarchivefile.__file_format_delimiter__
-__file_format_dict__ = pyarchivefile.__file_format_dict__
-__file_format_default__ = pyarchivefile.__file_format_default__
-__file_format_multi_dict__ = pyarchivefile.__file_format_multi_dict__
-__use_new_style__ = pyarchivefile.__use_new_style__
-__use_advanced_list__ = pyarchivefile.__use_advanced_list__
-__use_alt_inode__ = pyarchivefile.__use_alt_inode__
-__project_url__ = pyarchivefile.__project_url__
-__version_info__ = pyarchivefile.__version_info__
-__version_date_info__ = pyarchivefile.__version_date_info__
-__version_date__ = pyarchivefile.__version_date__
-__version_date_plusrc__ = pyarchivefile.__version_date_plusrc__
-__version__ = pyarchivefile.__version__
+__project__ = pyfoxfile.__project__
+__program_name__ = pyfoxfile.__program_name__
+__file_format_name__ = pyfoxfile.__file_format_name__
+__file_format_magic__ = pyfoxfile.__file_format_magic__
+__file_format_len__ = pyfoxfile.__file_format_len__
+__file_format_hex__ = pyfoxfile.__file_format_hex__
+__file_format_delimiter__ = pyfoxfile.__file_format_delimiter__
+__file_format_dict__ = pyfoxfile.__file_format_dict__
+__file_format_default__ = pyfoxfile.__file_format_default__
+__file_format_multi_dict__ = pyfoxfile.__file_format_multi_dict__
+__use_new_style__ = pyfoxfile.__use_new_style__
+__use_advanced_list__ = pyfoxfile.__use_advanced_list__
+__use_alt_inode__ = pyfoxfile.__use_alt_inode__
+__project_url__ = pyfoxfile.__project_url__
+__version_info__ = pyfoxfile.__version_info__
+__version_date_info__ = pyfoxfile.__version_date_info__
+__version_date__ = pyfoxfile.__version_date__
+__version_date_plusrc__ = pyfoxfile.__version_date_plusrc__
+__version__ = pyfoxfile.__version__
 
 # Initialize the argument parser
 argparser = argparse.ArgumentParser(
@@ -170,72 +170,72 @@ input_file = getargs.input[0]
 if active_action:
     if active_action == 'create':
         if getargs.convert:
-            checkcompressfile = pyarchivefile.CheckCompressionSubType(
+            checkcompressfile = pyfoxfile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, getargs.verbose, False)
+                tmpout = pyfoxfile.RePackFoxFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, getargs.verbose, False)
             else:
-                tmpout = pyarchivefile.PackArchiveFileFromInFile(
-                    input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
+                tmpout = pyfoxfile.PackFoxFileFromInFile(
+                    input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pyarchivefile.PackArchiveFile(getargs.input, getargs.output, getargs.text, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
+            pyfoxfile.PackFoxFile(getargs.input, getargs.output, getargs.text, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, False, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
     elif active_action == 'repack':
         if getargs.convert:
-            checkcompressfile = pyarchivefile.CheckCompressionSubType(
+            checkcompressfile = pyfoxfile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt,
+                pyfoxfile.RePackFoxFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt,
                                             False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, getargs.verbose, False)
             else:
-                pyarchivefile.PackArchiveFileFromInFile(input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
+                pyfoxfile.PackFoxFileFromInFile(input_file, getargs.output, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, getargs.verbose, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pyarchivefile.RePackArchiveFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt,
+            pyfoxfile.RePackFoxFile(input_file, getargs.output, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt,
                                         False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, getargs.verbose, False)
     elif active_action == 'extract':
         if getargs.convert:
-            checkcompressfile = pyarchivefile.CheckCompressionSubType(
+            checkcompressfile = pyfoxfile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             tempout = BytesIO()
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False)
+                tmpout = pyfoxfile.RePackFoxFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False)
             else:
-                tmpout = pyarchivefile.PackArchiveFileFromInFile(
-                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, False, False)
+                tmpout = pyfoxfile.PackFoxFileFromInFile(
+                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, False, False)
             if(not tmpout):
                 sys.exit(1)
             input_file = tempout
-        pyarchivefile.UnPackArchiveFile(input_file, getargs.output, False, 0, 0, getargs.skipchecksum,
+        pyfoxfile.UnPackFoxFile(input_file, getargs.output, False, 0, 0, getargs.skipchecksum,
                                     fnamedict, getargs.verbose, getargs.preserve, getargs.preserve, False, False)
     elif active_action == 'list':
         if getargs.convert:
-            checkcompressfile = pyarchivefile.CheckCompressionSubType(
+            checkcompressfile = pyfoxfile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
+                tmpout = pyfoxfile.FoxFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
             else:
-                tmpout = pyarchivefile.InFileListFiles(input_file, getargs.verbose, fnamedict, False, False)
+                tmpout = pyfoxfile.InFileListFiles(input_file, getargs.verbose, fnamedict, False, False)
             if(not tmpout):
                 sys.exit(1)
         else:
-            pyarchivefile.ArchiveFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
+            pyfoxfile.FoxFileListFiles(input_file, "auto", 0, 0, getargs.skipchecksum, fnamedict, False, getargs.verbose, False)
     elif active_action == 'validate':
         if getargs.convert:
-            checkcompressfile = pyarchivefile.CheckCompressionSubType(
+            checkcompressfile = pyfoxfile.CheckCompressionSubType(
                 input_file, fnamedict, True)
             tempout = BytesIO()
             if((IsNestedDict(fnamedict) and compresscheck in fnamedict) or (IsSingleDict(fnamedict) and compresscheck==fnamedict['format_magic'])):
-                tmpout = pyarchivefile.RePackArchiveFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False, False)
+                tmpout = pyfoxfile.RePackFoxFile(input_file, tempout, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, False, 0, 0, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], getargs.skipchecksum, [], {}, fnamedict, False, False, False)
             else:
-                tmpout = pyarchivefile.PackArchiveFileFromInFile(
-                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyarchivefile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, False, False)
+                tmpout = pyfoxfile.PackFoxFileFromInFile(
+                    input_file, tempout, __file_format_default__, getargs.compression, getargs.wholefile, getargs.level, pyfoxfile.compressionlistalt, [getargs.checksum, getargs.checksum, getargs.checksum, getargs.checksum], [], {}, fnamedict, False, False)
             input_file = tempout
             if(not tmpout):
                 sys.exit(1)
-        fvalid = pyarchivefile.ArchiveFileValidate(
+        fvalid = pyfoxfile.FoxFileValidate(
             input_file, "auto", fnamedict, False, getargs.verbose, False)
         if(not getargs.verbose):
             import sys
@@ -243,6 +243,6 @@ if active_action:
             logging.basicConfig(format="%(message)s",
                                 stream=sys.stdout, level=logging.DEBUG)
         if(fvalid):
-            pyarchivefile.VerbosePrintOut("File is valid: \n" + str(input_file))
+            pyfoxfile.VerbosePrintOut("File is valid: \n" + str(input_file))
         else:
-            pyarchivefile.VerbosePrintOut("File is invalid: \n" + str(input_file))
+            pyfoxfile.VerbosePrintOut("File is invalid: \n" + str(input_file))

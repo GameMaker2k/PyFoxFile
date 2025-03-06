@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-function PackArchiveFile {
+function PackFoxFile {
  shopt -s globstar
  declare -A inodetofile
  declare -i curinode=0
  numfiles=$(find "${1}" -mindepth 1 -type f,l,c,b,d,p -print | wc -l)
- printf 'ArchiveFile1\x00%s\x00' "${numfiles}" > "${2}"
+ printf 'FoxFile1\x00%s\x00' "${numfiles}" > "${2}"
  tmpfile=$(mktemp)
  
  for file in "${1}"/**; do
@@ -54,19 +54,19 @@ function PackArchiveFile {
   # Calculate checksums
   if [ "${4}" == "none" ]; then
     echo -n "none\x00" > "$tmpfile"  # Writing directly to temporary file
-    archivefileheadercshex="0"
-    archivefilecontentcshex="0"
+    foxfileheadercshex="0"
+    foxfilecontentcshex="0"
   elif [ -z "${4}" ] || [ "${4}" == "crc32" ]; then
-    archivefileheadercshex=$(crc32 "$tmpfile" | cut -d ' ' -f 1)
-    archivefilecontentcshex=$(if [ -f "$fname" ]; then crc32 "$fname"; else crc32 /dev/null; fi | cut -d ' ' -f 1)
+    foxfileheadercshex=$(crc32 "$tmpfile" | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(if [ -f "$fname" ]; then crc32 "$fname"; else crc32 /dev/null; fi | cut -d ' ' -f 1)
   else
     checksum_command="${4}sum"
-    archivefileheadercshex=$($checksum_command "$tmpfile" | cut -d ' ' -f 1)
-    archivefilecontentcshex=$(if [ -f "$fname" ]; then $checksum_command "$fname"; else $checksum_command /dev/null; fi | cut -d ' ' -f 1)
+    foxfileheadercshex=$($checksum_command "$tmpfile" | cut -d ' ' -f 1)
+    foxfilecontentcshex=$(if [ -f "$fname" ]; then $checksum_command "$fname"; else $checksum_command /dev/null; fi | cut -d ' ' -f 1)
   fi
   
   cat "$tmpfile" >> "${2}"
-  printf "%s\x00%s\x00" "$archivefileheadercshex" "$archivefilecontentcshex" >> "${2}"
+  printf "%s\x00%s\x00" "$foxfileheadercshex" "$foxfilecontentcshex" >> "${2}"
   [ -f "$fname" ] && cat "$fname" >> "${2}"
   printf '\x00' >> "${2}"
  done
@@ -86,4 +86,4 @@ function PackArchiveFile {
  esac
 }
 
-PackArchiveFile "${1}" "${2}" "${3}" "${4}"
+PackFoxFile "${1}" "${2}" "${3}" "${4}"

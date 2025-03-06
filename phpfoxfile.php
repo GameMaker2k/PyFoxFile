@@ -12,14 +12,14 @@
     Copyright 2018-2024 Game Maker 2k - http://intdb.sourceforge.net/
     Copyright 2018-2024 Kazuki Przyborowski - https://github.com/KazukiPrzyborowski
 
-    $FileInfo: phparchivefile.php - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
+    $FileInfo: phpfoxfile.php - Last Update: 2/20/2025 Ver. 0.18.6 RC 1 - Author: cooldude2k $
 */
 
 date_default_timezone_set('UTC');
 
-$info['program_name'] = "PHPArchiveFile";
+$info['program_name'] = "PHPFoxFile";
 $info['project'] = $info['program_name'];
-$info['project_url'] = "https://github.com/GameMaker2k/PyArchiveFile";
+$info['project_url'] = "https://github.com/GameMaker2k/PyFoxFile";
 $info['version_info'] = [0, 13, 14, "RC 1", 1];
 $info['version_id'] = "$Id$";
 $info['version_date_info'] = [2024, 7, 10, "RC 1", 1];
@@ -205,13 +205,13 @@ function CheckFileType($infile)
     /*if($prefp==hex2bin("fd377a585a0000")) {
      $filetype = "lzma"; }*/
     if ($prefp == hex2bin("43617446696c65")) {
-        $filetype = "archivefile";
+        $filetype = "foxfile";
     }
     fclose($catfp);
     return $filetype;
 }
 
-function CompressArchiveFile($infile)
+function CompressFoxFile($infile)
 {
     if (pathinfo($infile, PATHINFO_EXTENSION) == "gz" or pathinfo($infile, PATHINFO_EXTENSION) == "cgz") {
         if (!function_exists("gzcompress")) {
@@ -252,7 +252,7 @@ function CompressArchiveFile($infile)
     return true;
 }
 
-function PackArchiveFile($infiles, $outfile, $followlink = false, $checksumtype = "crc32", $verbose = false)
+function PackFoxFile($infiles, $outfile, $followlink = false, $checksumtype = "crc32", $verbose = false)
 {
     global $info;
     $catver = $info['version_info'][0].".".$info['version_info'][1].".".$info['version_info'][2];
@@ -267,7 +267,7 @@ function PackArchiveFile($infiles, $outfile, $followlink = false, $checksumtype 
     }
     $catfp = fopen($outfile, "wb");
     $fileheaderver = intval(str_replace(".", "", $catver));
-    $fileheader = AppendNullByte("ArchiveFile".$fileheaderver);
+    $fileheader = AppendNullByte("FoxFile".$fileheaderver);
     fwrite($catfp, $fileheader);
     $GetDirList = ListDir($infiles);
     foreach ($GetDirList as $curfname) {
@@ -323,40 +323,40 @@ function PackArchiveFile($infiles, $outfile, $followlink = false, $checksumtype 
         }
         $ftypehex = strtolower(dechex($ftype));
         $ftypeoutstr = $ftypehex;
-        $archivefileoutstr = AppendNullByte($ftypeoutstr);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fname);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($flinkname);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fsize);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fatime);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fmtime);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fmode);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fuid);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fgid);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fdev_minor);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fdev_major);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($frdev_minor);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($frdev_major);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($checksumtype);
+        $foxfileoutstr = AppendNullByte($ftypeoutstr);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fname);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($flinkname);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fsize);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fatime);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fmtime);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fmode);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fuid);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fgid);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fdev_minor);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fdev_major);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($frdev_minor);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($frdev_major);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($checksumtype);
         if ($checksumtype == "adler32" || $checksumtype == "crc32") {
-            $archivefileheadercshex = strtolower(dechex(hash($checksumtype, $archivefileoutstr)));
-            $archivefilecontentcshex = strtolower(dechex(hash($checksumtype, $archivefileoutstr)));
+            $foxfileheadercshex = strtolower(dechex(hash($checksumtype, $foxfileoutstr)));
+            $foxfilecontentcshex = strtolower(dechex(hash($checksumtype, $foxfileoutstr)));
         }
         if ($checksumtype == "md5" || $checksumtype == "sha1" || $checksumtype == "sha224" || $checksumtype == "sha256" || $checksumtype == "sha384" || $checksumtype == "sha512") {
-            $archivefileheadercshex = strtolower(hash($checksumtype, $archivefileoutstr));
-            $archivefilecontentcshex = strtolower(hash($checksumtype, $archivefileoutstr));
+            $foxfileheadercshex = strtolower(hash($checksumtype, $foxfileoutstr));
+            $foxfilecontentcshex = strtolower(hash($checksumtype, $foxfileoutstr));
         }
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($archivefileheadercshex);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($archivefilecontentcshex);
-        $archivefileoutstrecd = $archivefileoutstr;
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($foxfileheadercshex);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($foxfilecontentcshex);
+        $foxfileoutstrecd = $foxfileoutstr;
         $Nullstrecd = "\0";
-        $archivefileout = $archivefileoutstrecd.$fcontents.$Nullstrecd;
-        fwrite($catfp, $archivefileout);
+        $foxfileout = $foxfileoutstrecd.$fcontents.$Nullstrecd;
+        fwrite($catfp, $foxfileout);
     }
     fclose($catfp);
     return true;
 }
 
-function ArchiveFileToArray($infile, $seekstart = 0, $seekend = 0, $listonly = false, $skipchecksum = false)
+function FoxFileToArray($infile, $seekstart = 0, $seekend = 0, $listonly = false, $skipchecksum = false)
 {
     $infile = RemoveWindowsPath($infile);
     $compresscheck = CheckFileType($infile);
@@ -369,7 +369,7 @@ function ArchiveFileToArray($infile, $seekstart = 0, $seekend = 0, $listonly = f
     if ($compresscheck === "bzip2") {
         $catfp = bzopen($infile, "rb");
     }
-    if ($compresscheck === "archivefile") {
+    if ($compresscheck === "foxfile") {
         $catfp = fopen($infile, "rb");
     }
     fseek($catfp, 0, SEEK_END);
@@ -446,7 +446,7 @@ function ArchiveFileToArray($infile, $seekstart = 0, $seekend = 0, $listonly = f
             $phphascontents = false;
         }
         $catfcontentend = ftell($catfp);
-        $catlist[$fileidnum] = array('archivefileversion' => $catversion, 'fid' => $fileidnum, 'fhstart' => $catfhstart, 'fhend' => $catfhend, 'ftype' => $catftype, 'fname' => $catfname, 'flinkname' => $catflinkname, 'fsize' => $catfsize, 'fatime' => $catfatime, 'fmtime' => $catfmtime, 'fmode' => $catfmode, 'fchmod' => $catfchmod, 'fuid' => $catfuid, 'fgid' => $catfgid, 'fminor' => $catfdev_minor, 'fmajor' => $catfdev_major, 'fchecksumtype' => $catfchecksumtype, 'fheaderchecksum' => $catfcs, 'fcontentchecksum' => $catfccs, 'fhascontents' => $phphascontents, 'fcontentstart' => $catfcontentstart, 'fcontentend' => $catfcontentend, 'fcontents' => $catfcontents);
+        $catlist[$fileidnum] = array('foxfileversion' => $catversion, 'fid' => $fileidnum, 'fhstart' => $catfhstart, 'fhend' => $catfhend, 'ftype' => $catftype, 'fname' => $catfname, 'flinkname' => $catflinkname, 'fsize' => $catfsize, 'fatime' => $catfatime, 'fmtime' => $catfmtime, 'fmode' => $catfmode, 'fchmod' => $catfchmod, 'fuid' => $catfuid, 'fgid' => $catfgid, 'fminor' => $catfdev_minor, 'fmajor' => $catfdev_major, 'fchecksumtype' => $catfchecksumtype, 'fheaderchecksum' => $catfcs, 'fcontentchecksum' => $catfccs, 'fhascontents' => $phphascontents, 'fcontentstart' => $catfcontentstart, 'fcontentend' => $catfcontentend, 'fcontents' => $catfcontents);
         fseek($catfp, 1, SEEK_CUR);
         $seekstart = ftell($catfp);
         $fileidnum = $fileidnum + 1;
@@ -455,58 +455,58 @@ function ArchiveFileToArray($infile, $seekstart = 0, $seekend = 0, $listonly = f
     return $catlist;
 }
 
-function ArchiveFileToArrayIndex($infile, $seekstart = 0, $seekend = 0, $listonly = false, $skipchecksum = false)
+function FoxFileToArrayIndex($infile, $seekstart = 0, $seekend = 0, $listonly = false, $skipchecksum = false)
 {
     if (is_array($infile)) {
-        $listarchivefiles = $infile;
+        $listfoxfiles = $infile;
     } else {
         $infile = RemoveWindowsPath($infile);
-        $listarchivefiles = ArchiveFileToArray($infile, $seekstart, $seekend, $listonly, $skipchecksum);
+        $listfoxfiles = FoxFileToArray($infile, $seekstart, $seekend, $listonly, $skipchecksum);
     }
-    if ($listarchivefiles === false) {
+    if ($listfoxfiles === false) {
         return false;
     }
-    $catarray = array('list' => $listarchivefiles, 'filetoid' => array(), 'idtofile' => array(), 'filetypes' => array('directories' => array('filetoid' => array(), 'idtofile' => array()), 'files' => array('filetoid' => array(), 'idtofile' => array()), 'links' => array('filetoid' => array(), 'idtofile' => array()), 'symlinks' => array('filetoid' => array(), 'idtofile' => array()), 'hardlinks' => array('filetoid' => array(), 'idtofile' => array()), 'character' => array('filetoid' => array(), 'idtofile' => array()), 'block' => array('filetoid' => array(), 'idtofile' => array()), 'fifo' => array('filetoid' => array(), 'idtofile' => array()), 'devices' => array('filetoid' => array(), 'idtofile' => array())));
+    $catarray = array('list' => $listfoxfiles, 'filetoid' => array(), 'idtofile' => array(), 'filetypes' => array('directories' => array('filetoid' => array(), 'idtofile' => array()), 'files' => array('filetoid' => array(), 'idtofile' => array()), 'links' => array('filetoid' => array(), 'idtofile' => array()), 'symlinks' => array('filetoid' => array(), 'idtofile' => array()), 'hardlinks' => array('filetoid' => array(), 'idtofile' => array()), 'character' => array('filetoid' => array(), 'idtofile' => array()), 'block' => array('filetoid' => array(), 'idtofile' => array()), 'fifo' => array('filetoid' => array(), 'idtofile' => array()), 'devices' => array('filetoid' => array(), 'idtofile' => array())));
     $lcfi = 0;
-    $lcfx = count($listarchivefiles);
+    $lcfx = count($listfoxfiles);
     while ($lcfi < $lcfx) {
-        $fname = $listarchivefiles[$lcfi]['fname'];
-        $fid = $listarchivefiles[$lcfi]['fid'];
+        $fname = $listfoxfiles[$lcfi]['fname'];
+        $fid = $listfoxfiles[$lcfi]['fid'];
         $catarray['filetoid'][$fname] = $fid;
         $catarray['idtofile'][$fid] = $fname;
-        if ($listarchivefiles[$lcfi]['ftype'] == 0) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 0) {
             $catarray['filetypes']['files']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['files']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 1) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 1) {
             $catarray['filetypes']['hardlinks']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['hardlinks']['idtofile'][$fid] = $fname;
             $catarray['filetypes']['links']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['links']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 2) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 2) {
             $catarray['filetypes']['symlinks']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['symlinks']['idtofile'][$fid] = $fname;
             $catarray['filetypes']['links']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['links']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 3) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 3) {
             $catarray['filetypes']['character']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['character']['idtofile'][$fid] = $fname;
             $catarray['filetypes']['devices']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['devices']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 4) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 4) {
             $catarray['filetypes']['block']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['block']['idtofile'][$fid] = $fname;
             $catarray['filetypes']['devices']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['devices']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 5) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 5) {
             $catarray['filetypes']['directories']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['directories']['idtofile'][$fid] = $fname;
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 6) {
+        if ($listfoxfiles[$lcfi]['ftype'] == 6) {
             $catarray['filetypes']['fifo']['filetoid'][$fname] = $fid;
             $catarray['filetypes']['fifo']['idtofile'][$fid] = $fname;
             $catarray['filetypes']['devices']['filetoid'][$fname] = $fid;
@@ -517,187 +517,187 @@ function ArchiveFileToArrayIndex($infile, $seekstart = 0, $seekend = 0, $listonl
     return $catarray;
 }
 
-function RePackArchiveFile($infiles, $outfile, $seekstart = 0, $seekend = 0, $checksumtype = "crc32", $skipchecksum = false, $verbose = false)
+function RePackFoxFile($infiles, $outfile, $seekstart = 0, $seekend = 0, $checksumtype = "crc32", $skipchecksum = false, $verbose = false)
 {
     if (is_array($infile)) {
-        $listarchivefiles = $infile;
+        $listfoxfiles = $infile;
     } else {
         $infile = RemoveWindowsPath($infile);
-        $listarchivefiles = ArchiveFileToArray($infile, $seekstart, $seekend, false, $skipchecksum);
+        $listfoxfiles = FoxFileToArray($infile, $seekstart, $seekend, false, $skipchecksum);
     }
     $checksumtype = strtolower($checksumtype);
     if ($checksumtype != "adler32" && $checksumtype != "crc32" && $checksumtype != "md5" && $checksumtype != "sha1" && $checksumtype != "sha224" && $checksumtype != "sha256" && $checksumtype != "sha384" && $checksumtype != "sha512") {
         $checksumtype = "crc32";
     }
-    if ($listarchivefiles === false) {
+    if ($listfoxfiles === false) {
         return false;
     }
     $lcfi = 0;
-    $lcfx = count($listarchivefiles);
+    $lcfx = count($listfoxfiles);
     while ($lcfi < $lcfx) {
-        $fname = $listarchivefiles[$lcfi]['fname'];
+        $fname = $listfoxfiles[$lcfi]['fname'];
         if ($verbose === true) {
             print($fname."\n");
         }
-        $fsize = strtolower(dechex(intval($listarchivefiles[$lcfi]['fsize'])));
-        $flinkname = $listarchivefiles[$lcfi]['flinkname'];
-        $fatime = strtolower(dechex(intval($listarchivefiles[$lcfi]['fatime'])));
-        $fmtime = strtolower(dechex(intval($listarchivefiles[$lcfi]['fmtime'])));
-        $fmode = strtolower(dechex(intval($listarchivefiles[$lcfi]['fmode'])));
-        $fuid = strtolower(dechex(intval($listarchivefiles[$lcfi]['fuid'])));
-        $fgid = strtolower(dechex(intval($listarchivefiles[$lcfi]['fgid'])));
-        $fdev_minor = strtolower(dechex(intval($listarchivefiles[$lcfi]['fminor'])));
-        $fdev_major = strtolower(dechex(intval($listarchivefiles[$lcfi]['fmajor'])));
-        $frdev_minor = strtolower(dechex(intval($listarchivefiles[$lcfi]['frminor'])));
-        $frdev_major = strtolower(dechex(intval($listarchivefiles[$lcfi]['frmajor'])));
-        $fcontents = $listarchivefiles[$lcfi]['fcontents'];
-        $ftypehex = strtolower(dechex(intval($listarchivefiles[$lcfi]['ftype'])));
+        $fsize = strtolower(dechex(intval($listfoxfiles[$lcfi]['fsize'])));
+        $flinkname = $listfoxfiles[$lcfi]['flinkname'];
+        $fatime = strtolower(dechex(intval($listfoxfiles[$lcfi]['fatime'])));
+        $fmtime = strtolower(dechex(intval($listfoxfiles[$lcfi]['fmtime'])));
+        $fmode = strtolower(dechex(intval($listfoxfiles[$lcfi]['fmode'])));
+        $fuid = strtolower(dechex(intval($listfoxfiles[$lcfi]['fuid'])));
+        $fgid = strtolower(dechex(intval($listfoxfiles[$lcfi]['fgid'])));
+        $fdev_minor = strtolower(dechex(intval($listfoxfiles[$lcfi]['fminor'])));
+        $fdev_major = strtolower(dechex(intval($listfoxfiles[$lcfi]['fmajor'])));
+        $frdev_minor = strtolower(dechex(intval($listfoxfiles[$lcfi]['frminor'])));
+        $frdev_major = strtolower(dechex(intval($listfoxfiles[$lcfi]['frmajor'])));
+        $fcontents = $listfoxfiles[$lcfi]['fcontents'];
+        $ftypehex = strtolower(dechex(intval($listfoxfiles[$lcfi]['ftype'])));
         $ftypeoutstr = $ftypehex;
-        $archivefileoutstr = AppendNullByte($ftypeoutstr);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fname);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($flinkname);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fsize);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fatime);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fmtime);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fmode);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fuid);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fgid);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fdev_minor);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($fdev_major);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($frdev_minor);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($frdev_major);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($checksumtype);
+        $foxfileoutstr = AppendNullByte($ftypeoutstr);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fname);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($flinkname);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fsize);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fatime);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fmtime);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fmode);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fuid);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fgid);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fdev_minor);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($fdev_major);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($frdev_minor);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($frdev_major);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($checksumtype);
         if ($checksumtype == "adler32" || $checksumtype == "crc32") {
-            $archivefileheadercshex = strtolower(dechex(hash($checksumtype, $archivefileoutstr)));
-            $archivefilecontentcshex = strtolower(dechex(hash($checksumtype, $archivefileoutstr)));
+            $foxfileheadercshex = strtolower(dechex(hash($checksumtype, $foxfileoutstr)));
+            $foxfilecontentcshex = strtolower(dechex(hash($checksumtype, $foxfileoutstr)));
         }
         if ($checksumtype == "md5" || $checksumtype == "sha1" || $checksumtype == "sha224" || $checksumtype == "sha256" || $checksumtype == "sha384" || $checksumtype == "sha512") {
-            $archivefileheadercshex = strtolower(hash($checksumtype, $archivefileoutstr));
-            $archivefilecontentcshex = strtolower(hash($checksumtype, $archivefileoutstr));
+            $foxfileheadercshex = strtolower(hash($checksumtype, $foxfileoutstr));
+            $foxfilecontentcshex = strtolower(hash($checksumtype, $foxfileoutstr));
         }
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($archivefileheadercshex);
-        $archivefileoutstr = $archivefileoutstr.AppendNullByte($archivefilecontentcshex);
-        $archivefileoutstrecd = $archivefileoutstr;
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($foxfileheadercshex);
+        $foxfileoutstr = $foxfileoutstr.AppendNullByte($foxfilecontentcshex);
+        $foxfileoutstrecd = $foxfileoutstr;
         $Nullstrecd = "\0";
-        $archivefileout = $archivefileoutstrecd.$fcontents.$Nullstrecd;
-        fwrite($catfp, $archivefileout);
+        $foxfileout = $foxfileoutstrecd.$fcontents.$Nullstrecd;
+        fwrite($catfp, $foxfileout);
     }
     fclose($catfp);
     return true;
 }
 
-function UnPackArchiveFile($infile, $outdir = null, $verbose = false, $skipchecksum = false)
+function UnPackFoxFile($infile, $outdir = null, $verbose = false, $skipchecksum = false)
 {
     if ($outdir !== null) {
         $outdir = RemoveWindowsPath($outdir);
     }
     if (is_array($infile)) {
-        $listarchivefiles = $infile;
+        $listfoxfiles = $infile;
     } else {
         $infile = RemoveWindowsPath($infile);
-        $listarchivefiles = ArchiveFileToArray($infile, 0, 0, false, $skipchecksum);
+        $listfoxfiles = FoxFileToArray($infile, 0, 0, false, $skipchecksum);
     }
-    if ($listarchivefiles === false) {
+    if ($listfoxfiles === false) {
         return false;
     }
     $lcfi = 0;
-    $lcfx = count($listarchivefiles);
+    $lcfx = count($listfoxfiles);
     while ($lcfi < $lcfx) {
         if ($verbose === true) {
-            print($listarchivefiles[$lcfi]['fname']."\n");
+            print($listfoxfiles[$lcfi]['fname']."\n");
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 0) {
-            $fpc = fopen($listarchivefiles[$lcfi]['fname'], "wb");
-            fwrite($fpc, $listarchivefiles[$lcfi]['fcontents']);
+        if ($listfoxfiles[$lcfi]['ftype'] == 0) {
+            $fpc = fopen($listfoxfiles[$lcfi]['fname'], "wb");
+            fwrite($fpc, $listfoxfiles[$lcfi]['fcontents']);
             fclose($fpc);
-            chown($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fuid']);
-            chgrp($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fgid']);
-            chmod($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fchmod']);
-            touch($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fmtime'], $listarchivefiles[$lcfi]['fatime']);
+            chown($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fuid']);
+            chgrp($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fgid']);
+            chmod($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fchmod']);
+            touch($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fmtime'], $listfoxfiles[$lcfi]['fatime']);
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 1) {
-            link($listarchivefiles[$lcfi]['flinkname'], $listarchivefiles[$lcfi]['fname']);
+        if ($listfoxfiles[$lcfi]['ftype'] == 1) {
+            link($listfoxfiles[$lcfi]['flinkname'], $listfoxfiles[$lcfi]['fname']);
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 2) {
-            symlink($listarchivefiles[$lcfi]['flinkname'], $listarchivefiles[$lcfi]['fname']);
+        if ($listfoxfiles[$lcfi]['ftype'] == 2) {
+            symlink($listfoxfiles[$lcfi]['flinkname'], $listfoxfiles[$lcfi]['fname']);
         }
-        if ($listarchivefiles[$lcfi]['ftype'] == 5) {
-            mkdir($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fchmod']);
-            chown($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fuid']);
-            chgrp($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fgid']);
-            chmod($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fchmod']);
-            touch($listarchivefiles[$lcfi]['fname'], $listarchivefiles[$lcfi]['fmtime'], $listarchivefiles[$lcfi]['fatime']);
+        if ($listfoxfiles[$lcfi]['ftype'] == 5) {
+            mkdir($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fchmod']);
+            chown($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fuid']);
+            chgrp($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fgid']);
+            chmod($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fchmod']);
+            touch($listfoxfiles[$lcfi]['fname'], $listfoxfiles[$lcfi]['fmtime'], $listfoxfiles[$lcfi]['fatime']);
         }
         $lcfi = $lcfi + 1;
     }
     return true;
 }
 
-function ArchiveFileListFiles($infile, $seekstart = 0, $seekend = 0, $verbose = false, $skipchecksum = false)
+function FoxFileListFiles($infile, $seekstart = 0, $seekend = 0, $verbose = false, $skipchecksum = false)
 {
     if (is_array($infile)) {
-        $listarchivefiles = $infile;
+        $listfoxfiles = $infile;
     } else {
         $infile = RemoveWindowsPath($infile);
-        $listarchivefiles = ArchiveFileToArray($infile, $seekstart, $seekend, true, $skipchecksum);
+        $listfoxfiles = FoxFileToArray($infile, $seekstart, $seekend, true, $skipchecksum);
     }
-    if ($listarchivefiles === false) {
+    if ($listfoxfiles === false) {
         return false;
     }
     $lcfi = 0;
-    $lcfx = count($listarchivefiles);
+    $lcfx = count($listfoxfiles);
     $returnval = array();
     while ($lcfi < $lcfx) {
-        $returnval[$lcfi] = $listarchivefiles[$lcfi]['fname'];
+        $returnval[$lcfi] = $listfoxfiles[$lcfi]['fname'];
         if ($verbose === false) {
-            print($listarchivefiles[$lcfi]['fname']."\n");
+            print($listfoxfiles[$lcfi]['fname']."\n");
         }
         if ($verbose === true) {
             $permissionstr = "";
-            if ($listarchivefiles[$lcfi]['ftype'] == 0) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 0) {
                 $permissionstr = "-";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 1) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 1) {
                 $permissionstr = "h";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 2) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 2) {
                 $permissionstr = "l";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 3) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 3) {
                 $permissionstr = "c";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 4) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 4) {
                 $permissionstr = "b";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 5) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 5) {
                 $permissionstr = "d";
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 6) {
+            if ($listfoxfiles[$lcfi]['ftype'] == 6) {
                 $permissionstr = "f";
             }
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0100) ? 'r' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0080) ? 'w' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0040) ?
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0800) ? 's' : 'x') :
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0800) ? 'S' : '-'));
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0020) ? 'r' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0010) ? 'w' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0008) ?
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0400) ? 's' : 'x') :
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0400) ? 'S' : '-'));
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0004) ? 'r' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0002) ? 'w' : '-');
-            $permissionstr .= (($listarchivefiles[$lcfi]['fchmod'] & 0x0001) ?
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0200) ? 't' : 'x') :
-                              (($listarchivefiles[$lcfi]['fchmod'] & 0x0200) ? 'T' : '-'));
-            $printfname = $listarchivefiles[$lcfi]['fname'];
-            if ($listarchivefiles[$lcfi]['ftype'] == 1) {
-                $printfname = $listarchivefiles[$lcfi]['fname']." link to " + $listarchivefiles[$lcfi]['flinkname'];
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0100) ? 'r' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0080) ? 'w' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0040) ?
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0800) ? 's' : 'x') :
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0800) ? 'S' : '-'));
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0020) ? 'r' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0010) ? 'w' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0008) ?
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0400) ? 's' : 'x') :
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0400) ? 'S' : '-'));
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0004) ? 'r' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0002) ? 'w' : '-');
+            $permissionstr .= (($listfoxfiles[$lcfi]['fchmod'] & 0x0001) ?
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0200) ? 't' : 'x') :
+                              (($listfoxfiles[$lcfi]['fchmod'] & 0x0200) ? 'T' : '-'));
+            $printfname = $listfoxfiles[$lcfi]['fname'];
+            if ($listfoxfiles[$lcfi]['ftype'] == 1) {
+                $printfname = $listfoxfiles[$lcfi]['fname']." link to " + $listfoxfiles[$lcfi]['flinkname'];
             }
-            if ($listarchivefiles[$lcfi]['ftype'] == 2) {
-                $printfname = $listarchivefiles[$lcfi]['fname']." -> " + $listarchivefiles[$lcfi]['flinkname'];
+            if ($listfoxfiles[$lcfi]['ftype'] == 2) {
+                $printfname = $listfoxfiles[$lcfi]['fname']." -> " + $listfoxfiles[$lcfi]['flinkname'];
             }
-            print($permissionstr." ".$listarchivefiles[$lcfi]['fuid']."/".$listarchivefiles[$lcfi]['fgid']." ".str_pad($listarchivefiles[$lcfi]['fsize'], 15, " ", STR_PAD_LEFT)." ".gmdate('Y-m-d H:i', $listarchivefiles[$lcfi]['fmtime'])." ".$printfname."\n");
+            print($permissionstr." ".$listfoxfiles[$lcfi]['fuid']."/".$listfoxfiles[$lcfi]['fgid']." ".str_pad($listfoxfiles[$lcfi]['fsize'], 15, " ", STR_PAD_LEFT)." ".gmdate('Y-m-d H:i', $listfoxfiles[$lcfi]['fmtime'])." ".$printfname."\n");
         }
         $lcfi = $lcfi + 1;
     }

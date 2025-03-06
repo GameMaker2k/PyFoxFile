@@ -1,10 +1,10 @@
 [project]
-    name = "PyArchiveFile"
+    name = "PyFoxFile"
     version = "0.18.6"
     readme = "README.md"
     license = { text = "BSD-3-Clause" }
     keywords = []
-    description = "A tar like file format name archivefile."
+    description = "A tar like file format name foxfile."
     authors = [
         { name = "Kazuki Przyborowski", email = "kazuki.przyborowski@gmail.com" },
     ]
