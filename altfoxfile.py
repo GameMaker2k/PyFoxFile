@@ -72,7 +72,7 @@ def load_config():
             'name': "FoxFile",
             'delimiter': "\x00",
             'version': "001",
-            'extension': ".cat"
+            'extension': ".fox"
         }
 
 # Combined Script Main
