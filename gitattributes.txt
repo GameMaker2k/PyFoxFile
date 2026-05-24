@@ -1,0 +1,39 @@
+*.py ident
+*.php ident
+* text eol=lf
+
+#
+## These files are binary and should be left untouched
+#
+
+# (binary is a macro for -text -diff)
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mov binary
+*.mp4 binary
+*.mp3 binary
+*.flv binary
+*.fla binary
+*.swf binary
+*.gz binary
+*.zip binary
+*.7z binary
+*.ttf binary
+*.eot binary
+*.woff binary
+*.pyc binary
+*.pdf binary
+*.fox binary
+*.kitsune binary
+*.UwU binary
+*.キツネ binary
+*.きつね binary
+*.狐 binary
+*.狐狸 binary
+*.여우 binary
+*.基次内 binary
+*.키츠네 binary

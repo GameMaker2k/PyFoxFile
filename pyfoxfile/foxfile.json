@@ -1,0 +1,105 @@
+{
+    "config": {
+        "default": "FoxFile",
+        "proname": "PyFoxFile",
+        "includedef": true,
+        "useinmem": true,
+        "usememfd": false,
+        "usespoolfile": false,
+        "spoolfilesize": 4194304,
+        "filebuffsize": 262144,
+        "advancedlist": true,
+        "altinode": false,
+        "newstyle": true
+    },
+    "FoxFile": {
+        "len": 7,
+        "hex": "466f7846696c65",
+        "ver": "001",
+        "name": "FoxFile",
+        "magic": "FoxFile",
+        "delimiter": "\u0000",
+        "extension": ".fox"
+    },
+    "KitsuneFile": {
+        "len": 11,
+        "hex": "4b697473756e6546696c65",
+        "ver": "001",
+        "name": "KitsuneFile",
+        "magic": "KitsuneFile",
+        "delimiter": "\u0000",
+        "extension": ".kitsune"
+    },
+    "UwUFile": {
+        "len": 7,
+        "hex": "55775546696c65",
+        "ver": "001",
+        "name": "UwUFile",
+        "magic": "UwUFile",
+        "delimiter": "\u0000",
+        "extension": ".UwU"
+    },
+    "キツネファイル": {
+        "len": 21,
+        "hex": "e382ade38384e3838de38395e382a1e382a4e383ab",
+        "ver": "001",
+        "name": "KitsuneFairu",
+        "magic": "キツネファイル",
+        "delimiter": "\u0000",
+        "extension": ".キツネ"
+    },
+    "きつねファイル": {
+        "len": 21,
+        "hex": "e3818de381a4e381ade38395e382a1e382a4e383ab",
+        "ver": "001",
+        "name": "KitsuneFairu",
+        "magic": "きつねファイル",
+        "delimiter": "\u0000",
+        "extension": ".きつね"
+    },
+    "狐ファイル": {
+        "len": 15,
+        "hex": "e78b90e38395e382a1e382a4e383ab",
+        "ver": "001",
+        "name": "KitsuneFairu",
+        "magic": "狐ファイル",
+        "delimiter": "\u0000",
+        "extension": ".狐"
+    },
+    "狐狸文件": {
+        "len": 12,
+        "hex": "e78b90e78bb8e69687e4bbb6",
+        "ver": "001",
+        "name": "KitsuneFairu",
+        "magic": "狐狸文件",
+        "delimiter": "\u0000",
+        "extension": ".狐狸"
+    },
+    "여우파일": {
+        "len": 12,
+        "hex": "ec97acec9ab0ed8c8cec9dbc",
+        "ver": "001",
+        "name": "YeouPa-il",
+        "magic": "여우파일",
+        "delimiter": "\u0000",
+        "extension": ".여우"
+    },
+    "基次内法伊鲁": {
+      "len": 18,
+      "hex": "e59fbae6aca1e58685e6b395e4bc8ae9b281",
+      "ver": "001",
+      "name": "JīCìNèiFǎYīLǔ",
+      "magic": "基次内法伊鲁",
+      "delimiter": "\u0000",
+      "extension": ".基次内"
+    },
+    "키츠네파일": {
+      "len": 15,
+      "hex": "ed82a4ecb8a0eb84a4ed8c8cec9dbc",
+      "ver": "001",
+      "name": "KicheunePa-il",
+      "magic": "키츠네파일",
+      "delimiter": "\u0000",
+      "extension": ".키츠네"
+    }
+}
